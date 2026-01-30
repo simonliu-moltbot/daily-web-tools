@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>今天喝什麼？ - 台灣手搖飲抽籤機</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Noto Sans TC', sans-serif; }
+    </style>
+</head>
+<body class="bg-amber-50 min-h-screen flex flex-col">
+    <!-- Header -->
+    <header class="bg-orange-500 text-white p-4 shadow-md">
+        <div class="container mx-auto flex justify-between items-center">
+            <h1 class="text-xl font-bold">🥤 今天喝什麼？</h1>
+            <a href="../../index.html" class="bg-white text-orange-500 px-4 py-2 rounded-full font-bold hover:bg-orange-100 transition">
+                🏠 回首頁
+            </a>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="flex-grow container mx-auto p-4 flex flex-col items-center justify-center">
+        <div class="bg-white rounded-2xl shadow-xl p-8 w-full max-w-md text-center border-4 border-orange-200">
+            <h2 class="text-2xl font-bold text-gray-800 mb-6">不知道喝什麼嗎？讓命運決定！</h2>
+            
+            <div id="result" class="space-y-4 mb-8 hidden">
+                <div class="p-4 bg-orange-50 rounded-lg">
+                    <p class="text-gray-500 text-sm">品牌</p>
+                    <p id="brand" class="text-3xl font-bold text-orange-600">???</p>
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="p-3 bg-blue-50 rounded-lg">
+                        <p class="text-gray-500 text-sm">種類</p>
+                        <p id="type" class="text-xl font-bold text-blue-600">???</p>
+                    </div>
+                    <div class="p-3 bg-green-50 rounded-lg">
+                        <p class="text-gray-500 text-sm">甜度冰塊</p>
+                        <p id="sugar-ice" class="text-xl font-bold text-green-600">???</p>
+                    </div>
+                </div>
+            </div>
+
+            <div id="placeholder" class="mb-8 text-gray-400 text-6xl animate-bounce">
+                🧋
+            </div>
+
+            <button onclick="spin()" class="w-full bg-orange-500 hover:bg-orange-600 text-white text-2xl font-bold py-4 rounded-xl shadow-lg transform transition active:scale-95">
+                🎲 幫我選！
+            </button>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="text-center p-4 text-gray-400 text-sm">
+        Created by AI Agent on 2026-01-31
+    </footer>
+
+    <script>
+        const brands = [
+            "50嵐", "可不可熟成紅茶", "麻古茶坊", "迷客夏", 
+            "龜記茗品", "一沐日", "得正", "五桐號", 
+            "清心福全", "茶の魔手", "路易莎", "康青龍",
+            "大苑子", "萬波", "珍煮丹"
+        ];
+        
+        const types = [
+            "招牌奶茶", "純茶類 (紅/綠/烏/青)", "鮮奶茶拿鐵", 
+            "水果特調", "咀嚼系 (加珍珠/椰果)", "芝士奶蓋",
+            "季節限定", "多多系列"
+        ];
+
+        const sugars = ["正常甜", "少糖 (8分)", "半糖 (5分)", "微糖 (3分)", "一分糖", "無糖"];
+        const ices = ["正常冰", "少冰", "微冰", "去冰", "完全去冰", "溫/熱飲"];
+
+        function spin() {
+            const btn = document.querySelector('button');
+            const resultDiv = document.getElementById('result');
+            const placeholder = document.getElementById('placeholder');
+            
+            // Animation state
+            btn.disabled = true;
+            btn.innerHTML = "🔄 搖晃中...";
+            placeholder.classList.remove('hidden');
+            resultDiv.classList.add('hidden');
+            
+            // Suspense delay
+            setTimeout(() => {
+                const rBrand = brands[Math.floor(Math.random() * brands.length)];
+                const rType = types[Math.floor(Math.random() * types.length)];
+                const rSugar = sugars[Math.floor(Math.random() * sugars.length)];
+                const rIce = ices[Math.floor(Math.random() * ices.length)];
+
+                document.getElementById('brand').innerText = rBrand;
+                document.getElementById('type').innerText = rType;
+                document.getElementById('sugar-ice').innerText = `${rSugar} / ${rIce}`;
+
+                placeholder.classList.add('hidden');
+                resultDiv.classList.remove('hidden');
+                
+                btn.disabled = false;
+                btn.innerHTML = "🎲 再抽一次";
+            }, 800);
+        }
+    </script>
+</body>
+</html>
