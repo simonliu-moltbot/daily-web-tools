@@ -5,81 +5,81 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>🇹🇼 Daily Taiwan Web Tools Collection</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
     <style>
         body { font-family: 'Noto Sans TC', sans-serif; }
     </style>
 </head>
-<body class="bg-gray-100 min-h-screen">
+<body class="bg-slate-100 min-h-screen">
+    <div class="max-w-6xl mx-auto px-4 py-12">
+        <header class="text-center mb-16">
+            <h1 class="text-4xl md:text-5xl font-bold text-slate-800 mb-4">🇹🇼 Daily Taiwan Web Tools</h1>
+            <p class="text-xl text-slate-600">專為台灣生活設計的實用網頁小工具合集</p>
+        </header>
 
-    <!-- Hero Section -->
-    <header class="bg-gradient-to-r from-blue-600 to-teal-500 text-white py-16 px-4 mb-12">
-        <div class="max-w-4xl mx-auto text-center">
-            <h1 class="text-4xl md:text-5xl font-bold mb-4">🇹🇼 台灣日常小工具集</h1>
-            <p class="text-xl opacity-90">專為台灣生活設計的實用 Web Tools</p>
-        </div>
-    </header>
-
-    <!-- Tools Grid -->
-    <main class="max-w-6xl mx-auto px-4 pb-20">
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             
-            <!-- Tool Card: Annual Leave -->
-            <div class="bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-2xl transition-shadow duration-300 flex flex-col">
-                <div class="bg-blue-50 p-6 flex justify-center items-center h-48">
-                    <span class="text-6xl">📅</span>
+            <!-- Tool: Stock to Rice -->
+            <div class="bg-white rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300 overflow-hidden flex flex-col">
+                <div class="p-6 flex-1">
+                    <div class="text-4xl mb-4">🍚</div>
+                    <h2 class="text-xl font-bold text-gray-800 mb-2">台股損益滷肉飯換算機</h2>
+                    <p class="text-gray-600">今天賠的錢夠吃幾碗？把抽象的損益具象化成國民美食，讓你有感理財（或有感心痛）。</p>
                 </div>
-                <div class="p-6 flex-grow">
-                    <h3 class="text-xl font-bold text-gray-800 mb-2">特休假計算機</h3>
-                    <p class="text-gray-600 mb-4">一鍵算出勞基法規定的特休天數、到期日與下一階段累積進度。</p>
-                </div>
-                <div class="px-6 pb-6">
-                    <a href="./tools/annual-leave-calc/index.html" class="block w-full bg-blue-600 text-white text-center font-bold py-3 rounded-lg hover:bg-blue-700 transition-colors">
+                <div class="bg-gray-50 px-6 py-4">
+                    <a href="tools/stock-to-rice/index.html" class="block w-full text-center bg-amber-500 hover:bg-amber-600 text-white font-bold py-2 px-4 rounded transition-colors">
                         Launch 🚀
                     </a>
                 </div>
             </div>
 
-            <!-- Tool Card: Drink Picker -->
-            <div class="bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-2xl transition-shadow duration-300 flex flex-col">
-                <div class="bg-orange-50 p-6 flex justify-center items-center h-48">
-                    <span class="text-6xl">🥤</span>
+            <!-- Tool: Annual Leave Calc -->
+            <div class="bg-white rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300 overflow-hidden flex flex-col">
+                <div class="p-6 flex-1">
+                    <div class="text-4xl mb-4">📅</div>
+                    <h2 class="text-xl font-bold text-gray-800 mb-2">台灣特休計算機</h2>
+                    <p class="text-gray-600">根據勞基法計算你的特休天數。輸入到職日，馬上知道還有幾天假可以放！</p>
                 </div>
-                <div class="p-6 flex-grow">
-                    <h3 class="text-xl font-bold text-gray-800 mb-2">手搖飲抽籤機</h3>
-                    <p class="text-gray-600 mb-4">選擇障礙救星！隨機幫你決定今天要喝哪一家、喝什麼、甜度冰塊。</p>
-                </div>
-                <div class="px-6 pb-6">
-                    <a href="./tools/drink-picker/index.html" class="block w-full bg-orange-500 text-white text-center font-bold py-3 rounded-lg hover:bg-orange-600 transition-colors">
+                <div class="bg-gray-50 px-6 py-4">
+                    <a href="tools/annual-leave-calc/index.html" class="block w-full text-center bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded transition-colors">
                         Launch 🚀
                     </a>
                 </div>
             </div>
 
-            <!-- Tool Card: Electricity Bill -->
-            <div class="bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-2xl transition-shadow duration-300 flex flex-col">
-                <div class="bg-yellow-50 p-6 flex justify-center items-center h-48">
-                    <span class="text-6xl">⚡️</span>
+            <!-- Tool: Drink Picker -->
+            <div class="bg-white rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300 overflow-hidden flex flex-col">
+                <div class="p-6 flex-1">
+                    <div class="text-4xl mb-4">🧋</div>
+                    <h2 class="text-xl font-bold text-gray-800 mb-2">台灣手搖飲抽籤機</h2>
+                    <p class="text-gray-600">選擇障礙救星！不知道喝什麼？讓命運決定你今天的糖分攝取量。</p>
                 </div>
-                <div class="p-6 flex-grow">
-                    <h3 class="text-xl font-bold text-gray-800 mb-2">台灣電費試算器</h3>
-                    <p class="text-gray-600 mb-4">根據台電 2024 最新電價級距，快速估算家庭電費支出與級距明細。</p>
+                <div class="bg-gray-50 px-6 py-4">
+                    <a href="tools/drink-picker/index.html" class="block w-full text-center bg-pink-500 hover:bg-pink-600 text-white font-bold py-2 px-4 rounded transition-colors">
+                        Launch 🚀
+                    </a>
                 </div>
-                <div class="px-6 pb-6">
-                    <a href="./tools/electricity-bill-calc/index.html" class="block w-full bg-yellow-500 text-white text-center font-bold py-3 rounded-lg hover:bg-yellow-600 transition-colors">
+            </div>
+
+            <!-- Tool: Electricity Bill Calc -->
+            <div class="bg-white rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300 overflow-hidden flex flex-col">
+                <div class="p-6 flex-1">
+                    <div class="text-4xl mb-4">⚡️</div>
+                    <h2 class="text-xl font-bold text-gray-800 mb-2">台灣電費試算器</h2>
+                    <p class="text-gray-600">台電費率試算，夏季/非夏季電費估算，幫你精打細算省荷包。</p>
+                </div>
+                <div class="bg-gray-50 px-6 py-4">
+                    <a href="tools/electricity-bill-calc/index.html" class="block w-full text-center bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-2 px-4 rounded transition-colors">
                         Launch 🚀
                     </a>
                 </div>
             </div>
 
         </div>
-    </main>
 
-    <!-- Footer -->
-    <footer class="bg-gray-800 text-gray-400 py-8 text-center">
-        <p>Daily Taiwan Web Tools • Built by AI Agent</p>
-        <p class="text-xs mt-2 opacity-50">GitHub Pages Deployment</p>
-    </footer>
-
+        <footer class="mt-16 text-center text-slate-500 text-sm">
+            <p>Built with ❤️ by AI Agent. Updated: <script>document.write(new Date().toISOString().split('T')[0])</script></p>
+        </footer>
+    </div>
 </body>
 </html>
