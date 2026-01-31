@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>台灣婚禮紅包行情計算機 🧧</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Noto Sans TC', sans-serif; }
+        .envelope-anim { transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); }
+        .envelope-anim:hover { transform: translateY(-5px) rotate(2deg); }
+        .result-pop { animation: popIn 0.5s cubic-bezier(0.68, -0.55, 0.27, 1.55); }
+        @keyframes popIn {
+            0% { transform: scale(0.8); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+    </style>
+</head>
+<body class="bg-red-50 min-h-screen flex flex-col items-center p-4">
+
+    <!-- Header -->
+    <div class="w-full max-w-md flex justify-between items-center mb-6">
+        <a href="../../index.html" class="text-red-800 hover:text-red-900 font-medium flex items-center gap-1 transition-colors">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                <path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z" />
+            </svg>
+            回首頁
+        </a>
+    </div>
+
+    <!-- Main Card -->
+    <div class="bg-white rounded-3xl shadow-2xl p-6 w-full max-w-md border-t-8 border-red-600 relative overflow-hidden">
+        <div class="absolute -right-10 -top-10 w-32 h-32 bg-red-100 rounded-full opacity-50 z-0"></div>
+        <div class="relative z-10">
+            <div class="text-center mb-6">
+                <span class="text-5xl mb-2 block">🧧</span>
+                <h1 class="text-2xl font-bold text-gray-800">婚禮紅包行情計算</h1>
+                <p class="text-red-500 text-sm mt-1">拒絕失禮，包多少才不被記恨？</p>
+            </div>
+
+            <!-- Inputs -->
+            <div class="space-y-5">
+                <!-- Location -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">宴客地點 (場地等級)</label>
+                    <select id="venue" class="w-full rounded-xl border-gray-200 bg-gray-50 border-2 focus:ring-red-500 focus:border-red-500 p-3 transition-all appearance-none cursor-pointer">
+                        <option value="1">流水席 / 一般海鮮餐廳 (辦桌)</option>
+                        <option value="2" selected>婚宴會館 / 一般飯店</option>
+                        <option value="3">五星級大飯店</option>
+                    </select>
+                </div>
+
+                <!-- Relationship -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">交情關係</label>
+                    <select id="relation" class="w-full rounded-xl border-gray-200 bg-gray-50 border-2 focus:ring-red-500 focus:border-red-500 p-3 transition-all appearance-none cursor-pointer">
+                        <option value="1">普通同事 / 不熟同學</option>
+                        <option value="2" selected>好朋友 / 重視的主管</option>
+                        <option value="3">閨蜜 / 換帖兄弟 / 至親</option>
+                        <option value="4">前任 (來亂的)</option>
+                    </select>
+                </div>
+
+                <!-- Attendance -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">出席人數</label>
+                    <div class="grid grid-cols-3 gap-2">
+                        <label class="cursor-pointer">
+                            <input type="radio" name="attendance" value="0" class="peer sr-only">
+                            <div class="rounded-lg border-2 border-gray-200 p-2 text-center peer-checked:border-red-500 peer-checked:bg-red-50 hover:bg-gray-50 transition-all">
+                                <div class="text-xl">🎁</div>
+                                <div class="text-xs text-gray-600">禮到人不到</div>
+                            </div>
+                        </label>
+                        <label class="cursor-pointer">
+                            <input type="radio" name="attendance" value="1" checked class="peer sr-only">
+                            <div class="rounded-lg border-2 border-gray-200 p-2 text-center peer-checked:border-red-500 peer-checked:bg-red-50 hover:bg-gray-50 transition-all">
+                                <div class="text-xl">👤</div>
+                                <div class="text-xs text-gray-600">1人出席</div>
+                            </div>
+                        </label>
+                        <label class="cursor-pointer">
+                            <input type="radio" name="attendance" value="2" class="peer sr-only">
+                            <div class="rounded-lg border-2 border-gray-200 p-2 text-center peer-checked:border-red-500 peer-checked:bg-red-50 hover:bg-gray-50 transition-all">
+                                <div class="text-xl">👫</div>
+                                <div class="text-xs text-gray-600">攜伴 (+1)</div>
+                            </div>
+                        </label>
+                    </div>
+                </div>
+
+                <button onclick="calculateRedEnvelope()" class="w-full bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white font-bold py-4 px-4 rounded-xl shadow-lg shadow-red-200 transition-all active:scale-95 text-lg flex justify-center items-center gap-2">
+                    <span>試算金額</span>
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-11a1 1 0 10-2 0v2H7a1 1 0 100 2h2v2a1 1 0 102 0v-2h2a1 1 0 100-2h-2V7z" clip-rule="evenodd" />
+                    </svg>
+                </button>
+            </div>
+
+            <!-- Result Area -->
+            <div id="result" class="hidden mt-8 pt-6 border-t border-gray-100 text-center result-pop">
+                <p class="text-gray-400 text-xs tracking-wider uppercase font-semibold mb-2">Recommended Amount</p>
+                <div class="relative inline-block">
+                    <div class="absolute inset-0 bg-red-100 rounded-full filter blur-xl opacity-50"></div>
+                    <div class="text-5xl font-black text-red-600 relative z-10 font-mono tracking-tight" id="amountDisplay">
+                        $0
+                    </div>
+                </div>
+                
+                <div id="commentBox" class="mt-4 bg-yellow-50 text-yellow-800 p-4 rounded-lg text-sm border border-yellow-200 flex items-start gap-3">
+                    <span class="text-xl">💡</span>
+                    <span id="commentText" class="text-left pt-0.5"></span>
+                </div>
+
+                <div class="mt-4 text-xs text-gray-400">
+                    *僅供參考，請考量自身財力與交情。
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="mt-8 text-center text-red-300 text-xs">
+        <p>Created by AI Agent on <script>document.write(new Date().toISOString().split('T')[0])</script></p>
+    </footer>
+
+    <script>
+        function calculateRedEnvelope() {
+            const venue = parseInt(document.getElementById('venue').value); // 1: Bando, 2: Hall, 3: 5-Star
+            const relation = parseInt(document.getElementById('relation').value); // 1: Colleague, 2: Friend, 3: Bestie, 4: Ex
+            const attendance = parseInt(document.querySelector('input[name="attendance"]:checked').value); // 0: No, 1: Solo, 2: Pair
+
+            // Base cost per head estimation (NTD)
+            let baseCostPerHead = 0;
+            if (venue === 1) baseCostPerHead = 1200;
+            if (venue === 2) baseCostPerHead = 1800;
+            if (venue === 3) baseCostPerHead = 2800;
+
+            let attendees = attendance === 0 ? 0 : (attendance === 2 ? 2 : 1);
+            let cost = attendees * baseCostPerHead;
+
+            // Suggested starts at cost
+            let suggested = cost;
+
+            // Relationship multiplier/adder
+            if (relation === 1) { // Ordinary
+                // Just cover cost or slightly above
+                if (attendance === 0) suggested = 600; 
+                else suggested = Math.max(1200, suggested);
+            } else if (relation === 2) { // Good friend
+                if (attendance === 0) suggested = 1200;
+                else suggested += 600; // Add some blessing
+            } else if (relation === 3) { // Bestie
+                if (attendance === 0) suggested = 2000;
+                else suggested += 1200; // Generous blessing
+            } else if (relation === 4) { // Ex
+                // Joke logic
+                suggested = 0;
+            }
+
+            // Adjust to auspicious numbers
+            // Rules: No 4, No 8 (sometimes), Ends in 00, 200, 600.
+            // Common tiers: 600, 1200, 1600, 2000, 2200, 2600, 3200, 3600, 6000, 6600, 10000, 12000
+            const tiers = [
+                0, 600, 1200, 1600, 2000, 2200, 2600, 3200, 3600, 
+                6000, 6600, 8000, 8800, 10000, 12000, 16000, 20000, 36000, 66000
+            ];
+
+            // Find first tier >= suggested
+            let finalAmount = tiers.find(t => t >= suggested);
+            if (!finalAmount) finalAmount = tiers[tiers.length - 1];
+
+            // Special handling for Ex
+            let comment = "";
+            if (relation === 4) {
+                if (attendance > 0) {
+                    finalAmount = 0; // Or maybe just don't go
+                    comment = "前任結婚你還去？是去砸場的嗎？建議不要出席，省錢省心。";
+                } else {
+                    finalAmount = 0;
+                    comment = "前任就不用包了吧，當作沒看到喜帖就好。";
+                }
+            } else {
+                // Comments based on amount and venue
+                if (attendance === 0) {
+                    comment = "禮到人不到，心意有到就好，省下來的錢去吃頓好的。";
+                } else if (venue === 3 && finalAmount < 3600 && attendance > 0) {
+                    comment = "這金額在五星級飯店可能有點危險...如果交情普通就裝傻吧，交情好建議再加一點。";
+                } else if (attendance === 2 && finalAmount < 3600) {
+                    comment = "兩個人去包這樣...可能會被寫在小本本上喔！";
+                } else if (finalAmount >= 6000) {
+                    comment = "哇！這包是大戶等級的！新郎新娘一定愛死你。";
+                } else {
+                    comment = "中規中矩的安全牌，既不失禮也不傷荷包。";
+                }
+            }
+
+            // Relationship override comments
+            if (relation === 3 && finalAmount < 3600 && attendance > 0) {
+                comment = "閨蜜/好兄弟這種金額有點說不過去喔，建議直上 3600 或 6000！";
+            }
+
+            // Display
+            document.getElementById('result').classList.remove('hidden');
+            
+            // Animation for number
+            const display = document.getElementById('amountDisplay');
+            display.innerText = "$" + finalAmount;
+            
+            const commentText = document.getElementById('commentText');
+            commentText.innerText = comment;
+        }
+    </script>
+</body>
+</html>

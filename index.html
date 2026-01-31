@@ -8,134 +8,169 @@
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
     <style>
         body { font-family: 'Noto Sans TC', sans-serif; }
+        .tool-card { transition: all 0.3s ease; }
+        .tool-card:hover { transform: translateY(-5px); box-shadow: 0 10px 20px rgba(0,0,0,0.1); }
     </style>
 </head>
-<body class="bg-slate-100 min-h-screen">
-    <div class="max-w-6xl mx-auto px-4 py-12">
-        <header class="text-center mb-16">
-            <h1 class="text-4xl md:text-5xl font-bold text-slate-800 mb-4">🇹🇼 Daily Taiwan Web Tools</h1>
-            <p class="text-xl text-slate-600">專為台灣生活設計的實用網頁小工具合集</p>
-        </header>
+<body class="bg-slate-50 min-h-screen">
 
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    <!-- Hero Section -->
+    <header class="bg-white border-b border-slate-200">
+        <div class="max-w-5xl mx-auto px-4 py-12 text-center">
+            <h1 class="text-4xl font-bold text-slate-800 mb-4">🇹🇼 Daily Taiwan Web Tools</h1>
+            <p class="text-lg text-slate-500">
+                專為台灣人設計的實用、有趣、在地化的小工具集合。<br>
+                由 AI Agent 每日生成與維護。
+            </p>
+        </div>
+    </header>
 
-            <!-- Tool: Meeting Cost Calc (New) -->
-            <div class="bg-white rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300 overflow-hidden flex flex-col border-t-4 border-red-500">
-                <div class="p-6 flex-1">
-                    <div class="text-4xl mb-4">⏱️</div>
-                    <h2 class="text-xl font-bold text-gray-800 mb-2">開會成本計算機</h2>
-                    <p class="text-gray-600">Time is Money. 你的會議值多少雞排？即時計算會議燃燒的薪水，老闆講廢話專用。</p>
-                </div>
-                <div class="bg-gray-50 px-6 py-4">
-                    <a href="tools/meeting-cost-calc/index.html" class="block w-full text-center bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded transition-colors">
-                        Launch 🚀
-                    </a>
-                </div>
-            </div>
+    <!-- Tools Grid -->
+    <main class="max-w-5xl mx-auto px-4 py-12">
+        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
 
-            <!-- Tool: AI Art Gallery -->
-            <div class="bg-white rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300 overflow-hidden flex flex-col border-t-4 border-purple-600">
-                <div class="p-6 flex-1">
-                    <div class="text-4xl mb-4">🎨</div>
-                    <h2 class="text-xl font-bold text-gray-800 mb-2">AI Art Gallery</h2>
-                    <p class="text-gray-600">Explore Taiwan through AI. A daily collection of generated art inspired by Taiwanese culture and landscapes.</p>
-                </div>
-                <div class="bg-gray-50 px-6 py-4">
-                    <a href="tools/ai-gallery/index.html" class="block w-full text-center bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded transition-colors">
-                        Enter Gallery 🚀
-                    </a>
-                </div>
-            </div>
-
-            <!-- Tool: Bwa Bwei -->
-            <div class="bg-white rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300 overflow-hidden flex flex-col border-t-4 border-red-600">
-                <div class="p-6 flex-1">
-                    <div class="text-4xl mb-4">🙏</div>
-                    <h2 class="text-xl font-bold text-gray-800 mb-2">線上擲筊 Bwa Bwei</h2>
-                    <p class="text-gray-600">有求必應！心誠則靈。遇到人生難題無法決定？讓神明為你指點迷津。</p>
-                </div>
-                <div class="bg-gray-50 px-6 py-4">
-                    <a href="tools/bwa-bwei/index.html" class="block w-full text-center bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded transition-colors">
-                        Launch 🚀
-                    </a>
-                </div>
-            </div>
-            
-            <!-- Tool: Invoice Lottery Helper -->
-            <div class="bg-white rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300 overflow-hidden flex flex-col">
-                <div class="p-6 flex-1">
-                    <div class="text-4xl mb-4">🧾</div>
-                    <h2 class="text-xl font-bold text-gray-800 mb-2">統一發票對獎小幫手</h2>
-                    <p class="text-gray-600">快速對獎神器！輸入當期號碼，急速篩選末三碼。財富自由就看這一次。</p>
-                </div>
-                <div class="bg-gray-50 px-6 py-4">
-                    <a href="tools/invoice-lottery/index.html" class="block w-full text-center bg-teal-600 hover:bg-teal-700 text-white font-bold py-2 px-4 rounded transition-colors">
+            <!-- Tool: Red Envelope Guide (New) -->
+            <div class="tool-card bg-white rounded-xl overflow-hidden border border-slate-100 shadow-sm flex flex-col">
+                <div class="h-2 bg-red-500"></div>
+                <div class="p-6 flex-1 flex flex-col">
+                    <div class="text-3xl mb-4">🧧</div>
+                    <h3 class="text-xl font-bold text-slate-800 mb-2">婚禮紅包行情計算機</h3>
+                    <p class="text-slate-500 text-sm mb-6 flex-1">
+                        參加婚禮包多少才不失禮？輸入地點、交情、人數，立刻幫你算出不踩雷金額！
+                    </p>
+                    <a href="tools/red-envelope-guide/index.html" class="block w-full text-center bg-slate-800 hover:bg-slate-900 text-white font-medium py-2 rounded-lg transition-colors">
                         Launch 🚀
                     </a>
                 </div>
             </div>
 
             <!-- Tool: Stock to Rice -->
-            <div class="bg-white rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300 overflow-hidden flex flex-col">
-                <div class="p-6 flex-1">
-                    <div class="text-4xl mb-4">🍚</div>
-                    <h2 class="text-xl font-bold text-gray-800 mb-2">台股損益滷肉飯換算機</h2>
-                    <p class="text-gray-600">今天賠的錢夠吃幾碗？把抽象的損益具象化成國民美食，讓你有感理財（或有感心痛）。</p>
-                </div>
-                <div class="bg-gray-50 px-6 py-4">
-                    <a href="tools/stock-to-rice/index.html" class="block w-full text-center bg-amber-500 hover:bg-amber-600 text-white font-bold py-2 px-4 rounded transition-colors">
+            <div class="tool-card bg-white rounded-xl overflow-hidden border border-slate-100 shadow-sm flex flex-col">
+                <div class="h-2 bg-amber-500"></div>
+                <div class="p-6 flex-1 flex flex-col">
+                    <div class="text-3xl mb-4">🍚</div>
+                    <h3 class="text-xl font-bold text-slate-800 mb-2">台股損益滷肉飯換算</h3>
+                    <p class="text-slate-500 text-sm mb-6 flex-1">
+                        今天當沖賠了多少？別難過，換算成滷肉飯你會覺得... 好像還是很難過。
+                    </p>
+                    <a href="tools/stock-to-rice/index.html" class="block w-full text-center bg-slate-800 hover:bg-slate-900 text-white font-medium py-2 rounded-lg transition-colors">
                         Launch 🚀
                     </a>
                 </div>
             </div>
 
-            <!-- Tool: Annual Leave Calc -->
-            <div class="bg-white rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300 overflow-hidden flex flex-col">
-                <div class="p-6 flex-1">
-                    <div class="text-4xl mb-4">📅</div>
-                    <h2 class="text-xl font-bold text-gray-800 mb-2">台灣特休計算機</h2>
-                    <p class="text-gray-600">根據勞基法計算你的特休天數。輸入到職日，馬上知道還有幾天假可以放！</p>
+            <!-- Tool: Annual Leave -->
+            <div class="tool-card bg-white rounded-xl overflow-hidden border border-slate-100 shadow-sm flex flex-col">
+                <div class="h-2 bg-blue-500"></div>
+                <div class="p-6 flex-1 flex flex-col">
+                    <div class="text-3xl mb-4">🏖️</div>
+                    <h3 class="text-xl font-bold text-slate-800 mb-2">勞基法特休計算機</h3>
+                    <p class="text-slate-500 text-sm mb-6 flex-1">
+                        輸入到職日，精準計算你還有幾天假可以放。老闆不想讓你知道的秘密。
+                    </p>
+                    <a href="tools/annual-leave-calc/index.html" class="block w-full text-center bg-slate-800 hover:bg-slate-900 text-white font-medium py-2 rounded-lg transition-colors">
+                        Launch 🚀
+                    </a>
                 </div>
-                <div class="bg-gray-50 px-6 py-4">
-                    <a href="tools/annual-leave-calc/index.html" class="block w-full text-center bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded transition-colors">
+            </div>
+
+            <!-- Tool: Bwa Bwei -->
+            <div class="tool-card bg-white rounded-xl overflow-hidden border border-slate-100 shadow-sm flex flex-col">
+                <div class="h-2 bg-red-600"></div>
+                <div class="p-6 flex-1 flex flex-col">
+                    <div class="text-3xl mb-4">🛐</div>
+                    <h3 class="text-xl font-bold text-slate-800 mb-2">線上擲筊 (博杯)</h3>
+                    <p class="text-slate-500 text-sm mb-6 flex-1">
+                        遇事不決問神明。心誠則靈，隨時隨地都能求個心安。
+                    </p>
+                    <a href="tools/bwa-bwei/index.html" class="block w-full text-center bg-slate-800 hover:bg-slate-900 text-white font-medium py-2 rounded-lg transition-colors">
                         Launch 🚀
                     </a>
                 </div>
             </div>
 
             <!-- Tool: Drink Picker -->
-            <div class="bg-white rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300 overflow-hidden flex flex-col">
-                <div class="p-6 flex-1">
-                    <div class="text-4xl mb-4">🧋</div>
-                    <h2 class="text-xl font-bold text-gray-800 mb-2">台灣手搖飲抽籤機</h2>
-                    <p class="text-gray-600">選擇障礙救星！不知道喝什麼？讓命運決定你今天的糖分攝取量。</p>
-                </div>
-                <div class="bg-gray-50 px-6 py-4">
-                    <a href="tools/drink-picker/index.html" class="block w-full text-center bg-pink-500 hover:bg-pink-600 text-white font-bold py-2 px-4 rounded transition-colors">
+            <div class="tool-card bg-white rounded-xl overflow-hidden border border-slate-100 shadow-sm flex flex-col">
+                <div class="h-2 bg-orange-400"></div>
+                <div class="p-6 flex-1 flex flex-col">
+                    <div class="text-3xl mb-4">🥤</div>
+                    <h3 class="text-xl font-bold text-slate-800 mb-2">今天喝什麼？</h3>
+                    <p class="text-slate-500 text-sm mb-6 flex-1">
+                        選擇困難症救星。五十嵐、可不可、迷客夏... 轉盤決定你的下午茶！
+                    </p>
+                    <a href="tools/drink-picker/index.html" class="block w-full text-center bg-slate-800 hover:bg-slate-900 text-white font-medium py-2 rounded-lg transition-colors">
                         Launch 🚀
                     </a>
                 </div>
             </div>
 
-            <!-- Tool: Electricity Bill Calc -->
-            <div class="bg-white rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300 overflow-hidden flex flex-col">
-                <div class="p-6 flex-1">
-                    <div class="text-4xl mb-4">⚡️</div>
-                    <h2 class="text-xl font-bold text-gray-800 mb-2">台灣電費試算器</h2>
-                    <p class="text-gray-600">台電費率試算，夏季/非夏季電費估算，幫你精打細算省荷包。</p>
+             <!-- Tool: Electricity Bill -->
+             <div class="tool-card bg-white rounded-xl overflow-hidden border border-slate-100 shadow-sm flex flex-col">
+                <div class="h-2 bg-yellow-400"></div>
+                <div class="p-6 flex-1 flex flex-col">
+                    <div class="text-3xl mb-4">⚡</div>
+                    <h3 class="text-xl font-bold text-slate-800 mb-2">台電電費試算</h3>
+                    <p class="text-slate-500 text-sm mb-6 flex-1">
+                        夏季電價好可怕？輸入度數，幫你算出這期帳單金額，提早存錢。
+                    </p>
+                    <a href="tools/electricity-bill-calc/index.html" class="block w-full text-center bg-slate-800 hover:bg-slate-900 text-white font-medium py-2 rounded-lg transition-colors">
+                        Launch 🚀
+                    </a>
                 </div>
-                <div class="bg-gray-50 px-6 py-4">
-                    <a href="tools/electricity-bill-calc/index.html" class="block w-full text-center bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-2 px-4 rounded transition-colors">
+            </div>
+
+            <!-- Tool: Invoice Lottery -->
+            <div class="tool-card bg-white rounded-xl overflow-hidden border border-slate-100 shadow-sm flex flex-col">
+                <div class="h-2 bg-green-500"></div>
+                <div class="p-6 flex-1 flex flex-col">
+                    <div class="text-3xl mb-4">🧾</div>
+                    <h3 class="text-xl font-bold text-slate-800 mb-2">統一發票對獎助手</h3>
+                    <p class="text-slate-500 text-sm mb-6 flex-1">
+                        輸入末三碼快速對獎。雖然通常只會中兩百，但有夢最美。
+                    </p>
+                    <a href="tools/invoice-lottery/index.html" class="block w-full text-center bg-slate-800 hover:bg-slate-900 text-white font-medium py-2 rounded-lg transition-colors">
+                        Launch 🚀
+                    </a>
+                </div>
+            </div>
+
+            <!-- Tool: Meeting Cost -->
+            <div class="tool-card bg-white rounded-xl overflow-hidden border border-slate-100 shadow-sm flex flex-col">
+                <div class="h-2 bg-gray-500"></div>
+                <div class="p-6 flex-1 flex flex-col">
+                    <div class="text-3xl mb-4">💸</div>
+                    <h3 class="text-xl font-bold text-slate-800 mb-2">會議成本計算機</h3>
+                    <p class="text-slate-500 text-sm mb-6 flex-1">
+                        這個會議到底燒了公司多少錢？輸入薪資與人數，看著數字跳動心驚膽跳。
+                    </p>
+                    <a href="tools/meeting-cost-calc/index.html" class="block w-full text-center bg-slate-800 hover:bg-slate-900 text-white font-medium py-2 rounded-lg transition-colors">
+                        Launch 🚀
+                    </a>
+                </div>
+            </div>
+
+            <!-- Tool: AI Gallery -->
+            <div class="tool-card bg-white rounded-xl overflow-hidden border border-slate-100 shadow-sm flex flex-col">
+                <div class="h-2 bg-purple-500"></div>
+                <div class="p-6 flex-1 flex flex-col">
+                    <div class="text-3xl mb-4">🎨</div>
+                    <h3 class="text-xl font-bold text-slate-800 mb-2">AI Art Gallery</h3>
+                    <p class="text-slate-500 text-sm mb-6 flex-1">
+                        AI 生成的台灣在地意象圖庫。
+                    </p>
+                    <a href="tools/ai-gallery/index.html" class="block w-full text-center bg-slate-800 hover:bg-slate-900 text-white font-medium py-2 rounded-lg transition-colors">
                         Launch 🚀
                     </a>
                 </div>
             </div>
 
         </div>
+    </main>
 
-        <footer class="mt-16 text-center text-slate-500 text-sm">
-            <p>Built with ❤️ by AI Agent. Updated: 2026-01-31</p>
-        </footer>
-    </div>
+    <footer class="bg-slate-50 border-t border-slate-200 py-8 text-center text-slate-400 text-sm">
+        <p>Built with ❤️ for Taiwan by AI Agent.</p>
+        <p class="mt-1">Last Updated: <script>document.write(new Date().toISOString().split('T')[0])</script></p>
+    </footer>
+
 </body>
 </html>
