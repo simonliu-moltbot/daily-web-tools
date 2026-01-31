@@ -3,17 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SimonLiu OpenClaw Works</title>
+    <title>Home | SimonLiu OpenClaw Works</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
     <style>
         body { font-family: 'Noto Sans TC', sans-serif; }
-        .tool-card { transition: all 0.3s ease; }
-        .tool-card:hover { transform: translateY(-5px); box-shadow: 0 10px 20px rgba(0,0,0,0.1); }
+        .project-card { transition: all 0.3s ease; }
+        .project-card:hover { transform: translateY(-5px); box-shadow: 0 10px 20px rgba(0,0,0,0.1); }
     </style>
 </head>
 <body class="bg-stone-50 min-h-screen flex flex-col">
 
+    
     <!-- Top Navigation Bar -->
     <nav class="bg-stone-900 text-white shadow-lg z-50">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -21,7 +22,7 @@
                 
                 <!-- Logo -->
                 <div class="flex-shrink-0 flex items-center">
-                    <a href="#" class="text-xl font-bold tracking-wider leading-tight flex items-center gap-2">
+                    <a href="./index.html" class="text-xl font-bold tracking-wider leading-tight flex items-center gap-2">
                         SimonLiu <span class="text-stone-400 text-base font-normal">OpenClaw Works</span>
                     </a>
                 </div>
@@ -29,8 +30,11 @@
                 <!-- Desktop Navigation -->
                 <div class="hidden md:block">
                     <div class="ml-10 flex items-baseline space-x-4">
-                        <a href="#" class="px-3 py-2 rounded-md text-sm font-medium bg-stone-800 text-white border border-stone-700">Daily Web Tools</a>
-                        <a href="tools/ai-gallery/index.html" class="px-3 py-2 rounded-md text-sm font-medium text-stone-300 hover:text-white hover:bg-stone-700 transition-colors">AI Art Gallery</a>
+                        <a href="./index.html" class="px-3 py-2 rounded-md text-sm font-medium bg-stone-800 text-white border border-stone-700 hover:bg-stone-700 hover:text-white transition-colors">Home</a>
+                        <a href="./web-tools/index.html" class="px-3 py-2 rounded-md text-sm font-medium text-stone-300 hover:bg-stone-700 hover:text-white transition-colors">Web Tools</a>
+                        <a href="./gallery/index.html" class="px-3 py-2 rounded-md text-sm font-medium text-stone-300 hover:bg-stone-700 hover:text-white transition-colors">AI Gallery</a>
+                        <a href="./mcp/index.html" class="px-3 py-2 rounded-md text-sm font-medium text-stone-300 hover:bg-stone-700 hover:text-white transition-colors">MCP Services</a>
+                        <a href="./adk/index.html" class="px-3 py-2 rounded-md text-sm font-medium text-stone-300 hover:bg-stone-700 hover:text-white transition-colors">ADK Agents</a>
                     </div>
                 </div>
 
@@ -38,7 +42,6 @@
                 <div class="-mr-2 flex md:hidden">
                     <button type="button" onclick="document.getElementById('mobile-menu').classList.toggle('hidden')" class="bg-stone-800 inline-flex items-center justify-center p-2 rounded-md text-stone-400 hover:text-white hover:bg-stone-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-stone-800 focus:ring-white" aria-controls="mobile-menu" aria-expanded="false">
                         <span class="sr-only">Open main menu</span>
-                        <!-- Icon when menu is closed -->
                         <svg class="block h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
                         </svg>
@@ -47,175 +50,101 @@
             </div>
         </div>
 
-        <!-- Mobile Menu (Hidden by default) -->
+        <!-- Mobile Menu -->
         <div class="hidden md:hidden bg-stone-800 border-t border-stone-700" id="mobile-menu">
             <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3">
-                <a href="#" class="block px-3 py-2 rounded-md text-base font-medium bg-stone-900 text-white">Daily Web Tools</a>
-                <a href="tools/ai-gallery/index.html" class="block px-3 py-2 rounded-md text-base font-medium text-stone-300 hover:text-white hover:bg-stone-700">AI Art Gallery</a>
+                <a href="./index.html" class="block px-3 py-2 rounded-md text-base font-medium text-stone-300 hover:text-white hover:bg-stone-700">Home</a>
+                <a href="./web-tools/index.html" class="block px-3 py-2 rounded-md text-base font-medium text-stone-300 hover:text-white hover:bg-stone-700">Web Tools</a>
+                <a href="./gallery/index.html" class="block px-3 py-2 rounded-md text-base font-medium text-stone-300 hover:text-white hover:bg-stone-700">AI Gallery</a>
+                <a href="./mcp/index.html" class="block px-3 py-2 rounded-md text-base font-medium text-stone-300 hover:text-white hover:bg-stone-700">MCP Services</a>
+                <a href="./adk/index.html" class="block px-3 py-2 rounded-md text-base font-medium text-stone-300 hover:text-white hover:bg-stone-700">ADK Agents</a>
             </div>
         </div>
     </nav>
 
-    <!-- Main Content Area -->
+
     <div class="flex-1 flex flex-col w-full">
         
-        <!-- Page Header -->
         <header class="bg-white border-b border-stone-200 px-6 py-10 md:px-8 shadow-sm">
             <div class="max-w-7xl mx-auto">
-                <h2 class="text-3xl font-bold text-stone-800">Daily Web Tools</h2>
+                <h2 class="text-3xl font-bold text-stone-800">SimonLiu OpenClaw Works</h2>
                 <p class="text-stone-500 mt-3 text-lg">
-                    專為台灣人設計的實用、有趣、在地化的小工具集合。<br class="hidden sm:block">
-                    由 AI Agent 每日生成與維護。
+                    Central hub for all AI-powered tools, services, and galleries.
                 </p>
             </div>
         </header>
 
-        <!-- Tool Grid -->
         <main class="flex-1 p-4 md:p-8">
             <div class="max-w-7xl mx-auto pb-12">
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                    
+    <div class="project-card bg-white rounded-xl overflow-hidden border border-stone-100 shadow-sm flex flex-col">
+        <div class="h-2 bg-amber-500"></div>
+        <div class="p-6 flex-1 flex flex-col">
+            <div class="text-3xl mb-4">🛠️</div>
+            <h3 class="text-xl font-bold text-stone-800 mb-2">Web Tools</h3>
+            <p class="text-stone-500 text-sm mb-6 flex-1">
+                Collection of daily useful tools for Taiwan life.
+            </p>
+            <a href="web-tools/index.html" target="_blank" class="block w-full text-center bg-stone-800 hover:bg-stone-900 text-white font-medium py-2 rounded-lg transition-colors">
+                Open Tools ↗
+            </a>
+        </div>
+    </div>
+    
 
-                    <!-- Tool: Red Envelope Guide -->
-                    <div class="tool-card bg-white rounded-xl overflow-hidden border border-stone-100 shadow-sm flex flex-col">
-                        <div class="h-2 bg-red-500"></div>
-                        <div class="p-6 flex-1 flex flex-col">
-                            <div class="text-3xl mb-4">🧧</div>
-                            <h3 class="text-xl font-bold text-stone-800 mb-2">婚禮紅包行情計算機</h3>
-                            <p class="text-stone-500 text-sm mb-6 flex-1">
-                                參加婚禮包多少才不失禮？輸入地點、交情、人數，立刻幫你算出不踩雷金額！
-                            </p>
-                            <a href="tools/red-envelope-guide/index.html" class="block w-full text-center bg-stone-800 hover:bg-stone-900 text-white font-medium py-2 rounded-lg transition-colors">
-                                Launch 🚀
-                            </a>
-                        </div>
-                    </div>
+    <div class="project-card bg-white rounded-xl overflow-hidden border border-stone-100 shadow-sm flex flex-col">
+        <div class="h-2 bg-pink-500"></div>
+        <div class="p-6 flex-1 flex flex-col">
+            <div class="text-3xl mb-4">🎨</div>
+            <h3 class="text-xl font-bold text-stone-800 mb-2">AI Gallery</h3>
+            <p class="text-stone-500 text-sm mb-6 flex-1">
+                Daily AI generated art featuring Taiwan scenery.
+            </p>
+            <a href="gallery/index.html" target="_blank" class="block w-full text-center bg-stone-800 hover:bg-stone-900 text-white font-medium py-2 rounded-lg transition-colors">
+                Enter Gallery ↗
+            </a>
+        </div>
+    </div>
+    
 
-                    <!-- Tool: Stock to Rice -->
-                    <div class="tool-card bg-white rounded-xl overflow-hidden border border-stone-100 shadow-sm flex flex-col">
-                        <div class="h-2 bg-amber-500"></div>
-                        <div class="p-6 flex-1 flex flex-col">
-                            <div class="text-3xl mb-4">🍚</div>
-                            <h3 class="text-xl font-bold text-stone-800 mb-2">台股損益滷肉飯換算</h3>
-                            <p class="text-stone-500 text-sm mb-6 flex-1">
-                                今天當沖賠了多少？別難過，換算成滷肉飯你會覺得... 好像還是很難過。
-                            </p>
-                            <a href="tools/stock-to-rice/index.html" class="block w-full text-center bg-stone-800 hover:bg-stone-900 text-white font-medium py-2 rounded-lg transition-colors">
-                                Launch 🚀
-                            </a>
-                        </div>
-                    </div>
+    <div class="project-card bg-white rounded-xl overflow-hidden border border-stone-100 shadow-sm flex flex-col">
+        <div class="h-2 bg-blue-500"></div>
+        <div class="p-6 flex-1 flex flex-col">
+            <div class="text-3xl mb-4">🔌</div>
+            <h3 class="text-xl font-bold text-stone-800 mb-2">MCP Services</h3>
+            <p class="text-stone-500 text-sm mb-6 flex-1">
+                Backend data services for AI agents.
+            </p>
+            <a href="mcp/index.html" target="_blank" class="block w-full text-center bg-stone-800 hover:bg-stone-900 text-white font-medium py-2 rounded-lg transition-colors">
+                Browse Services ↗
+            </a>
+        </div>
+    </div>
+    
 
-                    <!-- Tool: Annual Leave -->
-                    <div class="tool-card bg-white rounded-xl overflow-hidden border border-stone-100 shadow-sm flex flex-col">
-                        <div class="h-2 bg-blue-500"></div>
-                        <div class="p-6 flex-1 flex flex-col">
-                            <div class="text-3xl mb-4">🏖️</div>
-                            <h3 class="text-xl font-bold text-stone-800 mb-2">勞基法特休計算機</h3>
-                            <p class="text-stone-500 text-sm mb-6 flex-1">
-                                輸入到職日，精準計算你還有幾天假可以放。老闆不想讓你知道的秘密。
-                            </p>
-                            <a href="tools/annual-leave-calc/index.html" class="block w-full text-center bg-stone-800 hover:bg-stone-900 text-white font-medium py-2 rounded-lg transition-colors">
-                                Launch 🚀
-                            </a>
-                        </div>
-                    </div>
-
-                    <!-- Tool: Bwa Bwei -->
-                    <div class="tool-card bg-white rounded-xl overflow-hidden border border-stone-100 shadow-sm flex flex-col">
-                        <div class="h-2 bg-red-600"></div>
-                        <div class="p-6 flex-1 flex flex-col">
-                            <div class="text-3xl mb-4">🛐</div>
-                            <h3 class="text-xl font-bold text-stone-800 mb-2">線上擲筊 (博杯)</h3>
-                            <p class="text-stone-500 text-sm mb-6 flex-1">
-                                遇事不決問神明。心誠則靈，隨時隨地都能求個心安。
-                            </p>
-                            <a href="tools/bwa-bwei/index.html" class="block w-full text-center bg-stone-800 hover:bg-stone-900 text-white font-medium py-2 rounded-lg transition-colors">
-                                Launch 🚀
-                            </a>
-                        </div>
-                    </div>
-
-                    <!-- Tool: Drink Picker -->
-                    <div class="tool-card bg-white rounded-xl overflow-hidden border border-stone-100 shadow-sm flex flex-col">
-                        <div class="h-2 bg-orange-400"></div>
-                        <div class="p-6 flex-1 flex flex-col">
-                            <div class="text-3xl mb-4">🥤</div>
-                            <h3 class="text-xl font-bold text-stone-800 mb-2">今天喝什麼？</h3>
-                            <p class="text-stone-500 text-sm mb-6 flex-1">
-                                選擇困難症救星。五十嵐、可不可、迷客夏... 轉盤決定你的下午茶！
-                            </p>
-                            <a href="tools/drink-picker/index.html" class="block w-full text-center bg-stone-800 hover:bg-stone-900 text-white font-medium py-2 rounded-lg transition-colors">
-                                Launch 🚀
-                            </a>
-                        </div>
-                    </div>
-
-                     <!-- Tool: Electricity Bill -->
-                     <div class="tool-card bg-white rounded-xl overflow-hidden border border-stone-100 shadow-sm flex flex-col">
-                        <div class="h-2 bg-yellow-400"></div>
-                        <div class="p-6 flex-1 flex flex-col">
-                            <div class="text-3xl mb-4">⚡</div>
-                            <h3 class="text-xl font-bold text-stone-800 mb-2">台電電費試算</h3>
-                            <p class="text-stone-500 text-sm mb-6 flex-1">
-                                夏季電價好可怕？輸入度數，幫你算出這期帳單金額，提早存錢。
-                            </p>
-                            <a href="tools/electricity-bill-calc/index.html" class="block w-full text-center bg-stone-800 hover:bg-stone-900 text-white font-medium py-2 rounded-lg transition-colors">
-                                Launch 🚀
-                            </a>
-                        </div>
-                    </div>
-
-                    <!-- Tool: Invoice Lottery -->
-                    <div class="tool-card bg-white rounded-xl overflow-hidden border border-stone-100 shadow-sm flex flex-col">
-                        <div class="h-2 bg-green-500"></div>
-                        <div class="p-6 flex-1 flex flex-col">
-                            <div class="text-3xl mb-4">🧾</div>
-                            <h3 class="text-xl font-bold text-stone-800 mb-2">統一發票對獎助手</h3>
-                            <p class="text-stone-500 text-sm mb-6 flex-1">
-                                輸入末三碼快速對獎。雖然通常只會中兩百，但有夢最美。
-                            </p>
-                            <a href="tools/invoice-lottery/index.html" class="block w-full text-center bg-stone-800 hover:bg-stone-900 text-white font-medium py-2 rounded-lg transition-colors">
-                                Launch 🚀
-                            </a>
-                        </div>
-                    </div>
-
-                    <!-- Tool: Meeting Cost -->
-                    <div class="tool-card bg-white rounded-xl overflow-hidden border border-stone-100 shadow-sm flex flex-col">
-                        <div class="h-2 bg-gray-500"></div>
-                        <div class="p-6 flex-1 flex flex-col">
-                            <div class="text-3xl mb-4">💸</div>
-                            <h3 class="text-xl font-bold text-stone-800 mb-2">會議成本計算機</h3>
-                            <p class="text-stone-500 text-sm mb-6 flex-1">
-                                這個會議到底燒了公司多少錢？輸入薪資與人數，看著數字跳動心驚膽跳。
-                            </p>
-                            <a href="tools/meeting-cost-calc/index.html" class="block w-full text-center bg-stone-800 hover:bg-stone-900 text-white font-medium py-2 rounded-lg transition-colors">
-                                Launch 🚀
-                            </a>
-                        </div>
-                    </div>
-
-                    <!-- Tool: AI Gallery -->
-                    <div class="tool-card bg-white rounded-xl overflow-hidden border border-stone-100 shadow-sm flex flex-col">
-                        <div class="h-2 bg-purple-500"></div>
-                        <div class="p-6 flex-1 flex flex-col">
-                            <div class="text-3xl mb-4">🎨</div>
-                            <h3 class="text-xl font-bold text-stone-800 mb-2">AI Art Gallery</h3>
-                            <p class="text-stone-500 text-sm mb-6 flex-1">
-                                AI 生成的台灣在地意象圖庫。
-                            </p>
-                            <a href="tools/ai-gallery/index.html" class="block w-full text-center bg-stone-800 hover:bg-stone-900 text-white font-medium py-2 rounded-lg transition-colors">
-                                Launch 🚀
-                            </a>
-                        </div>
-                    </div>
-
+    <div class="project-card bg-white rounded-xl overflow-hidden border border-stone-100 shadow-sm flex flex-col">
+        <div class="h-2 bg-purple-500"></div>
+        <div class="p-6 flex-1 flex flex-col">
+            <div class="text-3xl mb-4">🤖</div>
+            <h3 class="text-xl font-bold text-stone-800 mb-2">ADK Agents</h3>
+            <p class="text-stone-500 text-sm mb-6 flex-1">
+                Autonomous agents performing daily tasks.
+            </p>
+            <a href="adk/index.html" target="_blank" class="block w-full text-center bg-stone-800 hover:bg-stone-900 text-white font-medium py-2 rounded-lg transition-colors">
+                View Agents ↗
+            </a>
+        </div>
+    </div>
+    
                 </div>
 
+                
                 <div class="mt-12 text-center text-stone-400 text-sm border-t border-stone-200 pt-8">
                     <p>Built with ❤️ by AI Agent</p>
-                    <p class="mt-1">Last Updated: <script>document.write(new Date().toISOString().split('T')[0])</script></p>
+                    <p class="mt-1">Last Updated: 2026-01-31</p>
                 </div>
+
             </div>
         </main>
     </div>
