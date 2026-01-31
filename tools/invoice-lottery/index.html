@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>統一發票對獎小幫手 - Daily Taiwan Tools</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Noto Sans TC', sans-serif; }
+        .shake { animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both; }
+        @keyframes shake {
+            10%, 90% { transform: translate3d(-1px, 0, 0); }
+            20%, 80% { transform: translate3d(2px, 0, 0); }
+            30%, 50%, 70% { transform: translate3d(-4px, 0, 0); }
+            40%, 60% { transform: translate3d(4px, 0, 0); }
+        }
+    </style>
+</head>
+<body class="bg-teal-50 min-h-screen flex flex-col">
+    <!-- Header -->
+    <header class="bg-teal-600 text-white p-4 shadow-md">
+        <div class="container mx-auto flex justify-between items-center">
+            <h1 class="text-xl font-bold flex items-center gap-2">
+                🧾 統一發票對獎小幫手
+            </h1>
+            <a href="../../index.html" class="bg-white text-teal-600 px-4 py-2 rounded-full font-bold hover:bg-teal-100 transition text-sm">
+                🏠 回首頁
+            </a>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="flex-grow container mx-auto p-4 max-w-2xl">
+        
+        <!-- Status Panel -->
+        <div class="bg-white rounded-2xl shadow-xl p-6 mb-6 text-center border-4 border-transparent transition-all duration-200" id="statusPanel">
+            <h2 class="text-gray-500 mb-2 font-medium">請輸入發票末三碼</h2>
+            <input type="tel" id="inputDigits" maxlength="3" 
+                class="w-full text-center text-6xl font-bold tracking-widest text-gray-800 border-b-4 border-gray-200 focus:border-teal-500 outline-none py-4 bg-transparent placeholder-gray-200"
+                placeholder="---" autofocus>
+            <div id="resultMessage" class="mt-4 text-2xl font-bold h-8 text-gray-400">
+                等待輸入...
+            </div>
+        </div>
+
+        <!-- Winning Numbers Config (Accordion) -->
+        <div class="bg-white rounded-xl shadow p-4 mb-6">
+            <button onclick="toggleConfig()" class="w-full flex justify-between items-center text-gray-700 font-bold">
+                <span>⚙️ 設定中獎號碼 (預設: 113年 1-2月)</span>
+                <span id="configArrow">▼</span>
+            </button>
+            <div id="configPanel" class="hidden mt-4 space-y-4 border-t pt-4">
+                <div class="grid gap-4">
+                    <div>
+                        <label class="block text-sm text-gray-500 mb-1">特別獎 (1000萬)</label>
+                        <input type="text" id="specialPrize" value="16620962" class="w-full p-2 border rounded font-mono text-lg" placeholder="8位數">
+                    </div>
+                    <div>
+                        <label class="block text-sm text-gray-500 mb-1">特獎 (200萬)</label>
+                        <input type="text" id="grandPrize" value="50008017" class="w-full p-2 border rounded font-mono text-lg" placeholder="8位數">
+                    </div>
+                    <div>
+                        <label class="block text-sm text-gray-500 mb-1">頭獎 (20萬) - 多組以逗號分隔</label>
+                        <input type="text" id="firstPrize" value="73705743, 90315047, 10604429" class="w-full p-2 border rounded font-mono text-lg" placeholder="8位數, 8位數...">
+                    </div>
+                    <div>
+                        <label class="block text-sm text-gray-500 mb-1">增開六獎 (200元)</label>
+                        <input type="text" id="sixthPrizeAdd" value="" class="w-full p-2 border rounded font-mono text-lg" placeholder="末3碼">
+                    </div>
+                </div>
+                <div class="flex gap-2">
+                    <button onclick="saveConfig()" class="flex-1 bg-teal-600 text-white py-2 rounded hover:bg-teal-700 font-bold">儲存並更新</button>
+                    <button onclick="loadDemo()" class="px-4 py-2 border border-gray-300 rounded hover:bg-gray-50 text-gray-600">重置範例</button>
+                </div>
+                <p class="text-xs text-gray-400 mt-2">* 僅供輔助篩選，實際中獎以財政部公告與紙本/電子發票核對為準。</p>
+            </div>
+        </div>
+
+        <!-- History -->
+        <div class="bg-white rounded-xl shadow p-4">
+            <h3 class="text-gray-500 font-bold mb-3 border-b pb-2">📜 檢查紀錄</h3>
+            <div id="historyLog" class="flex flex-wrap gap-2 max-h-40 overflow-y-auto">
+                <!-- Log items will appear here -->
+                <span class="text-gray-300 text-sm italic">尚無紀錄</span>
+            </div>
+        </div>
+
+    </main>
+
+    <footer class="text-center p-4 text-teal-700/50 text-sm mt-auto">
+        Created by AI Agent
+    </footer>
+
+    <script>
+        // Default Data (113年 01-02月 Example)
+        // Source: Mocked for tool demonstration, user should update.
+        // Logic: 
+        // 1. Get last 3 digits of all winning numbers.
+        // 2. If user input matches any of these, ALERT "Possible Match".
+        // Note: For Special/Grand/First, matching last 3 is min requirement for smaller prizes or just checking if it's worth looking closer.
+        // Actually, for First Prize, matching last 3 is getting $200 (Sixth Prize).
+        // For Special/Grand, matching last 3 means NOTHING usually (needs full match), but we flag it anyway as "Check Full Number".
+        
+        let targetTargets = []; // Array of string strings (3 digits)
+
+        function parseConfig() {
+            const special = document.getElementById('specialPrize').value.trim();
+            const grand = document.getElementById('grandPrize').value.trim();
+            const first = document.getElementById('firstPrize').value.split(',').map(s => s.trim()).filter(s => s);
+            const addSix = document.getElementById('sixthPrizeAdd').value.split(',').map(s => s.trim()).filter(s => s);
+
+            let targets = new Set();
+
+            // First Prize: Matches last 3 digits = 200 NTD (Sixth Prize)
+            first.forEach(num => {
+                if (num.length >= 3) targets.add(num.slice(-3));
+            });
+
+            // Add Six Prize: Direct 3 digit match
+            addSix.forEach(num => {
+                if (num.length === 3) targets.add(num);
+            });
+            
+            // Special & Grand: Usually need full match, but some users like to check last 3 just in case.
+            // However, technically matching last 3 of Special/Grand gives $0.
+            // But let's include them as "Review" just in case the user entered them in the wrong field.
+            // Actually, correct rule: First Prize matches last 3+ digits get money. Special/Grand must match ALL.
+            // So we ONLY check First Prize tails and Added Six tails for the "Quick Check".
+            // We will also check Special/Grand tails but mark them differently? 
+            // Let's stick to the official "Sixth Prize" rule (Last 3 of First Prize + Added Six).
+            
+            // Re-eval: The most common check is for the $200 prize.
+            // If it matches Special/Grand last 3, we should warn "Check Full Number" but it's not a prize yet.
+            
+            return {
+                prizes: Array.from(targets), // 200 NTD winners
+                fullCheck: [special, grand, ...first] // Full numbers for reference
+            };
+        }
+
+        let currentTargets = [];
+
+        function saveConfig() {
+            const config = parseConfig();
+            currentTargets = config.prizes;
+            // Also add last 3 of special/grand just to notify user to look
+            const specials = config.fullCheck.map(s => s.slice(-3));
+            // We store them separately? 
+            // Let's just flatten for the "Rapid Check" - if it hits ANY known tail, we say "MATCH".
+            // User can verify details.
+            config.fullCheck.forEach(s => {
+                if(s.length >= 3) currentTargets.push(s.slice(-3));
+            });
+            
+            // Unique
+            currentTargets = [...new Set(currentTargets)];
+            
+            alert('中獎號碼已更新！');
+            toggleConfig();
+            document.getElementById('inputDigits').focus();
+        }
+
+        function toggleConfig() {
+            const panel = document.getElementById('configPanel');
+            panel.classList.toggle('hidden');
+        }
+
+        function loadDemo() {
+            document.getElementById('specialPrize').value = "16620962";
+            document.getElementById('grandPrize').value = "50008017";
+            document.getElementById('firstPrize').value = "73705743, 90315047, 10604429";
+            document.getElementById('sixthPrizeAdd').value = ""; // None for this dummy set
+            saveConfig();
+        }
+
+        // Init
+        window.addEventListener('DOMContentLoaded', () => {
+            saveConfig();
+            
+            const input = document.getElementById('inputDigits');
+            const statusPanel = document.getElementById('statusPanel');
+            const resultMsg = document.getElementById('resultMessage');
+            const history = document.getElementById('historyLog');
+
+            input.addEventListener('input', (e) => {
+                const val = e.target.value.replace(/[^0-9]/g, '');
+                e.target.value = val;
+
+                if (val.length === 3) {
+                    checkNumber(val);
+                } else {
+                    statusPanel.className = "bg-white rounded-2xl shadow-xl p-6 mb-6 text-center border-4 border-transparent transition-all duration-200";
+                    resultMsg.textContent = "等待輸入...";
+                    resultMsg.className = "mt-4 text-2xl font-bold h-8 text-gray-400";
+                }
+            });
+
+            function checkNumber(num) {
+                const isMatch = currentTargets.includes(num);
+                
+                if (isMatch) {
+                    statusPanel.className = "bg-red-50 rounded-2xl shadow-xl p-6 mb-6 text-center border-4 border-red-500 transition-all duration-200";
+                    resultMsg.textContent = "🎉 中獎機會！請核對全文";
+                    resultMsg.className = "mt-4 text-2xl font-bold h-8 text-red-600 animate-bounce";
+                    playSound('match');
+                    addToHistory(num, true);
+                } else {
+                    statusPanel.className = "bg-gray-50 rounded-2xl shadow-xl p-6 mb-6 text-center border-4 border-gray-200 transition-all duration-200";
+                    resultMsg.textContent = "沒中...再接再厲";
+                    resultMsg.className = "mt-4 text-2xl font-bold h-8 text-gray-400";
+                    addToHistory(num, false);
+                }
+
+                // Auto clear after delay
+                setTimeout(() => {
+                    input.value = '';
+                    statusPanel.className = "bg-white rounded-2xl shadow-xl p-6 mb-6 text-center border-4 border-transparent transition-all duration-200";
+                    resultMsg.textContent = "等待輸入...";
+                    resultMsg.className = "mt-4 text-2xl font-bold h-8 text-gray-400";
+                }, 800);
+            }
+
+            function addToHistory(num, won) {
+                if (history.children[0]?.textContent === "尚無紀錄") {
+                    history.innerHTML = '';
+                }
+                const badge = document.createElement('span');
+                badge.className = won 
+                    ? "px-3 py-1 bg-red-100 text-red-700 rounded-full font-bold text-sm"
+                    : "px-3 py-1 bg-gray-100 text-gray-500 rounded-full text-sm";
+                badge.textContent = num;
+                history.prepend(badge);
+            }
+
+            function playSound(type) {
+                // Simple beep logic could go here, but avoiding autoplay issues.
+            }
+        });
+    </script>
+</body>
+</html>
