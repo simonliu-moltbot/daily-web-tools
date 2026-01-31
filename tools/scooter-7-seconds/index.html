@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>機車路考：直線七秒大魔王</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Noto Sans TC', sans-serif; }
+        .lane {
+            background: #333;
+            border-left: 10px solid #fbbf24;
+            border-right: 10px solid #fbbf24;
+        }
+        .scooter-shadow {
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.5);
+        }
+    </style>
+</head>
+<body class="bg-gray-100 min-h-screen flex flex-col items-center">
+
+    <!-- Header -->
+    <div class="w-full bg-white shadow-md p-4 sticky top-0 z-10">
+        <div class="max-w-md mx-auto flex justify-between items-center">
+            <a href="../../index.html" class="text-blue-600 hover:text-blue-800 font-bold">🏠 回首頁</a>
+            <h1 class="text-xl font-bold text-gray-800">🛵 直線七秒大魔王</h1>
+        </div>
+    </div>
+
+    <!-- Main Game Area -->
+    <div class="flex-grow flex flex-col items-center justify-center w-full max-w-md p-4 relative">
+        
+        <!-- Score/Timer Panel -->
+        <div class="bg-white rounded-xl shadow-lg p-4 w-full mb-4 flex justify-between items-center border-2 border-gray-200">
+            <div class="text-center">
+                <p class="text-xs text-gray-500 uppercase">時間</p>
+                <p id="timer" class="text-3xl font-mono font-bold text-blue-600">0.00s</p>
+            </div>
+            <div class="text-center">
+                <p class="text-xs text-gray-500 uppercase">距離</p>
+                <p id="progress-text" class="text-3xl font-mono font-bold text-green-600">0%</p>
+            </div>
+        </div>
+
+        <!-- Game Canvas (The Lane) -->
+        <div id="game-container" class="relative w-full h-[60vh] bg-gray-800 rounded-lg overflow-hidden border-4 border-gray-700 shadow-inner">
+            <!-- The Lane Lines -->
+            <div class="absolute inset-y-0 left-1/4 w-1 bg-yellow-400 opacity-50"></div>
+            <div class="absolute inset-y-0 right-1/4 w-1 bg-yellow-400 opacity-50"></div>
+            
+            <!-- Start Line -->
+            <div class="absolute bottom-10 left-0 right-0 h-4 bg-white opacity-80 flex items-center justify-center">
+                <span class="text-[10px] text-black font-bold tracking-widest">START</span>
+            </div>
+
+            <!-- Finish Line -->
+            <div class="absolute top-10 left-0 right-0 h-4 bg-yellow-300 opacity-80 flex items-center justify-center checkered-pattern">
+                <span class="text-[10px] text-black font-bold tracking-widest">FINISH</span>
+            </div>
+
+            <!-- Scooter -->
+            <div id="scooter" class="absolute bottom-10 left-1/2 w-12 h-20 -ml-6 transition-transform duration-75 flex flex-col items-center justify-center">
+                <!-- Scooter Body -->
+                 <div class="text-4xl transform rotate-180">🛵</div>
+                 <!-- Wobble Indicator -->
+                 <div id="balance-bar" class="w-16 h-1 bg-gray-600 mt-1 rounded-full overflow-hidden">
+                     <div id="balance-indicator" class="w-1/2 h-full bg-green-500 mx-auto transition-all duration-75"></div>
+                 </div>
+            </div>
+
+            <!-- Messages Overlay -->
+            <div id="overlay" class="absolute inset-0 bg-black/80 flex flex-col items-center justify-center text-center p-6 z-20">
+                <h2 id="overlay-title" class="text-3xl font-bold text-white mb-2">準備考照！</h2>
+                <p id="overlay-desc" class="text-gray-300 mb-6">保持平衡，不要壓線<br>且必須「超過 7 秒」才算通過！</p>
+                <button id="start-btn" class="bg-yellow-500 hover:bg-yellow-400 text-black font-bold py-3 px-8 rounded-full text-lg shadow-lg transform transition active:scale-95">
+                    開始挑戰
+                </button>
+            </div>
+        </div>
+
+        <!-- Controls -->
+        <div class="w-full mt-4 grid grid-cols-2 gap-4 h-32">
+            <button id="btn-left" class="bg-gray-200 active:bg-gray-300 rounded-xl flex items-center justify-center shadow-md touch-manipulation">
+                <span class="text-4xl">⬅️</span>
+            </button>
+            <button id="btn-right" class="bg-gray-200 active:bg-gray-300 rounded-xl flex items-center justify-center shadow-md touch-manipulation">
+                <span class="text-4xl">➡️</span>
+            </button>
+        </div>
+        
+        <p class="text-xs text-gray-400 mt-4 text-center">
+            Tips: 電腦版可用鍵盤 ← → 方向鍵控制。<br>手機請點擊下方按鈕。
+        </p>
+
+    </div>
+
+    <footer class="p-4 text-center text-gray-500 text-sm w-full bg-white border-t mt-auto">
+        Created by AI Agent on 2026-02-01
+    </footer>
+
+    <script>
+        // Game State
+        let isPlaying = false;
+        let startTime = 0;
+        let animationFrame;
+        
+        // Scooter Physics
+        let posX = 50; // 0 to 100%
+        let progress = 0; // 0 to 100%
+        let speed = 0.08; // Progress per frame
+        let wobble = 0; // Current velocity X
+        let wobbleIntensity = 0; // Increases over time
+        
+        // DOM Elements
+        const scooter = document.getElementById('scooter');
+        const timerDisplay = document.getElementById('timer');
+        const progressDisplay = document.getElementById('progress-text');
+        const overlay = document.getElementById('overlay');
+        const overlayTitle = document.getElementById('overlay-title');
+        const overlayDesc = document.getElementById('overlay-desc');
+        const startBtn = document.getElementById('start-btn');
+        const btnLeft = document.getElementById('btn-left');
+        const btnRight = document.getElementById('btn-right');
+        const gameContainer = document.getElementById('game-container');
+        
+        // Constants
+        const LANE_WIDTH_PERCENT = 25; // Safe zone padding from edges
+        const FINISH_THRESHOLD = 90; // Percent progress to finish
+
+        // Input Handling
+        let inputLeft = false;
+        let inputRight = false;
+
+        function handleStart() {
+            resetGame();
+            isPlaying = true;
+            startTime = Date.now();
+            overlay.classList.add('hidden');
+            requestAnimationFrame(gameLoop);
+        }
+
+        function resetGame() {
+            posX = 50;
+            progress = 0;
+            wobble = 0;
+            wobbleIntensity = 0.1;
+            timerDisplay.textContent = '0.00s';
+            progressDisplay.textContent = '0%';
+            updateVisuals();
+        }
+
+        function gameOver(reason, success) {
+            isPlaying = false;
+            overlay.classList.remove('hidden');
+            
+            if (success) {
+                overlayTitle.textContent = '🎉 考照通過！';
+                overlayTitle.className = 'text-3xl font-bold text-green-400 mb-2';
+                overlayDesc.innerHTML = `成績：${((Date.now() - startTime)/1000).toFixed(2)}秒<br>恭喜你是合格的台灣騎士！`;
+                startBtn.textContent = '再次挑戰';
+            } else {
+                overlayTitle.textContent = '😱 遺憾落榜';
+                overlayTitle.className = 'text-3xl font-bold text-red-400 mb-2';
+                overlayDesc.innerHTML = `${reason}<br>請再接再厲！`;
+                startBtn.textContent = '重新開始';
+            }
+        }
+
+        function gameLoop() {
+            if (!isPlaying) return;
+
+            const now = Date.now();
+            const elapsed = (now - startTime) / 1000;
+            timerDisplay.textContent = elapsed.toFixed(2) + 's';
+
+            // Increase difficulty
+            wobbleIntensity = 0.1 + (elapsed * 0.02);
+
+            // Random Wind/Instability
+            const randomForce = (Math.random() - 0.5) * wobbleIntensity;
+            wobble += randomForce;
+
+            // Input Influence
+            if (inputLeft) wobble -= 0.3;
+            if (inputRight) wobble += 0.3;
+
+            // Friction/Damping
+            wobble *= 0.95;
+
+            // Apply Movement
+            posX += wobble;
+            progress += speed;
+
+            // Check Bounds (Lane is approx 15% to 85% visually, but let's be strict)
+            // Visual lane lines are at 25% and 75%. Scooter is centered.
+            // Let's say safe zone is 20-80 to account for scooter width.
+            if (posX < 20 || posX > 80) {
+                gameOver('壓線了！嗶嗶！', false);
+                return;
+            }
+
+            // Check Finish
+            if (progress >= 100) {
+                if (elapsed >= 7) {
+                    gameOver('太神啦！完美控制！', true);
+                } else {
+                    gameOver('太快了！未滿七秒！', false);
+                }
+                return;
+            }
+
+            // Update UI
+            progressDisplay.textContent = Math.floor(progress) + '%';
+            updateVisuals();
+
+            requestAnimationFrame(gameLoop);
+        }
+
+        function updateVisuals() {
+            // Move scooter up logic (actually we move background or just indicate progress)
+            // For simplicity, we keep scooter at bottom and maybe move stripes?
+            // Or just just simple: move scooter Y slightly, but mostly X.
+            // Let's move scooter UP from bottom: 10% to 80% container height.
+            const visualY = 10 + (progress * 0.7); 
+            
+            scooter.style.left = posX + '%';
+            scooter.style.bottom = visualY + '%';
+            
+            // Tilt scooter based on wobble
+            const tilt = wobble * 10;
+            scooter.querySelector('div').style.transform = `rotate(${180 + tilt}deg)`;
+        }
+
+        // Event Listeners
+        startBtn.addEventListener('click', handleStart);
+
+        // Touch/Mouse
+        const handleInput = (left, right) => {
+            inputLeft = left;
+            inputRight = right;
+        };
+
+        btnLeft.addEventListener('mousedown', () => handleInput(true, false));
+        btnLeft.addEventListener('mouseup', () => handleInput(false, false));
+        btnLeft.addEventListener('touchstart', (e) => { e.preventDefault(); handleInput(true, false); });
+        btnLeft.addEventListener('touchend', (e) => { e.preventDefault(); handleInput(false, false); });
+
+        btnRight.addEventListener('mousedown', () => handleInput(false, true));
+        btnRight.addEventListener('mouseup', () => handleInput(false, false));
+        btnRight.addEventListener('touchstart', (e) => { e.preventDefault(); handleInput(false, true); });
+        btnRight.addEventListener('touchend', (e) => { e.preventDefault(); handleInput(false, false); });
+
+        // Keyboard
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowLeft') inputLeft = true;
+            if (e.key === 'ArrowRight') inputRight = true;
+        });
+        document.addEventListener('keyup', (e) => {
+            if (e.key === 'ArrowLeft') inputLeft = false;
+            if (e.key === 'ArrowRight') inputRight = false;
+        });
+
+    </script>
+</body>
+</html>
