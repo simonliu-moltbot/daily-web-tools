@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>親戚稱謂計算機 (Relatives Calculator) - Daily Taiwan Tools</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Noto Sans TC', sans-serif; }
+        .btn-calc {
+            transition: all 0.1s;
+        }
+        .btn-calc:active {
+            transform: scale(0.95);
+        }
+    </style>
+</head>
+<body class="bg-orange-50 min-h-screen flex flex-col items-center p-4">
+
+    <!-- Header -->
+    <div class="w-full max-w-md flex justify-between items-center mb-6">
+        <a href="../../index.html" class="text-orange-800 hover:text-orange-900 font-medium flex items-center gap-1 transition-colors">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                <path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z" />
+            </svg>
+            回首頁
+        </a>
+    </div>
+
+    <!-- Main Calculator -->
+    <div class="bg-white rounded-3xl shadow-2xl overflow-hidden w-full max-w-md border border-orange-100">
+        
+        <!-- Display Screen -->
+        <div class="bg-gray-900 p-6 text-right relative">
+            <div class="text-gray-400 text-sm mb-1 h-6" id="chainText">我</div>
+            <div class="text-white text-4xl font-bold truncate h-12" id="resultText">自己</div>
+            <div class="absolute top-4 left-4 text-orange-400 opacity-20 text-6xl select-none pointer-events-none">
+                👪
+            </div>
+        </div>
+
+        <!-- Controls -->
+        <div class="p-4 grid grid-cols-4 gap-3 bg-gray-50">
+            
+            <button onclick="handleBtn('f')" class="btn-calc bg-white p-4 rounded-xl shadow-sm border border-gray-200 text-gray-700 font-bold hover:bg-orange-50 hover:border-orange-200">父</button>
+            <button onclick="handleBtn('m')" class="btn-calc bg-white p-4 rounded-xl shadow-sm border border-gray-200 text-gray-700 font-bold hover:bg-orange-50 hover:border-orange-200">母</button>
+            <button onclick="handleAction('back')" class="btn-calc bg-gray-200 p-4 rounded-xl shadow-sm text-gray-600 font-bold hover:bg-gray-300">←</button>
+            <button onclick="handleAction('reset')" class="btn-calc bg-red-100 p-4 rounded-xl shadow-sm text-red-600 font-bold hover:bg-red-200">C</button>
+
+            <button onclick="handleBtn('h')" class="btn-calc bg-white p-4 rounded-xl shadow-sm border border-gray-200 text-gray-700 font-bold hover:bg-orange-50 hover:border-orange-200">夫</button>
+            <button onclick="handleBtn('w')" class="btn-calc bg-white p-4 rounded-xl shadow-sm border border-gray-200 text-gray-700 font-bold hover:bg-orange-50 hover:border-orange-200">妻</button>
+            <button onclick="handleBtn('ob')" class="btn-calc bg-white p-4 rounded-xl shadow-sm border border-gray-200 text-gray-700 font-bold hover:bg-orange-50 hover:border-orange-200">兄</button>
+            <button onclick="handleBtn('yb')" class="btn-calc bg-white p-4 rounded-xl shadow-sm border border-gray-200 text-gray-700 font-bold hover:bg-orange-50 hover:border-orange-200">弟</button>
+
+            <button onclick="handleBtn('s')" class="btn-calc bg-white p-4 rounded-xl shadow-sm border border-gray-200 text-gray-700 font-bold hover:bg-orange-50 hover:border-orange-200">子</button>
+            <button onclick="handleBtn('d')" class="btn-calc bg-white p-4 rounded-xl shadow-sm border border-gray-200 text-gray-700 font-bold hover:bg-orange-50 hover:border-orange-200">女</button>
+            <button onclick="handleBtn('os')" class="btn-calc bg-white p-4 rounded-xl shadow-sm border border-gray-200 text-gray-700 font-bold hover:bg-orange-50 hover:border-orange-200">姐</button>
+            <button onclick="handleBtn('ys')" class="btn-calc bg-white p-4 rounded-xl shadow-sm border border-gray-200 text-gray-700 font-bold hover:bg-orange-50 hover:border-orange-200">妹</button>
+
+        </div>
+        
+        <div class="bg-orange-50 p-4 text-center text-xs text-orange-400">
+            按鈕順序：先按「父」再按「兄」= 爸爸的哥哥 (伯父)
+        </div>
+    </div>
+
+    <!-- Quick Common Guide -->
+    <div class="mt-8 max-w-md w-full">
+        <h3 class="text-orange-900 font-bold mb-3 flex items-center gap-2">
+            <span>🔥</span> 常見查詢
+        </h3>
+        <div class="grid grid-cols-2 gap-3">
+            <button onclick="setChain(['f','ob'])" class="bg-white p-3 rounded-lg shadow-sm text-sm text-left hover:shadow-md transition">
+                <span class="text-gray-500 block text-xs">爸爸的哥哥</span>
+                <span class="font-bold text-gray-800">伯父</span>
+            </button>
+            <button onclick="setChain(['m','ob'])" class="bg-white p-3 rounded-lg shadow-sm text-sm text-left hover:shadow-md transition">
+                <span class="text-gray-500 block text-xs">媽媽的兄弟</span>
+                <span class="font-bold text-gray-800">舅舅</span>
+            </button>
+            <button onclick="setChain(['f','ys'])" class="bg-white p-3 rounded-lg shadow-sm text-sm text-left hover:shadow-md transition">
+                <span class="text-gray-500 block text-xs">爸爸的姐妹</span>
+                <span class="font-bold text-gray-800">姑姑</span>
+            </button>
+            <button onclick="setChain(['m','ys'])" class="bg-white p-3 rounded-lg shadow-sm text-sm text-left hover:shadow-md transition">
+                <span class="text-gray-500 block text-xs">媽媽的姐妹</span>
+                <span class="font-bold text-gray-800">阿姨</span>
+            </button>
+        </div>
+    </div>
+
+    <footer class="mt-8 text-center text-orange-300 text-xs pb-4">
+        Created by AI Agent on <script>document.write(new Date().toISOString().split('T')[0])</script>
+    </footer>
+
+    <script>
+        // Database of titles
+        // Keys: comma separated sequence
+        // f=father, m=mother, h=husband, w=wife, s=son, d=daughter
+        // ob=older bro, yb=younger bro, os=older sis, ys=younger sis
+        
+        const TITLES = {
+            // Level 1
+            'f': '父親 (爸爸)',
+            'm': '母親 (媽媽)',
+            'h': '丈夫 (老公)',
+            'w': '妻子 (老婆)',
+            'ob': '哥哥 (兄)',
+            'yb': '弟弟 (弟)',
+            'os': '姐姐 (姐)',
+            'ys': '妹妹 (妹)',
+            's': '兒子',
+            'd': '女兒',
+
+            // Level 2 (Paternal)
+            'f,f': '祖父 (爺爺)',
+            'f,m': '祖母 (奶奶)',
+            'f,ob': '伯父 (阿伯)',
+            'f,yb': '叔父 (叔叔)',
+            'f,os': '姑母 (姑姑)',
+            'f,ys': '姑母 (姑姑)',
+            'f,s': '兄弟', // Context dependent (Me)
+            'f,d': '姐妹', // Context dependent
+
+            // Level 2 (Maternal)
+            'm,f': '外祖父 (外公)',
+            'm,m': '外祖母 (外婆)',
+            'm,ob': '舅父 (舅舅)',
+            'm,yb': '舅父 (舅舅)',
+            'm,os': '姨母 (阿姨)',
+            'm,ys': '姨母 (阿姨)',
+            'm,s': '兄弟',
+            'm,d': '姐妹',
+
+            // Level 2 (Spousal)
+            'h,f': '公公',
+            'h,m': '婆婆',
+            'h,ob': '大伯',
+            'h,yb': '小叔',
+            'h,os': '大姑',
+            'h,ys': '小姑',
+
+            'w,f': '岳父',
+            'w,m': '岳母',
+            'w,ob': '大舅子',
+            'w,yb': '小舅子',
+            'w,os': '大姨子',
+            'w,ys': '小姨子',
+
+            // Level 2 (Sibling's Spouses)
+            'ob,w': '嫂嫂',
+            'yb,w': '弟媳',
+            'os,h': '姐夫',
+            'ys,h': '妹夫',
+
+            // Level 3 (Uncles/Aunts Spouses)
+            'f,ob,w': '伯母',
+            'f,yb,w': '嬸嬸',
+            'f,os,h': '姑丈',
+            'f,ys,h': '姑丈',
+            
+            'm,ob,w': '舅媽',
+            'm,yb,w': '舅媽',
+            'm,os,h': '姨丈',
+            'm,ys,h': '姨丈',
+
+            // Level 3 (Grandparents)
+            'f,f,f': '曾祖父',
+            'f,f,m': '曾祖母',
+            'm,m,m': '曾外祖母', // etc
+
+            // Children of Siblings
+            'ob,s': '姪子',
+            'ob,d': '姪女',
+            'yb,s': '姪子',
+            'yb,d': '姪女',
+            'os,s': '外甥',
+            'os,d': '外甥女',
+            'ys,s': '外甥',
+            'ys,d': '外甥女',
+            
+            // Cousins (Paternal) - Simplified "Tang"
+            'f,ob,s': '堂兄弟',
+            'f,ob,d': '堂姐妹',
+            'f,yb,s': '堂兄弟',
+            'f,yb,d': '堂姐妹',
+            'f,os,s': '表兄弟', // Gu biao
+            'f,os,d': '表姐妹',
+
+            // Cousins (Maternal) - Simplified "Biao"
+            'm,ob,s': '表兄弟',
+            'm,ob,d': '表姐妹',
+            'm,os,s': '表兄弟',
+            'm,os,d': '表姐妹'
+        };
+
+        const LABELS = {
+            'f': '父親', 'm': '母親', 'h': '丈夫', 'w': '妻子',
+            'ob': '哥哥', 'yb': '弟弟', 'os': '姐姐', 'ys': '妹妹',
+            's': '兒子', 'd': '女兒'
+        };
+
+        let currentChain = [];
+
+        function updateDisplay() {
+            const chainDiv = document.getElementById('chainText');
+            const resultDiv = document.getElementById('resultText');
+
+            if (currentChain.length === 0) {
+                chainDiv.innerText = "我";
+                resultDiv.innerText = "自己";
+                return;
+            }
+
+            // Build chain text e.g. "我的 父親 的 哥哥"
+            const text = "我的 " + currentChain.map(k => LABELS[k]).join(" 的 ");
+            chainDiv.innerText = text;
+
+            // Lookup
+            const key = currentChain.join(',');
+            if (TITLES[key]) {
+                resultDiv.innerText = TITLES[key];
+                resultDiv.classList.remove('text-gray-400');
+                resultDiv.classList.add('text-white');
+            } else {
+                resultDiv.innerText = "??? (太遠了)";
+                resultDiv.classList.remove('text-white');
+                resultDiv.classList.add('text-gray-400');
+            }
+        }
+
+        function handleBtn(key) {
+            if (currentChain.length >= 4) {
+                // Limit depth
+                alert("太複雜了，請查族譜！");
+                return;
+            }
+            currentChain.push(key);
+            updateDisplay();
+        }
+
+        function handleAction(action) {
+            if (action === 'reset') {
+                currentChain = [];
+            } else if (action === 'back') {
+                currentChain.pop();
+            }
+            updateDisplay();
+        }
+
+        function setChain(chain) {
+            currentChain = chain;
+            updateDisplay();
+        }
+    </script>
+</body>
+</html>
