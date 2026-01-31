@@ -7,23 +7,22 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
     <style>
-        /* Nordic / Muji Aesthetic */
         body {
             font-family: 'Inter', 'Noto Sans TC', sans-serif;
-            background-color: #faf9f6; /* Off-white / Stone-50-ish but warmer */
-            color: #44403c; /* Stone-700 */
+            background-color: #faf9f6;
+            color: #44403c;
         }
         .glass-panel {
             background: rgba(255, 255, 255, 0.8);
             backdrop-filter: blur(12px);
-            border: 1px solid rgba(231, 229, 228, 0.8);
+            border-b: 1px solid rgba(231, 229, 228, 0.5);
         }
         .card-hover {
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
         .card-hover:hover {
             transform: translateY(-4px);
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.025);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05);
         }
         .btn-toggle {
             @apply px-3 py-1.5 rounded-md text-sm transition-all duration-200;
@@ -34,91 +33,54 @@
         .btn-toggle:not(.active) {
             @apply text-stone-500 hover:bg-stone-200;
         }
-        /* Table View Styles */
-        .view-table .project-card {
-            @apply flex-row items-center p-4 min-h-[80px];
+        
+        /* Proper Table Styles */
+        .muji-table {
+            @apply w-full border-collapse text-left text-sm;
         }
-        .view-table .project-image {
-            @apply w-16 h-16 mr-4 mb-0;
+        .muji-table th {
+            @apply py-4 px-4 font-medium text-stone-400 border-b border-stone-200 uppercase tracking-widest text-[10px];
         }
-        .view-table .project-content {
-            @apply flex-row items-center justify-between flex-1;
+        .muji-table td {
+            @apply py-4 px-4 border-b border-stone-100 align-middle;
         }
-        .view-table .project-desc {
-            @apply hidden md:block mr-4 mb-0;
+        .muji-table tr:hover td {
+            @apply bg-stone-50/50;
         }
-        .view-table .project-actions {
-            @apply mt-0 w-auto;
-        }
-        [v-cloak] { display: none; }
     </style>
     <script>
-        // Data passed from Python
-        const PROJECT_DATA = [{"id": "adk-tw-forex", "title_zh": "Tw Forex", "title_en": "Tw Forex", "desc_zh": "ADK 專案: Tw Forex", "desc_en": "ADK project: Tw Forex", "link": "https://github.com/simonliu-moltbot/adk-tw-forex", "type": "ADK", "icon": "🤖", "color": "bg-purple-100"}, {"id": "adk-tw-power", "title_zh": "Tw Power", "title_en": "Tw Power", "desc_zh": "ADK 專案: Tw Power", "desc_en": "ADK project: Tw Power", "link": "https://github.com/simonliu-moltbot/adk-tw-power", "type": "ADK", "icon": "🤖", "color": "bg-purple-100"}];
-        const TRANSLATIONS = {"nav_home": {"en": "Home", "zh": "首頁"}, "nav_tools": {"en": "Web Tools", "zh": "網頁工具"}, "nav_gallery": {"en": "AI Gallery", "zh": "AI 藝廊"}, "nav_mcp": {"en": "MCP Services", "zh": "MCP 服務"}, "nav_adk": {"en": "ADK Agents", "zh": "ADK 代理人"}, "footer_built": {"en": "Built with ❤️ by AI Agent", "zh": "由 AI Agent ❤️ 打造"}, "footer_updated": {"en": "Last Updated", "zh": "最後更新"}, "search_placeholder": {"en": "Search projects...", "zh": "搜尋專案..."}, "view_grid": {"en": "Grid", "zh": "網格"}, "view_table": {"en": "Table", "zh": "列表"}, "btn_view": {"en": "View", "zh": "查看"}, "btn_repo": {"en": "Repo", "zh": "原始碼"}};
+        const PROJECT_DATA = [{"title_zh": "Tw Forex", "title_en": "Tw Forex", "desc_zh": "ADK Project: Tw Forex", "desc_en": "ADK Project: Tw Forex", "link": "https://github.com/simonliu-moltbot/adk-tw-forex", "type": "ADK", "icon": "🤖", "color": "bg-purple-50"}, {"title_zh": "Tw Power", "title_en": "Tw Power", "desc_zh": "ADK Project: Tw Power", "desc_en": "ADK Project: Tw Power", "link": "https://github.com/simonliu-moltbot/adk-tw-power", "type": "ADK", "icon": "🤖", "color": "bg-purple-50"}];
+        const TRANSLATIONS = {"nav_home": {"en": "Home", "zh": "首頁"}, "nav_tools": {"en": "Web Tools", "zh": "工具集"}, "nav_gallery": {"en": "AI Gallery", "zh": "藝術畫廊"}, "nav_mcp": {"en": "MCP Services", "zh": "MCP 服務"}, "nav_adk": {"en": "ADK Agents", "zh": "ADK 代理"}, "footer_built": {"en": "Built with ❤️ by AI Agent", "zh": "由 AI Agent 打造"}, "footer_updated": {"en": "Last Updated", "zh": "最後更新"}, "search_placeholder": {"en": "Search projects...", "zh": "檢索項目..."}, "view_grid": {"en": "Grid", "zh": "網格"}, "view_table": {"en": "Table", "zh": "列表"}, "btn_view": {"en": "View", "zh": "進入"}};
     </script>
 </head>
 <body class="min-h-screen flex flex-col selection:bg-stone-200 selection:text-stone-900">
 
     <!-- Navbar -->
-    <nav class="sticky top-0 z-50 glass-panel border-b border-stone-200/50">
+    <nav class="sticky top-0 z-50 glass-panel">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex items-center justify-between h-16">
-                <!-- Logo -->
+                <!-- Logo: Always links to Dashboard Index -->
                 <div class="flex-shrink-0 flex items-center">
-                    <a href="../index.html" class="text-lg font-semibold tracking-wide flex items-center gap-2 text-stone-800">
-                        SimonLiu <span class="text-stone-400 font-light">| Works</span>
+                    <a href="https://simonliu-moltbot.github.io/daily-web-tools/index.html" class="text-lg font-semibold tracking-wide flex items-center gap-2 text-stone-800">
+                        SimonLiu <span class="text-stone-400 font-light">OpenClaw Works</span>
                     </a>
                 </div>
 
                 <!-- Desktop Nav -->
                 <div class="hidden md:flex space-x-1">
-                    
-            <a href="../../index.html" 
-               class="px-3 py-2 rounded-md text-sm font-medium transition-colors text-stone-500 hover:text-stone-900 hover:bg-stone-50"
-               data-i18n-key="nav_home">
-               Home
-            </a>
-        
-
-            <a href="../web-tools/index.html" 
-               class="px-3 py-2 rounded-md text-sm font-medium transition-colors text-stone-500 hover:text-stone-900 hover:bg-stone-50"
-               data-i18n-key="nav_tools">
-               Web Tools
-            </a>
-        
-
-            <a href="../gallery/index.html" 
-               class="px-3 py-2 rounded-md text-sm font-medium transition-colors text-stone-500 hover:text-stone-900 hover:bg-stone-50"
-               data-i18n-key="nav_gallery">
-               AI Gallery
-            </a>
-        
-
-            <a href="../mcp/index.html" 
-               class="px-3 py-2 rounded-md text-sm font-medium transition-colors text-stone-500 hover:text-stone-900 hover:bg-stone-50"
-               data-i18n-key="nav_mcp">
-               MCP Services
-            </a>
-        
-
-            <a href="../adk/index.html" 
-               class="px-3 py-2 rounded-md text-sm font-medium transition-colors text-stone-900 bg-stone-100"
-               data-i18n-key="nav_adk">
-               ADK Agents
-            </a>
-        
+                    <a href="https://simonliu-moltbot.github.io/" class="px-3 py-2 rounded-md text-xs font-medium transition-colors text-stone-500 hover:text-stone-900" data-i18n-key="nav_home">Home</a>
+<a href="https://simonliu-moltbot.github.io/daily-web-tools/web-tools/index.html" class="px-3 py-2 rounded-md text-xs font-medium transition-colors text-stone-500 hover:text-stone-900" data-i18n-key="nav_tools">Web Tools</a>
+<a href="https://simonliu-moltbot.github.io/daily-web-tools/gallery/index.html" class="px-3 py-2 rounded-md text-xs font-medium transition-colors text-stone-500 hover:text-stone-900" data-i18n-key="nav_gallery">AI Gallery</a>
+<a href="https://simonliu-moltbot.github.io/daily-web-tools/mcp/index.html" class="px-3 py-2 rounded-md text-xs font-medium transition-colors text-stone-500 hover:text-stone-900" data-i18n-key="nav_mcp">MCP Services</a>
+<a href="https://simonliu-moltbot.github.io/daily-web-tools/adk/index.html" class="px-3 py-2 rounded-md text-xs font-medium transition-colors text-stone-900 bg-stone-100 font-bold" data-i18n-key="nav_adk">ADK Agents</a>
                 </div>
 
                 <!-- Right Side: Lang & Mobile Menu -->
                 <div class="flex items-center gap-4">
-                    <!-- Lang Switcher -->
-                    <button id="lang-toggle" class="text-xs font-medium bg-stone-100 hover:bg-stone-200 text-stone-600 px-3 py-1.5 rounded-full transition-colors border border-stone-200">
+                    <button id="lang-toggle" class="text-[10px] font-bold bg-stone-100 hover:bg-stone-200 text-stone-600 px-3 py-1.5 rounded-full transition-colors border border-stone-200">
                         EN / 中文
                     </button>
-                    
-                    <!-- Mobile Menu Button -->
-                    <button id="mobile-menu-btn" class="md:hidden p-2 rounded-md text-stone-500 hover:text-stone-900 hover:bg-stone-100">
+                    <button id="mobile-menu-btn" class="md:hidden p-2 rounded-md text-stone-500 hover:text-stone-900">
                         <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
                         </svg>
@@ -130,56 +92,26 @@
         <!-- Mobile Menu -->
         <div id="mobile-menu" class="hidden md:hidden border-t border-stone-200 bg-white/95 backdrop-blur-sm">
             <div class="px-2 pt-2 pb-3 space-y-1">
-                
-            <a href="../../index.html" 
-               class="block px-3 py-2 rounded-md text-base font-medium text-stone-500 hover:text-stone-900 hover:bg-stone-50"
-               data-i18n-key="nav_home">
-               Home
-            </a>
-        
-
-            <a href="../web-tools/index.html" 
-               class="block px-3 py-2 rounded-md text-base font-medium text-stone-500 hover:text-stone-900 hover:bg-stone-50"
-               data-i18n-key="nav_tools">
-               Web Tools
-            </a>
-        
-
-            <a href="../gallery/index.html" 
-               class="block px-3 py-2 rounded-md text-base font-medium text-stone-500 hover:text-stone-900 hover:bg-stone-50"
-               data-i18n-key="nav_gallery">
-               AI Gallery
-            </a>
-        
-
-            <a href="../mcp/index.html" 
-               class="block px-3 py-2 rounded-md text-base font-medium text-stone-500 hover:text-stone-900 hover:bg-stone-50"
-               data-i18n-key="nav_mcp">
-               MCP Services
-            </a>
-        
-
-            <a href="../adk/index.html" 
-               class="block px-3 py-2 rounded-md text-base font-medium text-stone-900 bg-stone-100"
-               data-i18n-key="nav_adk">
-               ADK Agents
-            </a>
-        
+                <a href="https://simonliu-moltbot.github.io/" class="block px-3 py-2 rounded-md text-sm font-medium text-stone-500 hover:text-stone-900" data-i18n-key="nav_home">Home</a>
+<a href="https://simonliu-moltbot.github.io/daily-web-tools/web-tools/index.html" class="block px-3 py-2 rounded-md text-sm font-medium text-stone-500 hover:text-stone-900" data-i18n-key="nav_tools">Web Tools</a>
+<a href="https://simonliu-moltbot.github.io/daily-web-tools/gallery/index.html" class="block px-3 py-2 rounded-md text-sm font-medium text-stone-500 hover:text-stone-900" data-i18n-key="nav_gallery">AI Gallery</a>
+<a href="https://simonliu-moltbot.github.io/daily-web-tools/mcp/index.html" class="block px-3 py-2 rounded-md text-sm font-medium text-stone-500 hover:text-stone-900" data-i18n-key="nav_mcp">MCP Services</a>
+<a href="https://simonliu-moltbot.github.io/daily-web-tools/adk/index.html" class="block px-3 py-2 rounded-md text-sm font-medium text-stone-900 bg-stone-100 font-bold" data-i18n-key="nav_adk">ADK Agents</a>
             </div>
         </div>
     </nav>
 
-    <!-- Header / Hero -->
+    <!-- Header -->
     <header class="bg-white border-b border-stone-100 pt-16 pb-12 px-4 sm:px-6 lg:px-8">
         <div class="max-w-7xl mx-auto text-center">
             <h1 class="text-4xl font-light text-stone-900 mb-4 tracking-tight" data-i18n-zh="ADK 代理人" data-i18n-en="ADK Agents">
                 ADK Agents
             </h1>
-            <p class="max-w-2xl mx-auto text-lg text-stone-500 font-light leading-relaxed" data-i18n-zh="使用 Agent Development Kit 構建的自主代理。" data-i18n-en="Autonomous agents built with the Agent Development Kit.">
-                Autonomous agents built with the Agent Development Kit.
+            <p class="max-w-2xl mx-auto text-lg text-stone-500 font-light leading-relaxed" data-i18n-zh="自主 AI 代理。" data-i18n-en="Autonomous agents.">
+                Autonomous agents.
             </p>
 
-            <!-- Controls: Search & View Toggle -->
+            <!-- Controls -->
             <div class="mt-10 max-w-xl mx-auto flex flex-col sm:flex-row gap-4 items-center justify-center ">
                 <div class="relative w-full">
                     <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -188,7 +120,7 @@
                         </svg>
                     </div>
                     <input type="text" id="search-input" 
-                           class="block w-full pl-10 pr-3 py-2.5 border border-stone-200 rounded-lg leading-5 bg-stone-50 placeholder-stone-400 focus:outline-none focus:bg-white focus:ring-1 focus:ring-stone-400 focus:border-stone-400 sm:text-sm transition-colors"
+                           class="block w-full pl-10 pr-3 py-2.5 border border-stone-200 rounded-lg bg-stone-50 text-sm focus:outline-none focus:bg-white focus:ring-1 focus:ring-stone-400 transition-colors"
                            placeholder="Search projects...">
                 </div>
                 
@@ -204,200 +136,123 @@
         </div>
     </header>
 
-    <!-- Main Content -->
+    <!-- Main -->
     <main class="flex-1 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <!-- Projects Container -->
-        <div id="projects-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            <!-- Content injected by JS -->
-        </div>
-        
-        <!-- Empty State -->
+        <div id="projects-container"></div>
         <div id="empty-state" class="hidden text-center py-20">
             <p class="text-stone-400 text-lg">No projects found.</p>
         </div>
     </main>
 
     <!-- Footer -->
-    <footer class="bg-white border-t border-stone-200 mt-auto">
-        <div class="max-w-7xl mx-auto py-12 px-4 overflow-hidden sm:px-6 lg:px-8">
-            <div class="flex justify-center space-x-6 text-stone-400">
-               <!-- Social Links could go here -->
-            </div>
-            <div class="mt-8 text-center text-sm text-stone-400">
-                <p data-i18n-key="footer_built">Built with ❤️ by AI Agent</p>
-                <p class="mt-2"><span data-i18n-key="footer_updated">Last Updated</span>: 2026-01-31</p>
-            </div>
-        </div>
+    <footer class="bg-white border-t border-stone-200 mt-auto py-12 text-center text-sm text-stone-400">
+        <p data-i18n-key="footer_built">Built with ❤️ by AI Agent</p>
+        <p class="mt-2"><span data-i18n-key="footer_updated">Last Updated</span>: 2026-01-31</p>
     </footer>
 
-    <!-- Client-Side Logic -->
     <script>
-        // State
-        let currentLang = localStorage.getItem('lang') || 'en'; // Default EN
-        // Check browser lang only if no preference
-        const browserLang = navigator.language || navigator.userLanguage;
-        if (!localStorage.getItem('lang')) {
-            currentLang = browserLang.toLowerCase().includes('zh') ? 'zh' : 'en';
-        }
-        
+        let currentLang = localStorage.getItem('lang') || 'en';
         let currentView = localStorage.getItem('view') || 'grid';
         let searchQuery = '';
 
-        // DOM Elements
         const container = document.getElementById('projects-container');
         const emptyState = document.getElementById('empty-state');
         const searchInput = document.getElementById('search-input');
-        const langToggle = document.getElementById('lang-toggle');
-        const mobileMenuBtn = document.getElementById('mobile-menu-btn');
-        const mobileMenu = document.getElementById('mobile-menu');
 
-        // Init
         function init() {
-            renderProjects();
             updateLangUI();
             updateViewUI();
-            
-            // Listeners
-            if (searchInput) {
-                searchInput.addEventListener('input', (e) => {
-                    searchQuery = e.target.value.toLowerCase();
-                    renderProjects();
-                });
-            }
-            
-            langToggle.addEventListener('click', toggleLang);
-            
-            mobileMenuBtn.addEventListener('click', () => {
-                mobileMenu.classList.toggle('hidden');
-            });
+            if (searchInput) searchInput.addEventListener('input', e => { searchQuery = e.target.value.toLowerCase(); renderProjects(); });
+            document.getElementById('lang-toggle').addEventListener('click', toggleLang);
+            document.getElementById('mobile-menu-btn').addEventListener('click', () => document.getElementById('mobile-menu').classList.toggle('hidden'));
         }
 
-        // Render Projects
         function renderProjects() {
-            container.innerHTML = '';
-            
             const filtered = PROJECT_DATA.filter(p => {
                 const term = searchQuery.toLowerCase();
-                const matchTitle = (p.title_en && p.title_en.toLowerCase().includes(term)) || (p.title_zh && p.title_zh.toLowerCase().includes(term));
-                const matchDesc = (p.desc_en && p.desc_en.toLowerCase().includes(term)) || (p.desc_zh && p.desc_zh.toLowerCase().includes(term));
-                return matchTitle || matchDesc;
+                return (p.title_en + p.title_zh + p.desc_en + p.desc_zh).toLowerCase().includes(term);
             });
 
             if (filtered.length === 0) {
-                container.classList.add('hidden');
+                container.innerHTML = '';
                 emptyState.classList.remove('hidden');
-            } else {
-                container.classList.remove('hidden');
-                emptyState.classList.add('hidden');
+                return;
+            }
+            emptyState.classList.add('hidden');
+            if (currentView === 'grid') renderGridView(filtered); else renderTableView(filtered);
+        }
+
+        function renderGridView(projects) {
+            container.className = 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6';
+            container.innerHTML = projects.map(p => {
+                const title = currentLang === 'zh' ? (p.title_zh || p.title_en) : (p.title_en || p.title_zh);
+                const desc = currentLang === 'zh' ? (p.desc_zh || p.desc_en) : (p.desc_en || p.desc_zh);
+                const visual = p.image ? 
+                    `<div class="h-48 w-full bg-stone-100 overflow-hidden relative"><img src="${p.image}" class="w-full h-full object-cover transition-transform group-hover:scale-105"></div>` : 
+                    `<div class="h-32 w-full ${p.color || 'bg-stone-100'} flex items-center justify-center text-4xl">${p.icon || '📦'}</div>`;
                 
-                filtered.forEach(p => {
-                    const card = createCard(p);
-                    container.appendChild(card);
-                });
-            }
+                return `<div class="project-card group bg-white rounded-xl border border-stone-200 overflow-hidden card-hover flex flex-col relative">
+                    ${visual}
+                    <div class="p-5 flex flex-col flex-1">
+                        <div class="mb-auto">
+                            <h3 class="text-lg font-bold text-stone-800 mb-2 group-hover:text-stone-600 transition-colors">${title}</h3>
+                            <p class="text-xs text-stone-500 line-clamp-3">${desc}</p>
+                        </div>
+                        <div class="mt-5 pt-4 border-t border-stone-100 flex items-center justify-between">
+                            <span class="text-[10px] font-mono text-stone-400 bg-stone-50 px-2 py-1 rounded border border-stone-100 uppercase">${p.type}</span>
+                            <a href="${p.link}" target="${p.target || '_blank'}" class="text-xs font-bold text-stone-900 hover:text-stone-500 transition-colors">${TRANSLATIONS.btn_view[currentLang]} &rarr;</a>
+                        </div>
+                    </div>
+                </div>`;
+            }).join('');
         }
 
-        function createCard(p) {
-            const el = document.createElement('div');
-            el.className = `project-card group bg-white rounded-xl border border-stone-200 overflow-hidden card-hover flex flex-col relative ${currentView === 'table' ? 'view-table-item' : ''}`;
+        function renderTableView(projects) {
+            container.className = 'overflow-x-auto bg-white rounded-xl border border-stone-200 shadow-sm';
+            const headers = currentLang === 'zh' ? ['圖標', '名稱', '描述', '操作'] : ['Icon', 'Name', 'Description', 'Action'];
             
-            // Image / Icon Area
-            let visual = '';
-            if (p.image) {
-                visual = `<div class="project-image h-48 w-full bg-stone-100 overflow-hidden relative">
-                            <img src="${p.image}" alt="${p.title_en}" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105">
-                          </div>`;
-            } else {
-                visual = `<div class="project-image h-32 w-full ${p.color || 'bg-stone-100'} flex items-center justify-center text-4xl">
-                            ${p.icon || '📦'}
-                          </div>`;
-            }
+            let tableHtml = `<table class="muji-table">
+                <thead><tr>
+                    <th class="w-12 text-center">${headers[0]}</th>
+                    <th class="w-1/4">${headers[1]}</th>
+                    <th>${headers[2]}</th>
+                    <th class="w-24 text-center">${headers[3]}</th>
+                </tr></thead>
+                <tbody>`;
 
-            // Content Area
-            const title = currentLang === 'zh' ? (p.title_zh || p.title_en) : (p.title_en || p.title_zh);
-            const desc = currentLang === 'zh' ? (p.desc_zh || p.desc_en) : (p.desc_en || p.desc_zh);
-            const btnText = currentLang === 'zh' ? TRANSLATIONS.btn_view.zh : TRANSLATIONS.btn_view.en;
-            
-            el.innerHTML = `
-                ${visual}
-                <div class="project-content p-5 flex flex-col flex-1">
-                    <div class="mb-auto">
-                        <h3 class="text-lg font-bold text-stone-800 mb-2 group-hover:text-stone-600 transition-colors">${title}</h3>
-                        <p class="project-desc text-sm text-stone-500 line-clamp-3">${desc}</p>
-                    </div>
-                    <div class="project-actions mt-5 pt-4 border-t border-stone-100 flex items-center justify-between">
-                        <span class="text-xs font-mono text-stone-400 bg-stone-50 px-2 py-1 rounded">${p.type}</span>
-                        <a href="${p.link}" target="${p.target || '_blank'}" class="text-sm font-medium text-stone-800 hover:text-stone-500 flex items-center gap-1 transition-colors">
-                            ${btnText} <span>&rarr;</span>
+            tableHtml += projects.map(p => {
+                const title = currentLang === 'zh' ? (p.title_zh || p.title_en) : (p.title_en || p.title_zh);
+                const desc = currentLang === 'zh' ? (p.desc_zh || p.desc_en) : (p.desc_en || p.desc_zh);
+                const icon = p.image ? `<img src="${p.image}" class="w-8 h-8 rounded-md object-cover mx-auto">` : `<span class="text-xl">${p.icon || '📦'}</span>`;
+                return `<tr>
+                    <td class="text-center">${icon}</td>
+                    <td class="font-medium text-stone-800">${title}</td>
+                    <td class="text-stone-500 text-xs">${desc}</td>
+                    <td class="text-center">
+                        <a href="${p.link}" target="${p.target || '_blank'}" class="text-[11px] font-bold text-stone-600 hover:text-stone-900 underline decoration-stone-200 underline-offset-4 transition-colors">
+                            ${TRANSLATIONS.btn_view[currentLang]}
                         </a>
-                    </div>
-                </div>
-            `;
-            
-            return el;
+                    </td>
+                </tr>`;
+            }).join('');
+
+            container.innerHTML = tableHtml + '</tbody></table>';
         }
 
-        // View Toggle
-        window.setView = function(mode) {
-            currentView = mode;
-            localStorage.setItem('view', mode);
-            updateViewUI();
-        }
-
+        function setView(mode) { currentView = mode; localStorage.setItem('view', mode); updateViewUI(); }
         function updateViewUI() {
-            const btnGrid = document.getElementById('view-grid');
-            const btnTable = document.getElementById('view-table');
-            
-            if (currentView === 'grid') {
-                container.className = 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6';
-                document.body.classList.remove('view-table');
-                btnGrid.classList.add('active');
-                btnTable.classList.remove('active');
-            } else {
-                container.className = 'flex flex-col gap-4';
-                document.body.classList.add('view-table');
-                btnGrid.classList.remove('active');
-                btnTable.classList.add('active');
-            }
-            
-            // Re-render to apply structural changes if any
-            renderProjects(); 
-        }
-
-        // Language Toggle
-        function toggleLang() {
-            currentLang = currentLang === 'zh' ? 'en' : 'zh';
-            localStorage.setItem('lang', currentLang);
-            updateLangUI();
+            document.getElementById('view-grid').classList.toggle('active', currentView === 'grid');
+            document.getElementById('view-table').classList.toggle('active', currentView === 'table');
             renderProjects();
         }
-
+        function toggleLang() { currentLang = currentLang === 'zh' ? 'en' : 'zh'; localStorage.setItem('lang', currentLang); updateLangUI(); renderProjects(); }
         function updateLangUI() {
             document.documentElement.lang = currentLang === 'zh' ? 'zh-TW' : 'en';
-            
-            // Toggle Button Text
-            langToggle.textContent = currentLang === 'zh' ? 'EN' : '中文';
-
-            // Update UI strings
-            document.querySelectorAll('[data-i18n-key]').forEach(el => {
-                const key = el.dataset.i18nKey;
-                if (TRANSLATIONS[key]) {
-                    el.textContent = TRANSLATIONS[key][currentLang];
-                }
-            });
-
-            // Update Header Title/Desc via data attributes
-            document.querySelectorAll('[data-i18n-zh]').forEach(el => {
-                el.textContent = currentLang === 'zh' ? el.dataset.i18nZh : el.dataset.i18nEn;
-            });
-            
-            // Update Search Placeholder
-            if (searchInput) {
-                searchInput.placeholder = TRANSLATIONS.search_placeholder[currentLang];
-            }
+            document.getElementById('lang-toggle').textContent = currentLang === 'zh' ? 'EN' : '中文';
+            document.querySelectorAll('[data-i18n-key]').forEach(el => { el.textContent = TRANSLATIONS[el.dataset.i18nKey][currentLang]; });
+            document.querySelectorAll('[data-i18n-zh]').forEach(el => { el.textContent = currentLang === 'zh' ? el.dataset.i18nZh : el.dataset.i18nEn; });
+            if (searchInput) searchInput.placeholder = TRANSLATIONS.search_placeholder[currentLang];
         }
-
-        // Run
         init();
     </script>
 </body>
