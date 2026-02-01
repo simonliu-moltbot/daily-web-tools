@@ -34,17 +34,25 @@
         .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 
         @media print {
-            @page { size: landscape; margin: 0; }
+            @page { size: landscape; margin: 5mm; }
             body { background: white; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
             .no-print { display: none !important; }
-            /* Force reveal full canvas */
-            .venue-container { overflow: visible !important; width: 100% !important; height: auto !important; }
-            .venue-canvas { width: 100% !important; height: 100% !important; transform: scale(0.6); transform-origin: top left; } 
-            header, aside { display: none; }
+            
+            /* Print Modes */
+            body.print-map .venue-container { display: block !important; overflow: visible !important; width: 100% !important; height: auto !important; }
+            body.print-map .venue-canvas { width: 100% !important; height: 100% !important; transform: scale(0.7); transform-origin: top left; background: none; } 
+            body.print-map #list-view-container { display: none !important; }
+            
+            body.print-list .venue-container { display: none !important; }
+            body.print-list #list-view-container { display: block !important; width: 100% !important; height: auto !important; overflow: visible !important; }
+            body.print-list .list-grid { display: grid !important; grid-template-columns: 1fr 1fr 1fr; gap: 20px; }
+            body.print-list .list-card { break-inside: avoid; border: 1px solid #ddd; box-shadow: none; }
+
+            header, aside { display: none !important; }
         }
     </style>
 </head>
-<body class="h-[100dvh] flex flex-col overflow-hidden" x-data="seatingApp()">
+<body class="h-[100dvh] flex flex-col overflow-hidden" x-data="seatingApp()" :class="printMode">
 
     <!-- Header -->
     <header class="bg-white border-b border-gray-200 px-4 py-3 flex items-center justify-between shrink-0 z-30 no-print shadow-sm">
@@ -62,10 +70,16 @@
                 <button @click="viewMode='map'" :class="{'bg-white shadow text-indigo-600': viewMode==='map', 'text-gray-500': viewMode!=='map'}" class="px-3 py-1 rounded text-xs font-bold transition">會場地圖</button>
             </div>
             
-            <button @click="print()" class="hidden md:flex items-center gap-2 px-3 py-1.5 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 transition text-sm">
-                🖨️ 輸出 PDF
-            </button>
-            <button @click="saveData()" class="flex items-center gap-2 px-3 py-1.5 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition text-sm shadow-sm active:scale-95">
+            <div class="hidden md:flex items-center gap-1 border-l border-gray-200 pl-3 ml-1">
+                <button @click="print('list')" class="flex items-center gap-1 px-3 py-1.5 bg-gray-50 text-gray-700 rounded hover:bg-gray-100 transition text-xs font-medium border border-gray-200">
+                    📄 印名單
+                </button>
+                <button @click="print('map')" class="flex items-center gap-1 px-3 py-1.5 bg-indigo-50 text-indigo-700 rounded hover:bg-indigo-100 transition text-xs font-medium border border-indigo-200">
+                    🗺️ 印地圖
+                </button>
+            </div>
+            
+            <button @click="saveData()" class="flex items-center gap-2 px-3 py-1.5 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition text-sm shadow-sm active:scale-95 ml-2">
                 <span class="hidden md:inline">儲存</span>
                 <svg class="w-4 h-4 md:hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"/></svg>
             </button>
@@ -75,7 +89,8 @@
                 <button @click="open = !open" class="p-1 text-gray-500"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z"/></svg></button>
                 <div x-show="open" @click.outside="open = false" class="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 border border-gray-100 z-50">
                     <button @click="viewMode = viewMode === 'list' ? 'map' : 'list'; open=false" class="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" x-text="viewMode === 'list' ? '切換地圖模式' : '切換列表模式'"></button>
-                    <button @click="print(); open=false" class="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">輸出 PDF</button>
+                    <button @click="print('list'); open=false" class="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">📄 列印名單</button>
+                    <button @click="print('map'); open=false" class="block w-full text-left px-4 py-2 text-sm text-indigo-600 hover:bg-indigo-50">🗺️ 列印地圖</button>
                     <button @click="resetAll(); open=false" class="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50">全部重置</button>
                 </div>
             </div>
@@ -129,26 +144,26 @@
         </aside>
 
         <!-- Main Workspace -->
-        <main class="flex-1 bg-gray-100 overflow-hidden relative venue-container">
+        <main class="flex-1 bg-gray-100 overflow-hidden relative">
             
             <!-- LIST MODE (Classic Grid) -->
-            <div x-show="viewMode === 'list'" class="h-full overflow-y-auto p-4 md:p-8">
-                <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 md:gap-8 pb-24">
+            <div id="list-view-container" x-show="viewMode === 'list'" class="h-full overflow-y-auto p-4 md:p-8">
+                <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 md:gap-8 pb-24 list-grid">
                      <template x-for="table in tables" :key="table.id">
-                        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-3 flex flex-col">
+                        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-3 flex flex-col list-card">
                             <!-- Header -->
                             <div class="flex justify-between items-center mb-2 border-b border-gray-100 pb-2">
                                 <div class="flex items-center gap-2 flex-1">
                                     <input type="text" x-model="table.name" class="font-bold text-base text-gray-800 bg-transparent border-none focus:ring-0 w-full p-0">
                                 </div>
-                                <button @click="editTable(table)" class="text-gray-400 hover:text-indigo-500 p-1"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/></svg></button>
+                                <button @click="editTable(table)" class="text-gray-400 hover:text-indigo-500 p-1 no-print"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/></svg></button>
                             </div>
                             <!-- Guests -->
                              <div :id="'list-table-' + table.id" class="space-y-1 min-h-[60px]">
                                 <template x-for="guest in getTableGuests(table.id)" :key="guest.id">
                                     <div :data-id="guest.id" @click="openAssignModal(guest)" class="bg-gray-50 p-2 rounded text-sm flex justify-between">
                                         <span x-text="guest.name"></span>
-                                        <button @click.stop="removeGuestFromTable(guest.id)" class="text-gray-300 hover:text-red-500">×</button>
+                                        <button @click.stop="removeGuestFromTable(guest.id)" class="text-gray-300 hover:text-red-500 no-print">×</button>
                                     </div>
                                 </template>
                              </div>
@@ -158,7 +173,7 @@
             </div>
 
             <!-- MAP MODE (Canvas) -->
-            <div x-show="viewMode === 'map'" class="h-full overflow-auto bg-slate-200 relative" id="map-scroll-container">
+            <div x-show="viewMode === 'map'" class="h-full overflow-auto bg-slate-200 relative venue-container" id="map-scroll-container">
                 <div class="venue-canvas" 
                      @mousedown.self="startPan($event)" 
                      @mousemove.window="pan($event)" 
@@ -177,7 +192,7 @@
                                     <svg class="w-4 h-4 text-gray-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8h16M4 16h16"/></svg>
                                     <span class="font-bold text-sm truncate" x-text="table.name"></span>
                                 </div>
-                                <button @click.stop="editTable(table)" class="text-gray-400 hover:text-indigo-600"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg></button>
+                                <button @click.stop="editTable(table)" class="text-gray-400 hover:text-indigo-600 no-print"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg></button>
                             </div>
 
                             <!-- Guest List (Sortable) -->
@@ -185,7 +200,7 @@
                                 <template x-for="guest in getTableGuests(table.id)" :key="guest.id">
                                     <div :data-id="guest.id" @click="openAssignModal(guest)" class="bg-gray-50 p-1.5 rounded text-xs flex justify-between items-center group">
                                         <span class="truncate" x-text="guest.name"></span>
-                                        <button @click.stop="removeGuestFromTable(guest.id)" class="hidden group-hover:block text-red-400">×</button>
+                                        <button @click.stop="removeGuestFromTable(guest.id)" class="hidden group-hover:block text-red-400 no-print">×</button>
                                     </div>
                                 </template>
                             </div>
@@ -263,6 +278,7 @@
                 guests: [],
                 tables: [],
                 newGuestName: '',
+                printMode: '',
                 showBulkImport: false,
                 bulkNames: '',
                 toast: { show: false, msg: '', icon: '' },
@@ -366,7 +382,14 @@
                 moveTo(tableId) {
                     if (this.assignModal.guest) { this.assignModal.guest.tableId = tableId; this.saveData(); this.assignModal.show = false; }
                 },
-                print() { window.print(); },
+                print(mode = 'map') {
+                    this.printMode = 'print-' + mode;
+                    if (mode === 'map') this.viewMode = 'map';
+                    this.$nextTick(() => {
+                        window.print();
+                        setTimeout(() => this.printMode = '', 1000);
+                    });
+                },
                 showToast(msg, icon) { this.toast = { show: true, msg, icon }; setTimeout(() => this.toast.show = false, 2000); },
 
                 // --- Dragging Tables ---
