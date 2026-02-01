@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>自助餐阿姨心算術 | Buffet Price Predictor</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Noto Sans TC', sans-serif; }
+        .dish-btn { transition: all 0.2s; }
+        .dish-btn:active { transform: scale(0.95); }
+    </style>
+</head>
+<body class="bg-yellow-50 min-h-screen text-gray-800 flex flex-col">
+
+    <!-- Navbar -->
+    <nav class="bg-orange-600 text-white p-4 shadow-lg sticky top-0 z-50">
+        <div class="max-w-2xl mx-auto flex justify-between items-center">
+            <a href="../../index.html" class="flex items-center gap-2 hover:text-orange-200 transition">
+                <span>🏠</span> <span class="hidden sm:inline">回首頁</span>
+            </a>
+            <h1 class="text-xl font-bold tracking-wider">自助餐阿姨心算術 🍱</h1>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="flex-grow container max-w-2xl mx-auto p-4 space-y-6">
+        
+        <!-- Intro Card -->
+        <div class="bg-white p-6 rounded-2xl shadow-sm border border-orange-100">
+            <p class="text-gray-600 mb-2">「阿姨，這盤多少？」</p>
+            <p class="text-sm text-gray-500">輸入你的菜色與變數，模擬出最真實（隨機）的自助餐價格。</p>
+        </div>
+
+        <!-- Controls -->
+        <div class="bg-white p-6 rounded-2xl shadow-lg border-2 border-orange-200">
+            <h2 class="font-bold text-lg mb-4 text-orange-800">1. 夾菜區</h2>
+            
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6">
+                <button onclick="addDish('meat')" class="dish-btn bg-red-100 hover:bg-red-200 text-red-800 py-3 rounded-xl flex flex-col items-center gap-1">
+                    <span class="text-2xl">🍗</span>
+                    <span class="text-sm font-bold">大肉</span>
+                </button>
+                <button onclick="addDish('sub_meat')" class="dish-btn bg-pink-100 hover:bg-pink-200 text-pink-800 py-3 rounded-xl flex flex-col items-center gap-1">
+                    <span class="text-2xl">🥓</span>
+                    <span class="text-sm font-bold">小肉</span>
+                </button>
+                <button onclick="addDish('veg')" class="dish-btn bg-green-100 hover:bg-green-200 text-green-800 py-3 rounded-xl flex flex-col items-center gap-1">
+                    <span class="text-2xl">🥬</span>
+                    <span class="text-sm font-bold">青菜</span>
+                </button>
+                <button onclick="addDish('egg')" class="dish-btn bg-yellow-100 hover:bg-yellow-200 text-yellow-800 py-3 rounded-xl flex flex-col items-center gap-1">
+                    <span class="text-2xl">🥚</span>
+                    <span class="text-sm font-bold">蛋/豆腐</span>
+                </button>
+                <button onclick="addDish('rice')" class="dish-btn bg-gray-100 hover:bg-gray-200 text-gray-800 py-3 rounded-xl flex flex-col items-center gap-1 col-span-2 sm:col-span-4">
+                    <span class="text-2xl">🍚</span>
+                    <span class="text-sm font-bold">白飯 (+10元)</span>
+                </button>
+            </div>
+
+            <div class="bg-gray-50 p-4 rounded-xl border border-dashed border-gray-300 min-h-[100px] mb-6">
+                <div class="flex justify-between items-center mb-2">
+                    <span class="text-xs text-gray-400 font-bold uppercase tracking-wider">你的餐盤</span>
+                    <button onclick="clearPlate()" class="text-xs text-red-500 hover:text-red-700 underline">清空重夾</button>
+                </div>
+                <div id="plate-items" class="flex flex-wrap gap-2 text-2xl">
+                    <!-- Items go here -->
+                    <span class="text-gray-400 text-sm italic py-2">盤子空空的...</span>
+                </div>
+            </div>
+
+            <h2 class="font-bold text-lg mb-4 text-orange-800">2. 變數設定</h2>
+            
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">阿姨今天心情</label>
+                    <input type="range" id="mood" min="0" max="100" value="50" class="w-full accent-orange-600 h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer">
+                    <div class="flex justify-between text-xs text-gray-500 mt-1">
+                        <span>剛吵完架 😡</span>
+                        <span>中樂透 🥰</span>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">你的穿著打扮</label>
+                    <select id="appearance" class="w-full p-2 rounded-lg border border-gray-300 bg-white">
+                        <option value="normal">一般路人 (T恤短褲)</option>
+                        <option value="rich">西裝筆挺 (看起來像盤子)</option>
+                        <option value="student">窮學生 (看起來很餓)</option>
+                        <option value="familiar">熟客 (每天都來)</option>
+                    </select>
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">結帳話術</label>
+                    <div class="flex gap-2">
+                        <label class="flex-1 cursor-pointer">
+                            <input type="radio" name="talk" value="none" class="peer hidden" checked>
+                            <div class="p-2 text-center rounded-lg border peer-checked:bg-orange-100 peer-checked:border-orange-500 text-sm transition">
+                                沉默不語
+                            </div>
+                        </label>
+                        <label class="flex-1 cursor-pointer">
+                            <input type="radio" name="talk" value="auntie" class="peer hidden">
+                            <div class="p-2 text-center rounded-lg border peer-checked:bg-orange-100 peer-checked:border-orange-500 text-sm transition">
+                                叫阿姨
+                            </div>
+                        </label>
+                        <label class="flex-1 cursor-pointer">
+                            <input type="radio" name="talk" value="sister" class="peer hidden">
+                            <div class="p-2 text-center rounded-lg border peer-checked:bg-orange-100 peer-checked:border-orange-500 text-sm transition">
+                                叫姊姊
+                            </div>
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <button onclick="calculatePrice()" class="w-full mt-8 bg-orange-600 hover:bg-orange-700 text-white font-bold py-4 rounded-xl shadow-lg transform transition active:scale-[0.98] text-lg">
+                阿姨算錢！💰
+            </button>
+        </div>
+
+        <!-- Result Modal (Hidden by default) -->
+        <div id="result-overlay" class="fixed inset-0 bg-black/50 z-50 hidden flex items-center justify-center p-4 backdrop-blur-sm">
+            <div class="bg-white rounded-2xl shadow-2xl max-w-sm w-full p-6 animate-[bounce_0.5s_ease-out]">
+                <div class="text-center">
+                    <div class="text-6xl mb-4">👀</div>
+                    <h3 class="text-xl font-bold text-gray-800 mb-2">阿姨瞄了一眼...</h3>
+                    <p id="comment" class="text-gray-600 mb-6 italic">"年輕人多吃點..."</p>
+                    
+                    <div class="bg-orange-50 p-4 rounded-xl border border-orange-200 mb-6">
+                        <span class="text-gray-500 text-sm">總金額</span>
+                        <div class="text-5xl font-black text-orange-600">
+                            $<span id="final-price">0</span>
+                        </div>
+                    </div>
+
+                    <button onclick="closeResult()" class="w-full bg-gray-800 hover:bg-gray-900 text-white font-bold py-3 rounded-lg">
+                        好...謝謝阿姨
+                    </button>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-gray-800 text-gray-400 py-6 text-center text-sm">
+        <p>Created by AI Agent on 2026-02-01</p>
+        <p class="mt-1">※ 本計算機純屬娛樂，實際價格以阿姨當下心情為主</p>
+    </footer>
+
+    <script>
+        const plate = [];
+        const prices = {
+            meat: 40,      // Market price reference
+            sub_meat: 25,
+            veg: 15,
+            egg: 15,
+            rice: 10
+        };
+        const emojis = {
+            meat: '🍗',
+            sub_meat: '🥓',
+            veg: '🥬',
+            egg: '🥚',
+            rice: '🍚'
+        };
+
+        function addDish(type) {
+            plate.push(type);
+            renderPlate();
+        }
+
+        function clearPlate() {
+            plate.length = 0;
+            renderPlate();
+        }
+
+        function renderPlate() {
+            const container = document.getElementById('plate-items');
+            if (plate.length === 0) {
+                container.innerHTML = '<span class="text-gray-400 text-sm italic py-2">盤子空空的...</span>';
+                return;
+            }
+            container.innerHTML = plate.map(item => `<span>${emojis[item]}</span>`).join('');
+        }
+
+        function calculatePrice() {
+            if (plate.length === 0) {
+                alert("你沒夾菜是要算空氣嗎？");
+                return;
+            }
+
+            let baseTotal = 0;
+            plate.forEach(item => baseTotal += prices[item]);
+
+            // Factors
+            const mood = parseInt(document.getElementById('mood').value); // 0-100 (Bad to Good)
+            const appearance = document.getElementById('appearance').value;
+            const talk = document.querySelector('input[name="talk"]:checked').value;
+
+            let multiplier = 1.0;
+            let comment = "";
+
+            // Mood Impact (Bad mood = Higher price)
+            // Mood 0 = 1.3x, Mood 50 = 1.0x, Mood 100 = 0.8x
+            const moodFactor = 1.3 - (mood / 100) * 0.5;
+            multiplier *= moodFactor;
+
+            // Appearance Impact
+            if (appearance === 'rich') {
+                multiplier *= 1.2;
+                comment = "阿姨看你穿西裝，應該不差這點錢吧？";
+            } else if (appearance === 'student') {
+                multiplier *= 0.85;
+                comment = "還在長身體，阿姨算你便宜點。";
+            } else if (appearance === 'familiar') {
+                multiplier *= 0.9; // Sometimes familiar gets discount, sometimes ripped off. Let's say discount.
+                comment = "帥哥又來了喔！";
+            } else {
+                comment = "嗯...（阿姨迅速心算中）";
+            }
+
+            // Talk Impact
+            if (talk === 'sister') {
+                if (mood < 30) {
+                    multiplier *= 1.1; // Annoyed
+                    comment = "叫姊姊也沒用，我很忙。";
+                } else {
+                    multiplier *= 0.9; // Flattery works
+                    comment = "哎唷嘴巴真甜，少算你5塊。";
+                }
+            } else if (talk === 'auntie') {
+                 // Neutral
+            }
+
+            // Random Chaos (The "Visual Estimation" Error) +/- 10%
+            const chaos = 0.9 + Math.random() * 0.2;
+            
+            let finalPrice = Math.round(baseTotal * multiplier * chaos);
+
+            // Round to nearest 5 or 0 usually
+            finalPrice = Math.round(finalPrice / 5) * 5;
+
+            // Override comments based on extreme price diff
+            if (finalPrice > baseTotal * 1.5) {
+                comment = "（阿姨覺得你看起來像盤子）";
+            } else if (finalPrice < baseTotal * 0.7) {
+                comment = "（阿姨今天心情特好，隨便算）";
+            }
+
+            showResult(finalPrice, comment);
+        }
+
+        function showResult(price, text) {
+            document.getElementById('final-price').innerText = price;
+            document.getElementById('comment').innerText = text;
+            document.getElementById('result-overlay').classList.remove('hidden');
+        }
+
+        function closeResult() {
+            document.getElementById('result-overlay').classList.add('hidden');
+        }
+    </script>
+</body>
+</html>
