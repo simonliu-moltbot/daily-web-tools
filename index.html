@@ -3,232 +3,141 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🇹🇼 Daily Taiwan Web Tools Collection</title>
+    <title>🇹🇼 Daily Taiwan Web Tools | SimonLiu OpenClaw Works</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
     <style>
-        body { font-family: 'Noto Sans TC', sans-serif; }
+        body { font-family: 'Inter', 'Noto Sans TC', sans-serif; background-color: #faf9f6; color: #44403c; }
+        .glass-panel { background: rgba(255, 255, 255, 0.8); backdrop-filter: blur(12px); border-bottom: 1px solid rgba(231, 229, 228, 0.5); }
+        .muji-table { width: 100%; border-collapse: collapse; text-align: left; font-size: 0.875rem; }
+        .muji-table th { padding: 1rem; font-weight: 500; color: #a8a29e; border-bottom: 1px solid #e7e5e4; text-transform: uppercase; letter-spacing: 0.1em; font-size: 10px; }
+        .muji-table td { padding: 1rem; border-bottom: 1px solid #f5f5f4; vertical-align: middle; }
+        .muji-table tr:hover td { background-color: rgba(250, 249, 246, 0.5); }
+        .btn-toggle { padding: 0.375rem 0.75rem; border-radius: 0.375rem; font-size: 0.875rem; transition: all 0.2s; }
+        .btn-toggle.active { background-color: #292524; color: white; }
+        .btn-toggle:not(.active) { color: #78716c; }
+        .btn-toggle:not(.active):hover { background-color: #e7e5e4; }
     </style>
+    <script>
+        const PROJECT_DATA = [{"title_zh": "自助餐阿姨心算術", "title_en": "Buffet Price Predictor", "desc_zh": "Tool", "desc_en": "Tool", "link": "tools/buffet-price/index.html", "type": "Tool", "icon": "🛠️"}, {"title_zh": "⚡️ 台灣電費試算器", "title_en": "Daily Taiwan Web Tools", "desc_zh": "Tool", "desc_en": "Tool", "link": "tools/electricity-bill-calc/index.html", "type": "Tool", "icon": "🛠️"}, {"title_zh": "里長廣播模擬器", "title_en": "Daily Taiwan Web Tools", "desc_zh": "Tool", "desc_en": "Tool", "link": "tools/village-broadcast/index.html", "type": "Tool", "icon": "🛠️"}, {"title_zh": "開會成本計算機", "title_en": "Meeting Cost Calculator", "desc_zh": "Tool", "desc_en": "Tool", "link": "tools/meeting-cost-calc/index.html", "type": "Tool", "icon": "🛠️"}, {"title_zh": "Simon's AI Gallery", "title_en": "Simon's AI Gallery", "desc_zh": "Tool", "desc_en": "Tool", "link": "tools/ai-gallery/index.html", "type": "Tool", "icon": "🛠️"}, {"title_zh": "台灣特休計算機", "title_en": "Taiwan Annual Leave Calculator", "desc_zh": "Tool", "desc_en": "Tool", "link": "tools/annual-leave-calc/index.html", "type": "Tool", "icon": "🛠️"}, {"title_zh": "今天喝什麼？ - 台灣手搖飲抽籤機", "title_en": "今天喝什麼？ - 台灣手搖飲抽籤機", "desc_zh": "Tool", "desc_en": "Tool", "link": "tools/drink-picker/index.html", "type": "Tool", "icon": "🛠️"}, {"title_zh": "台灣婚禮紅包行情計算機 🧧", "title_en": "台灣婚禮紅包行情計算機 🧧", "desc_zh": "Tool", "desc_en": "Tool", "link": "tools/red-envelope-guide/index.html", "type": "Tool", "icon": "🛠️"}, {"title_zh": "台股損益滷肉飯換算機 🍚", "title_en": "台股損益滷肉飯換算機 🍚", "desc_zh": "Tool", "desc_en": "Tool", "link": "tools/stock-to-rice/index.html", "type": "Tool", "icon": "🛠️"}, {"title_zh": "機車路考：直線七秒大魔王", "title_en": "機車路考：直線七秒大魔王", "desc_zh": "Tool", "desc_en": "Tool", "link": "tools/scooter-7-seconds/index.html", "type": "Tool", "icon": "🛠️"}, {"title_zh": "統一發票對獎小幫手 - Daily Taiwan Tools", "title_en": "統一發票對獎小幫手 - Daily Taiwan Tools", "desc_zh": "Tool", "desc_en": "Tool", "link": "tools/invoice-lottery/index.html", "type": "Tool", "icon": "🛠️"}, {"title_zh": "線上擲筊 - 有問必答 Bwa Bwei", "title_en": "線上擲筊 - 有問必答 Bwa Bwei", "desc_zh": "Tool", "desc_en": "Tool", "link": "tools/bwa-bwei/index.html", "type": "Tool", "icon": "🛠️"}, {"title_zh": "親戚稱謂計算機 (Relatives Calculator) - Daily Taiwan Tools", "title_en": "親戚稱謂計算機 (Relatives Calculator) - Daily Taiwan Tools", "desc_zh": "Tool", "desc_en": "Tool", "link": "tools/relative-calculator/index.html", "type": "Tool", "icon": "🛠️"}];
+        const TRANSLATIONS = {"nav_home": {"en": "Home", "zh": "首頁"}, "nav_tools": {"en": "Web Tools", "zh": "工具集"}, "nav_gallery": {"en": "AI Gallery", "zh": "藝術畫廊"}, "nav_mcp": {"en": "MCP Services", "zh": "MCP 服務"}, "nav_adk": {"en": "ADK Agents", "zh": "ADK 代理"}, "footer_built": {"en": "Built with ❤️ by AI Agent", "zh": "由 AI Agent 打造"}, "footer_updated": {"en": "Last Updated", "zh": "最後更新"}, "search_placeholder": {"en": "Search projects...", "zh": "檢索項目..."}, "btn_view": {"en": "View", "zh": "進入"}};
+    </script>
 </head>
-<body class="bg-gray-100 min-h-screen flex flex-col">
+<body class="min-h-screen flex flex-col selection:bg-stone-200">
 
-    <!-- Hero Section -->
-    <header class="bg-indigo-700 text-white py-12 px-4 shadow-lg">
-        <div class="container mx-auto text-center">
-            <h1 class="text-4xl md:text-5xl font-bold mb-4">🇹🇼 Daily Taiwan Web Tools</h1>
-            <p class="text-indigo-200 text-lg">Useful, funny, and uniquely Taiwanese web tools generated by AI.</p>
+    <nav class="sticky top-0 z-50 glass-panel">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between h-16">
+            <a href="index.html" class="text-lg font-bold tracking-tight text-stone-900">
+                SimonLiu OpenClaw Works
+            </a>
+            <div class="hidden md:flex space-x-1">
+                <a href="index.html" class="px-3 py-2 rounded-md text-xs font-medium transition-colors text-stone-500 hover:text-stone-900" data-i18n-key="nav_home">Home</a>
+<a href="index.html" class="px-3 py-2 rounded-md text-xs font-medium transition-colors text-stone-900 bg-stone-100 font-bold" data-i18n-key="nav_tools">Web Tools</a>
+<a href="gallery/index.html" class="px-3 py-2 rounded-md text-xs font-medium transition-colors text-stone-500 hover:text-stone-900" data-i18n-key="nav_gallery">AI Gallery</a>
+<a href="mcp/index.html" class="px-3 py-2 rounded-md text-xs font-medium transition-colors text-stone-500 hover:text-stone-900" data-i18n-key="nav_mcp">MCP Services</a>
+<a href="adk/index.html" class="px-3 py-2 rounded-md text-xs font-medium transition-colors text-stone-500 hover:text-stone-900" data-i18n-key="nav_adk">ADK Agents</a>
+            </div>
+            <div class="flex items-center gap-3">
+                <button id="lang-toggle" class="text-[10px] font-bold bg-stone-100 px-2.5 py-1.5 rounded-full border border-stone-200 hover:bg-stone-200 transition-colors">
+                    EN / 中文
+                </button>
+                <button id="mobile-menu-btn" class="md:hidden p-1 text-stone-500 hover:text-stone-900">
+                    <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" /></svg>
+                </button>
+            </div>
+        </div>
+        <div id="mobile-menu" class="hidden md:hidden border-t border-stone-100 bg-white/95 backdrop-blur-sm px-2 py-3 space-y-1">
+            <a href="index.html" class="block px-3 py-2 rounded-md text-sm font-medium text-stone-500 hover:text-stone-900" data-i18n-key="nav_home">Home</a>
+<a href="index.html" class="block px-3 py-2 rounded-md text-sm font-medium text-stone-900 bg-stone-100 font-bold" data-i18n-key="nav_tools">Web Tools</a>
+<a href="gallery/index.html" class="block px-3 py-2 rounded-md text-sm font-medium text-stone-500 hover:text-stone-900" data-i18n-key="nav_gallery">AI Gallery</a>
+<a href="mcp/index.html" class="block px-3 py-2 rounded-md text-sm font-medium text-stone-500 hover:text-stone-900" data-i18n-key="nav_mcp">MCP Services</a>
+<a href="adk/index.html" class="block px-3 py-2 rounded-md text-sm font-medium text-stone-500 hover:text-stone-900" data-i18n-key="nav_adk">ADK Agents</a>
+        </div>
+    </nav>
+
+    <header class="bg-white border-b border-stone-100 pt-16 pb-12 px-4 text-center">
+        <h1 class="text-4xl font-light text-stone-900 mb-4 tracking-tight" data-i18n-zh="🇹🇼 台灣日常工具集" data-i18n-en="🇹🇼 Daily Taiwan Web Tools">🇹🇼 Daily Taiwan Web Tools</h1>
+        <p class="max-w-2xl mx-auto text-lg text-stone-500 font-light leading-relaxed" data-i18n-zh="解決台灣生活痛點的實用小工具。" data-i18n-en="Useful tools for daily life in Taiwan.">Useful tools for daily life in Taiwan.</p>
+        <div class="mt-10 max-w-xl mx-auto flex flex-col sm:flex-row gap-4 items-center justify-center ">
+            <div class="relative w-full">
+                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <svg class="h-5 w-5 text-stone-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0" stroke-width="2"/></svg>
+                </div>
+                <input type="text" id="search-input" class="block w-full pl-10 pr-3 py-2.5 border border-stone-200 rounded-lg bg-stone-50 text-sm focus:outline-none focus:ring-1 focus:ring-stone-400 transition-colors">
+            </div>
+            <div class="flex items-center bg-stone-100 p-1 rounded-lg border border-stone-200 shrink-0">
+                <button id="view-grid" class="btn-toggle" onclick="setView('grid')"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" stroke-width="2"/></svg></button>
+                <button id="view-table" class="btn-toggle" onclick="setView('table')"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16" stroke-width="2"/></svg></button>
+            </div>
         </div>
     </header>
 
-    <!-- Tools Grid -->
-    <main class="flex-grow container mx-auto px-4 py-12">
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+    <main class="flex-1 w-full max-w-7xl mx-auto px-4 py-12"><div id="projects-container"></div><div id="empty-state" class="hidden text-center py-20 text-stone-400 text-lg">No projects found.</div></main>
 
-            <!-- Card Template -->
-            
-            <div class="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-xl transition-shadow duration-300 flex flex-col">
-                <div class="h-2 bg-pink-500"></div>
-                <div class="p-6 flex-grow">
-                    <h3 class="text-xl font-bold text-gray-800 mb-2">長輩圖產生器</h3>
-                    <p class="text-gray-600 text-sm mb-4">Elder Greeting Generator</p>
-                    <p class="text-gray-500 text-sm">自製早安、認同請分享的長輩圖，問候親友最方便！</p>
-                </div>
-                <div class="bg-gray-50 px-6 py-4">
-                    <a href="tools/elder-greeting-generator/index.html" class="block w-full text-center bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2 px-4 rounded transition">
-                        Launch 🚀
-                    </a>
-                </div>
-            </div>
-
-            <div class="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-xl transition-shadow duration-300 flex flex-col">
-                <div class="h-2 bg-blue-500"></div>
-                <div class="p-6 flex-grow">
-                    <h3 class="text-xl font-bold text-gray-800 mb-2">特休計算機</h3>
-                    <p class="text-gray-600 text-sm mb-4">Annual Leave Calculator</p>
-                    <p class="text-gray-500 text-sm">輸入到職日，快速計算你的勞基法特休天數。</p>
-                </div>
-                <div class="bg-gray-50 px-6 py-4">
-                    <a href="tools/annual-leave-calc/index.html" class="block w-full text-center bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2 px-4 rounded transition">
-                        Launch 🚀
-                    </a>
-                </div>
-            </div>
-
-            <div class="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-xl transition-shadow duration-300 flex flex-col">
-                <div class="h-2 bg-red-500"></div>
-                <div class="p-6 flex-grow">
-                    <h3 class="text-xl font-bold text-gray-800 mb-2">線上擲筊</h3>
-                    <p class="text-gray-600 text-sm mb-4">Bwa Bwei</p>
-                    <p class="text-gray-500 text-sm">心誠則靈，線上向神明請示，獲得聖筊指引。</p>
-                </div>
-                <div class="bg-gray-50 px-6 py-4">
-                    <a href="tools/bwa-bwei/index.html" class="block w-full text-center bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2 px-4 rounded transition">
-                        Launch 🚀
-                    </a>
-                </div>
-            </div>
-
-            <div class="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-xl transition-shadow duration-300 flex flex-col">
-                <div class="h-2 bg-yellow-500"></div>
-                <div class="p-6 flex-grow">
-                    <h3 class="text-xl font-bold text-gray-800 mb-2">電費計算機</h3>
-                    <p class="text-gray-600 text-sm mb-4">Electricity Bill Calc</p>
-                    <p class="text-gray-500 text-sm">輸入度數，依據台電分段累進費率試算電費。</p>
-                </div>
-                <div class="bg-gray-50 px-6 py-4">
-                    <a href="tools/electricity-bill-calc/index.html" class="block w-full text-center bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2 px-4 rounded transition">
-                        Launch 🚀
-                    </a>
-                </div>
-            </div>
-
-            <div class="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-xl transition-shadow duration-300 flex flex-col">
-                <div class="h-2 bg-green-500"></div>
-                <div class="p-6 flex-grow">
-                    <h3 class="text-xl font-bold text-gray-800 mb-2">飲料抽籤</h3>
-                    <p class="text-gray-600 text-sm mb-4">Drink Picker</p>
-                    <p class="text-gray-500 text-sm">不知道喝什麼？讓命運決定今天的下午茶！</p>
-                </div>
-                <div class="bg-gray-50 px-6 py-4">
-                    <a href="tools/drink-picker/index.html" class="block w-full text-center bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2 px-4 rounded transition">
-                        Launch 🚀
-                    </a>
-                </div>
-            </div>
-
-            <div class="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-xl transition-shadow duration-300 flex flex-col">
-                <div class="h-2 bg-purple-500"></div>
-                <div class="p-6 flex-grow">
-                    <h3 class="text-xl font-bold text-gray-800 mb-2">發票兌獎助手</h3>
-                    <p class="text-gray-600 text-sm mb-4">Invoice Lottery</p>
-                    <p class="text-gray-500 text-sm">輸入發票號碼末三碼，快速檢查是否中獎。</p>
-                </div>
-                <div class="bg-gray-50 px-6 py-4">
-                    <a href="tools/invoice-lottery/index.html" class="block w-full text-center bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2 px-4 rounded transition">
-                        Launch 🚀
-                    </a>
-                </div>
-            </div>
-
-            <div class="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-xl transition-shadow duration-300 flex flex-col">
-                <div class="h-2 bg-orange-500"></div>
-                <div class="p-6 flex-grow">
-                    <h3 class="text-xl font-bold text-gray-800 mb-2">損益換算滷肉飯</h3>
-                    <p class="text-gray-600 text-sm mb-4">Stock to Rice</p>
-                    <p class="text-gray-500 text-sm">股票賠了多少？換算成可以吃幾碗滷肉飯，痛感更真實。</p>
-                </div>
-                <div class="bg-gray-50 px-6 py-4">
-                    <a href="tools/stock-to-rice/index.html" class="block w-full text-center bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2 px-4 rounded transition">
-                        Launch 🚀
-                    </a>
-                </div>
-            </div>
-
-             <div class="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-xl transition-shadow duration-300 flex flex-col">
-                <div class="h-2 bg-teal-500"></div>
-                <div class="p-6 flex-grow">
-                    <h3 class="text-xl font-bold text-gray-800 mb-2">機車直線七秒</h3>
-                    <p class="text-gray-600 text-sm mb-4">Scooter 7 Seconds</p>
-                    <p class="text-gray-500 text-sm">模擬考駕照大魔王，能不能撐過七秒？</p>
-                </div>
-                <div class="bg-gray-50 px-6 py-4">
-                    <a href="tools/scooter-7-seconds/index.html" class="block w-full text-center bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2 px-4 rounded transition">
-                        Launch 🚀
-                    </a>
-                </div>
-            </div>
-
-            <div class="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-xl transition-shadow duration-300 flex flex-col">
-                <div class="h-2 bg-red-600"></div>
-                <div class="p-6 flex-grow">
-                    <h3 class="text-xl font-bold text-gray-800 mb-2">紅包行情指南</h3>
-                    <p class="text-gray-600 text-sm mb-4">Red Envelope Guide</p>
-                    <p class="text-gray-500 text-sm">婚禮、過年包多少？輸入關係與地點，獲得建議金額。</p>
-                </div>
-                <div class="bg-gray-50 px-6 py-4">
-                    <a href="tools/red-envelope-guide/index.html" class="block w-full text-center bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2 px-4 rounded transition">
-                        Launch 🚀
-                    </a>
-                </div>
-            </div>
-
-            <div class="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-xl transition-shadow duration-300 flex flex-col">
-                <div class="h-2 bg-indigo-500"></div>
-                <div class="p-6 flex-grow">
-                    <h3 class="text-xl font-bold text-gray-800 mb-2">親戚稱呼計算機</h3>
-                    <p class="text-gray-600 text-sm mb-4">Relative Calculator</p>
-                    <p class="text-gray-500 text-sm">三姑六婆怎麼叫？輸入關係鏈，馬上知道怎麼稱呼。</p>
-                </div>
-                <div class="bg-gray-50 px-6 py-4">
-                    <a href="tools/relative-calculator/index.html" class="block w-full text-center bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2 px-4 rounded transition">
-                        Launch 🚀
-                    </a>
-                </div>
-            </div>
-
-            <div class="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-xl transition-shadow duration-300 flex flex-col">
-                <div class="h-2 bg-gray-600"></div>
-                <div class="p-6 flex-grow">
-                    <h3 class="text-xl font-bold text-gray-800 mb-2">會議成本計算機</h3>
-                    <p class="text-gray-600 text-sm mb-4">Meeting Cost Calc</p>
-                    <p class="text-gray-500 text-sm">這個會議浪費了多少錢？輸入薪資與人數，即時顯示燒錢速度。</p>
-                </div>
-                <div class="bg-gray-50 px-6 py-4">
-                    <a href="tools/meeting-cost-calc/index.html" class="block w-full text-center bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2 px-4 rounded transition">
-                        Launch 🚀
-                    </a>
-                </div>
-            </div>
-
-            <div class="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-xl transition-shadow duration-300 flex flex-col">
-                <div class="h-2 bg-orange-400"></div>
-                <div class="p-6 flex-grow">
-                    <h3 class="text-xl font-bold text-gray-800 mb-2">吃到飽回本計算機</h3>
-                    <p class="text-gray-600 text-sm mb-4">Buffet Price</p>
-                    <p class="text-gray-500 text-sm">要吃多少盤肉才回本？精算你的戰鬥力。</p>
-                </div>
-                <div class="bg-gray-50 px-6 py-4">
-                    <a href="tools/buffet-price/index.html" class="block w-full text-center bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2 px-4 rounded transition">
-                        Launch 🚀
-                    </a>
-                </div>
-            </div>
-
-            <div class="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-xl transition-shadow duration-300 flex flex-col">
-                <div class="h-2 bg-blue-400"></div>
-                <div class="p-6 flex-grow">
-                    <h3 class="text-xl font-bold text-gray-800 mb-2">村里廣播系統</h3>
-                    <p class="text-gray-600 text-sm mb-4">Village Broadcast</p>
-                    <p class="text-gray-500 text-sm">文字轉語音，模擬台灣村里廣播的獨特口音與回音。</p>
-                </div>
-                <div class="bg-gray-50 px-6 py-4">
-                    <a href="tools/village-broadcast/index.html" class="block w-full text-center bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2 px-4 rounded transition">
-                        Launch 🚀
-                    </a>
-                </div>
-            </div>
-
-            <div class="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-xl transition-shadow duration-300 flex flex-col">
-                <div class="h-2 bg-fuchsia-500"></div>
-                <div class="p-6 flex-grow">
-                    <h3 class="text-xl font-bold text-gray-800 mb-2">AI 藝廊</h3>
-                    <p class="text-gray-600 text-sm mb-4">AI Gallery</p>
-                    <p class="text-gray-500 text-sm">展示 AI 生成的藝術作品。</p>
-                </div>
-                <div class="bg-gray-50 px-6 py-4">
-                    <a href="tools/ai-gallery/index.html" class="block w-full text-center bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2 px-4 rounded transition">
-                        Launch 🚀
-                    </a>
-                </div>
-            </div>
-
-        </div>
-    </main>
-
-    <!-- Footer -->
-    <footer class="bg-gray-800 text-gray-400 text-center py-6">
-        <p>© 2026 Daily Taiwan Web Tools. Created by AI.</p>
+    <footer class="bg-white border-t border-stone-200 py-12 text-center text-sm text-stone-400">
+        <p data-i18n-key="footer_built">Built with ❤️ by AI Agent</p>
+        <p class="mt-2"><span data-i18n-key="footer_updated">Last Updated</span>: 2026-02-01</p>
     </footer>
 
+    <script>
+        let currentLang = localStorage.getItem('lang') || 'en', currentView = localStorage.getItem('view') || 'grid', searchQuery = '';
+        const container = document.getElementById('projects-container'), empty = document.getElementById('empty-state'), searchInput = document.getElementById('search-input');
+
+        function init() {
+            updateLangUI(); updateViewUI();
+            if (searchInput) searchInput.addEventListener('input', e => { searchQuery = e.target.value.toLowerCase(); render(); });
+            document.getElementById('lang-toggle').addEventListener('click', () => { currentLang = currentLang==='zh'?'en':'zh'; localStorage.setItem('lang', currentLang); updateLangUI(); render(); });
+            document.getElementById('mobile-menu-btn').addEventListener('click', () => document.getElementById('mobile-menu').classList.toggle('hidden'));
+        }
+
+        function render() {
+            const filtered = PROJECT_DATA.filter(p => {
+                const term = searchQuery.toLowerCase();
+                return (p.title_en + p.title_zh + p.desc_en + p.desc_zh).toLowerCase().includes(term);
+            });
+            if (!filtered.length) { container.innerHTML = ''; empty.classList.remove('hidden'); return; }
+            empty.classList.add('hidden');
+            if (currentView === 'grid') renderGrid(filtered); else renderTable(filtered);
+        }
+
+        function renderGrid(projects) {
+            container.className = 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6';
+            container.innerHTML = projects.map(p => {
+                const t = currentLang==='zh'?(p.title_zh||p.title_en):(p.title_en||p.title_zh), d = currentLang==='zh'?(p.desc_zh||p.desc_en):(p.desc_en||p.desc_zh);
+                const visual = p.image ? `<div class="h-48 overflow-hidden"><img src="${p.image}" class="w-full h-full object-cover transition-transform group-hover:scale-105"></div>` : `<div class="h-32 flex items-center justify-center text-4xl bg-stone-100">${p.icon||'📦'}</div>`;
+                return `<div class="bg-white rounded-xl border border-stone-200 overflow-hidden flex flex-col group shadow-sm hover:shadow-md transition-all">
+                    ${visual}<div class="p-5 flex flex-col flex-1"><h3 class="text-lg font-bold text-stone-800 mb-2">${t}</h3><p class="text-xs text-stone-500 line-clamp-3 mb-5">${d}</p>
+                    <div class="mt-auto pt-4 border-t border-stone-50 flex items-center justify-between"><span class="text-[10px] font-mono text-stone-400 uppercase">${p.type}</span>
+                    <a href="${p.link}" target="${p.target||'_blank'}" class="text-xs font-bold text-stone-900 hover:text-stone-500">${TRANSLATIONS.btn_view[currentLang]} &rarr;</a></div></div></div>`;
+            }).join('');
+        }
+
+        function renderTable(projects) {
+            container.className = 'overflow-x-auto bg-white rounded-xl border border-stone-200 shadow-sm';
+            const h = currentLang==='zh'?['圖標','名稱','描述','操作']:['Icon','Name','Description','Action'];
+            container.innerHTML = `<table class="muji-table"><thead><tr><th class="w-12 text-center">${h[0]}</th><th class="w-1/4">${h[1]}</th><th>${h[2]}</th><th class="w-24 text-center">${h[3]}</th></tr></thead><tbody>` + 
+                projects.map(p => {
+                    const t = currentLang==='zh'?(p.title_zh||p.title_en):(p.title_en||p.title_zh), d = currentLang==='zh'?(p.desc_zh||p.desc_en):(p.desc_en||p.desc_zh);
+                    const icon = p.image ? `<img src="${p.image}" class="w-8 h-8 rounded object-cover mx-auto">` : `<span class="text-xl">${p.icon||'📦'}</span>`;
+                    return `<tr><td class="text-center">${icon}</td><td class="font-medium text-stone-800">${t}</td><td class="text-stone-500 text-xs">${d}</td><td class="text-center">
+                    <a href="${p.link}" target="${p.target||'_blank'}" class="text-[11px] font-bold text-stone-600 hover:text-stone-900 underline underline-offset-4 decoration-stone-200">${TRANSLATIONS.btn_view[currentLang]}</a></td></tr>`;
+                }).join('') + '</tbody></table>';
+        }
+
+        function setView(m) { currentView=m; localStorage.setItem('view',m); updateViewUI(); }
+        function updateViewUI() {
+            document.getElementById('view-grid').classList.toggle('active', currentView==='grid');
+            document.getElementById('view-table').classList.toggle('active', currentView==='table');
+            render();
+        }
+        function updateLangUI() {
+            document.documentElement.lang = currentLang==='zh'?'zh-TW':'en';
+            document.getElementById('lang-toggle').textContent = currentLang==='zh'?'EN':'中文';
+            document.querySelectorAll('[data-i18n-key]').forEach(el => { el.textContent = TRANSLATIONS[el.dataset.i18nKey][currentLang]; });
+            document.querySelectorAll('[data-i18n-zh]').forEach(el => { el.textContent = currentLang==='zh'?el.dataset.i18nZh:el.dataset.i18nEn; });
+            if (searchInput) searchInput.placeholder = TRANSLATIONS.search_placeholder[currentLang];
+        }
+        init();
+    </script>
 </body>
 </html>
