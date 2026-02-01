@@ -100,7 +100,7 @@
         document.getElementById('date').innerText = new Date().toISOString().split('T')[0];
         
         let audioCtx;
-        let isPlaying = false;
+        let isBroadcasting = false;
 
         function initAudio() {
             if (!audioCtx) {
@@ -111,104 +111,195 @@
             }
         }
 
-        // 播放前奏 (Do-Mi-So-Do)
-        function playChime() {
+        function createReverbNode(ctx) {
+            // Simple Feedback Delay for Echo
+            const input = ctx.createGain();
+            const output = ctx.createGain();
+            const delay = ctx.createDelay(1.0);
+            const feedback = ctx.createGain();
+            const filter = ctx.createBiquadFilter();
+
+            delay.delayTime.value = 0.4; // 400ms delay
+            feedback.gain.value = 0.4; // 40% feedback
+            filter.type = 'lowpass';
+            filter.frequency.value = 2000; // Low-fi sound
+
+            input.connect(output);
+            input.connect(delay);
+            delay.connect(filter);
+            filter.connect(feedback);
+            feedback.connect(delay);
+            feedback.connect(output);
+
+            return { input, output };
+        }
+
+        // 播放鐘聲 (type: 'intro' | 'outro')
+        function playChime(type = 'intro') {
             initAudio();
-            const now = audioCtx.currentTime;
-            // Notes: C4, E4, G4, C5 (Simple Major Arpeggio)
-            const notes = [261.63, 329.63, 392.00, 523.25];
-            const duration = 0.6;
-            
-            notes.forEach((freq, i) => {
-                const osc = audioCtx.createOscillator();
-                const gain = audioCtx.createGain();
+            return new Promise((resolve) => {
+                const now = audioCtx.currentTime;
+                // Notes: C4, E4, G4, C5 (Do Mi Sol Do)
+                const notes = [261.63, 329.63, 392.00, 523.25];
+                const duration = 0.6; // seconds per note
                 
-                osc.type = 'triangle'; // Triangle wave sounds more like a chime than sine
-                osc.frequency.value = freq;
+                // Audio Graph
+                const masterGain = audioCtx.createGain();
+                const reverb = createReverbNode(audioCtx);
                 
-                gain.gain.setValueAtTime(0.0, now + i * duration);
-                gain.gain.linearRampToValueAtTime(0.3, now + i * duration + 0.05); // Attack
-                gain.gain.exponentialRampToValueAtTime(0.01, now + i * duration + duration - 0.1); // Decay
+                masterGain.connect(reverb.input);
+                reverb.output.connect(audioCtx.destination);
                 
-                osc.connect(gain);
-                gain.connect(audioCtx.destination);
-                
-                osc.start(now + i * duration);
-                osc.stop(now + i * duration + duration);
+                masterGain.gain.value = 0.5;
+
+                notes.forEach((freq, i) => {
+                    const osc = audioCtx.createOscillator();
+                    const noteGain = audioCtx.createGain();
+                    
+                    osc.type = 'triangle'; 
+                    osc.frequency.value = freq;
+                    
+                    const startTime = now + i * duration;
+                    const stopTime = startTime + duration;
+
+                    noteGain.gain.setValueAtTime(0, startTime);
+                    noteGain.gain.linearRampToValueAtTime(1, startTime + 0.1);
+                    noteGain.gain.exponentialRampToValueAtTime(0.01, stopTime - 0.05);
+                    
+                    osc.connect(noteGain);
+                    noteGain.connect(masterGain);
+                    
+                    osc.start(startTime);
+                    osc.stop(stopTime);
+                });
+
+                // Resolve after melody + ringout
+                const totalDuration = (notes.length * duration) + 1.5; // +1.5s for echo tail
+                animateSpeaker(totalDuration * 1000);
+                setTimeout(resolve, totalDuration * 1000);
             });
-            
-            animateSpeaker(notes.length * duration * 1000);
         }
 
-        function speak(text, delay, volume) {
-            const utter = new SpeechSynthesisUtterance(text);
-            utter.lang = 'zh-TW';
-            utter.rate = parseFloat(document.getElementById('speed-range').value);
-            utter.volume = volume;
-            utter.pitch = 0.8; // Lower pitch for authority
-            
-            // Try to find a TW voice
-            const voices = speechSynthesis.getVoices();
-            const twVoice = voices.find(v => v.lang.includes('TW') || v.lang.includes('Hant'));
-            if (twVoice) utter.voice = twVoice;
+        function speak(text) {
+            return new Promise((resolve, reject) => {
+                const echoLevel = parseInt(document.getElementById('echo-range').value);
+                const speed = parseFloat(document.getElementById('speed-range').value);
+                
+                // Create main utterance
+                const utter = new SpeechSynthesisUtterance(text);
+                utter.lang = 'zh-TW';
+                utter.rate = speed;
+                utter.pitch = 0.9; // Slightly deeper
+                utter.volume = 1.0;
 
-            setTimeout(() => {
+                // Voice selection
+                const voices = speechSynthesis.getVoices();
+                // Prefer Google text-to-speech or generic TW
+                const twVoice = voices.find(v => v.lang.includes('TW') || v.lang.includes('Hant'));
+                if (twVoice) utter.voice = twVoice;
+
+                // Event handling
+                utter.onstart = () => {
+                    animateSpeaker(text.length * 400); // Rough visual duration estimate
+                };
+                utter.onend = () => {
+                    resolve();
+                };
+                utter.onerror = (e) => {
+                    console.error('TTS Error:', e);
+                    resolve(); // Resolve anyway to continue flow
+                };
+
+                // "Fake Echo" Strategy:
+                // Standard SpeechSynthesis puts calls in a queue. It CANNOT overlap audio on most platforms.
+                // To simulate echo, we really need the Chime to carry the "space" feeling.
+                
                 window.speechSynthesis.speak(utter);
-            }, delay);
-            
-            return utter;
+            });
         }
 
-        function startBroadcast() {
-            initAudio();
-            window.speechSynthesis.cancel();
+        async function startBroadcast() {
+            if (isBroadcasting) return;
+            isBroadcasting = true;
             
-            const text = document.getElementById('broadcast-text').value;
-            const echoLevel = parseInt(document.getElementById('echo-range').value);
-            
-            // Play chime first
-            playChime();
-            
-            // Wait for chime to finish (approx 2.4s) then speak
-            setTimeout(() => {
-                // Approximate duration for animation
-                animateSpeaker(text.length * 400); 
+            // UI Update
+            const btn = document.querySelector('button[onclick="startBroadcast()"]');
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '⏳ 廣播中...';
+            btn.disabled = true;
+
+            try {
+                initAudio();
+                window.speechSynthesis.cancel(); // Clear queue
                 
-                // Main voice
-                speak(text, 0, 1.0);
-                
-                // Echo 1
-                if (echoLevel > 0) {
-                    const delay1 = 200;
-                    speak(text, delay1, echoLevel / 200); // Max 0.5 vol
+                const text = document.getElementById('broadcast-text').value;
+
+                // 1. Intro Chime
+                await playChime('intro');
+
+                // 2. Wait a beat (silence/ambience)
+                await new Promise(r => setTimeout(r, 500));
+
+                // 3. Speak content
+                if (text.trim()) {
+                    await speak(text);
                 }
-                
-                // Echo 2
-                if (echoLevel > 50) {
-                    const delay2 = 450;
-                    speak(text, delay2, echoLevel / 400); // Max 0.25 vol
-                }
-                
-            }, 2500);
+
+                // 4. Wait a beat
+                await new Promise(r => setTimeout(r, 800));
+
+                // 5. Outro Chime
+                await playChime('outro');
+
+            } catch (err) {
+                console.error(err);
+            } finally {
+                isBroadcasting = false;
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+            }
         }
 
         function stopAll() {
             window.speechSynthesis.cancel();
+            if (audioCtx) audioCtx.suspend();
+            isBroadcasting = false;
+             // Reset UI
+            const btn = document.querySelector('button[onclick="startBroadcast()"]');
+            if(btn) {
+                btn.innerHTML = '🎙️ 開始廣播';
+                btn.disabled = false;
+            }
+            // Reset speaker animation
+            const box = document.getElementById('speaker-box');
+            box.classList.remove('vibrating');
+            box.classList.add('border-slate-300');
+            box.classList.remove('border-orange-400');
+            box.classList.remove('bg-orange-100');
         }
 
         function animateSpeaker(duration) {
             const box = document.getElementById('speaker-box');
+            // Reset just in case
+            box.classList.remove('vibrating');
+            void box.offsetWidth; // Trigger reflow
+
             box.classList.add('vibrating');
             box.classList.remove('border-slate-300');
             box.classList.add('border-orange-400');
             box.classList.add('bg-orange-100');
             
-            setTimeout(() => {
+            // Clear previous timeout if exists (not perfect but simple)
+            if (box.dataset.timeoutId) clearTimeout(parseInt(box.dataset.timeoutId));
+            
+            const tid = setTimeout(() => {
                 box.classList.remove('vibrating');
                 box.classList.add('border-slate-300');
                 box.classList.remove('border-orange-400');
                 box.classList.remove('bg-orange-100');
             }, duration);
+            
+            box.dataset.timeoutId = tid;
         }
         
         // Force load voices
