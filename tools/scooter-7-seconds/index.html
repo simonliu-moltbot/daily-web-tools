@@ -62,7 +62,7 @@
             <!-- Scooter -->
             <div id="scooter" class="absolute bottom-10 left-1/2 w-12 h-20 -ml-6 transition-transform duration-75 flex flex-col items-center justify-center">
                 <!-- Scooter Body -->
-                 <div class="text-4xl transform rotate-180">🛵</div>
+                 <div class="text-4xl transform rotate-90">🛵</div>
                  <!-- Wobble Indicator -->
                  <div id="balance-bar" class="w-16 h-1 bg-gray-600 mt-1 rounded-full overflow-hidden">
                      <div id="balance-indicator" class="w-1/2 h-full bg-green-500 mx-auto transition-all duration-75"></div>
@@ -229,7 +229,7 @@
             
             // Tilt scooter based on wobble
             const tilt = wobble * 10;
-            scooter.querySelector('div').style.transform = `rotate(${180 + tilt}deg)`;
+            scooter.querySelector('div').style.transform = `rotate(${90 + tilt}deg)`;
         }
 
         // Event Listeners
