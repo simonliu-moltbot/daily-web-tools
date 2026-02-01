@@ -23,6 +23,8 @@
             height: 2000px; 
             position: relative; 
             cursor: grab;
+            /* Default transform origin for printing */
+            transform-origin: top left;
         }
         .venue-canvas:active { cursor: grabbing; }
         .draggable-table { position: absolute; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06); touch-action: none; }
@@ -39,8 +41,12 @@
             .no-print { display: none !important; }
             
             /* Print Modes */
-            body.print-map .venue-container { display: block !important; overflow: visible !important; width: 100% !important; height: auto !important; }
-            body.print-map .venue-canvas { width: 100% !important; height: 100% !important; transform: scale(0.7); transform-origin: top left; background: none; } 
+            body.print-map .venue-container { display: flex !important; justify-content: center; align-items: center; overflow: visible !important; width: 100vw !important; height: 100vh !important; }
+            body.print-map .venue-canvas { 
+                /* Centering logic handled by JS auto-scaling */
+                background: none; 
+                border: none;
+            } 
             body.print-map #list-view-container { display: none !important; }
             
             body.print-list .venue-container { display: none !important; }
@@ -109,11 +115,26 @@
                     </h2>
                     <button @click="toggleBulkImport()" class="text-xs text-indigo-600 font-medium">匯入</button>
                 </div>
-                <div class="flex gap-2">
-                    <input type="text" x-model="newGuestName" @keydown.enter="addGuest()" placeholder="輸入姓名..." class="flex-1 px-3 py-1.5 bg-gray-50 border border-gray-200 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                    <button @click="addGuest()" class="px-3 py-1.5 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
-                    </button>
+                <!-- Add Guest Input Area -->
+                <div class="flex flex-col gap-2 mb-2">
+                    <input type="text" x-model="newGuestName" @keydown.enter="addGuest()" placeholder="輸入姓名..." class="w-full px-3 py-1.5 bg-gray-50 border border-gray-200 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                    <div class="flex justify-between items-center">
+                        <div class="flex gap-2">
+                            <button @click="newGuestTags.baby = !newGuestTags.baby" 
+                                    class="text-xs px-2 py-1 rounded border transition flex items-center gap-1"
+                                    :class="newGuestTags.baby ? 'bg-pink-50 border-pink-200 text-pink-600' : 'bg-gray-50 border-gray-200 text-gray-400'">
+                                👶 嬰兒
+                            </button>
+                            <button @click="newGuestTags.veg = !newGuestTags.veg" 
+                                    class="text-xs px-2 py-1 rounded border transition flex items-center gap-1"
+                                    :class="newGuestTags.veg ? 'bg-green-50 border-green-200 text-green-600' : 'bg-gray-50 border-gray-200 text-gray-400'">
+                                🥗 素食
+                            </button>
+                        </div>
+                        <button @click="addGuest()" class="px-3 py-1 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition text-xs font-bold">
+                            新增
+                        </button>
+                    </div>
                 </div>
                 
                 <div x-show="showBulkImport" x-transition class="absolute top-14 left-2 right-2 bg-white shadow-xl border border-gray-200 p-3 rounded-lg z-50">
@@ -131,7 +152,11 @@
                         <div :data-id="guest.id" 
                              @click="openAssignModal(guest)"
                              class="guest-chip group bg-white border border-gray-200 p-2 rounded shadow-sm hover:border-indigo-400 active:border-indigo-600 transition flex justify-between items-center touch-manipulation">
-                            <span class="text-gray-700 font-medium text-sm truncate" x-text="guest.name"></span>
+                            <div class="flex items-center gap-1 overflow-hidden">
+                                <span class="text-gray-700 font-medium text-sm truncate" x-text="guest.name"></span>
+                                <span x-show="guest.isBaby" class="text-xs" title="嬰兒">👶</span>
+                                <span x-show="guest.isVeg" class="text-xs" title="素食">🥗</span>
+                            </div>
                             <button @click.stop="deleteGuest(guest.id)" class="hidden md:block text-gray-300 hover:text-red-500 opacity-0 group-hover:opacity-100 transition">×</button>
                         </div>
                     </template>
@@ -161,8 +186,12 @@
                             <!-- Guests -->
                              <div :id="'list-table-' + table.id" class="space-y-1 min-h-[60px]">
                                 <template x-for="guest in getTableGuests(table.id)" :key="guest.id">
-                                    <div :data-id="guest.id" @click="openAssignModal(guest)" class="bg-gray-50 p-2 rounded text-sm flex justify-between">
-                                        <span x-text="guest.name"></span>
+                                    <div :data-id="guest.id" @click="openAssignModal(guest)" class="bg-gray-50 p-2 rounded text-sm flex justify-between items-center">
+                                        <div class="flex items-center gap-1">
+                                            <span x-text="guest.name"></span>
+                                            <span x-show="guest.isBaby" class="text-xs">👶</span>
+                                            <span x-show="guest.isVeg" class="text-xs">🥗</span>
+                                        </div>
                                         <button @click.stop="removeGuestFromTable(guest.id)" class="text-gray-300 hover:text-red-500 no-print">×</button>
                                     </div>
                                 </template>
@@ -175,6 +204,7 @@
             <!-- MAP MODE (Canvas) -->
             <div x-show="viewMode === 'map'" class="h-full overflow-auto bg-slate-200 relative venue-container" id="map-scroll-container">
                 <div class="venue-canvas" 
+                     id="venue-canvas"
                      @mousedown.self="startPan($event)" 
                      @mousemove.window="pan($event)" 
                      @mouseup.window="endPan()">
@@ -199,7 +229,11 @@
                             <div :id="'map-table-' + table.id" class="space-y-1 min-h-[40px] max-h-[200px] overflow-y-auto">
                                 <template x-for="guest in getTableGuests(table.id)" :key="guest.id">
                                     <div :data-id="guest.id" @click="openAssignModal(guest)" class="bg-gray-50 p-1.5 rounded text-xs flex justify-between items-center group">
-                                        <span class="truncate" x-text="guest.name"></span>
+                                        <div class="flex items-center gap-1 overflow-hidden">
+                                            <span class="truncate" x-text="guest.name"></span>
+                                            <span x-show="guest.isBaby" class="text-[10px]" title="嬰兒">👶</span>
+                                            <span x-show="guest.isVeg" class="text-[10px]" title="素食">🥗</span>
+                                        </div>
                                         <button @click.stop="removeGuestFromTable(guest.id)" class="hidden group-hover:block text-red-400 no-print">×</button>
                                     </div>
                                 </template>
@@ -250,10 +284,25 @@
     <div x-show="assignModal.show" class="fixed inset-0 z-50 flex items-end md:items-center justify-center bg-black/50 backdrop-blur-sm" x-cloak>
         <div @click.outside="assignModal.show = false" class="bg-white w-full md:w-96 md:rounded-2xl rounded-t-2xl p-4 shadow-2xl transform transition-transform duration-300">
              <div class="flex justify-between items-center mb-4 border-b border-gray-100 pb-2">
-                <h3 class="font-bold text-lg text-gray-800">移動 <span class="text-indigo-600" x-text="assignModal.guest?.name"></span></h3>
+                <div>
+                    <h3 class="font-bold text-lg text-gray-800">移動 <span class="text-indigo-600" x-text="assignModal.guest?.name"></span></h3>
+                    <!-- Tags Toggle in Modal -->
+                    <div class="flex gap-2 mt-2" x-if="assignModal.guest">
+                        <button @click="assignModal.guest.isBaby = !assignModal.guest.isBaby; saveData()" 
+                                class="text-xs px-2 py-1 rounded border transition flex items-center gap-1"
+                                :class="assignModal.guest?.isBaby ? 'bg-pink-50 border-pink-200 text-pink-600' : 'bg-gray-50 border-gray-200 text-gray-400'">
+                            👶 嬰兒
+                        </button>
+                        <button @click="assignModal.guest.isVeg = !assignModal.guest.isVeg; saveData()" 
+                                class="text-xs px-2 py-1 rounded border transition flex items-center gap-1"
+                                :class="assignModal.guest?.isVeg ? 'bg-green-50 border-green-200 text-green-600' : 'bg-gray-50 border-gray-200 text-gray-400'">
+                            🥗 素食
+                        </button>
+                    </div>
+                </div>
                 <button @click="assignModal.show = false" class="text-gray-400 bg-gray-100 rounded-full p-1">✕</button>
             </div>
-            <div class="grid grid-cols-2 gap-2 max-h-[50vh] overflow-y-auto p-1">
+            <div class="grid grid-cols-2 gap-2 max-h-[40vh] overflow-y-auto p-1">
                 <button @click="moveTo(null)" class="p-3 rounded-xl border-2 border-dashed border-gray-300 text-gray-500 text-left">↩️ 移回名單</button>
                 <template x-for="table in tables" :key="table.id">
                     <button @click="moveTo(table.id)" class="p-3 rounded-xl border-2 text-left" :class="assignModal.guest?.tableId === table.id ? 'border-indigo-500 bg-indigo-50' : 'border-gray-100'">
@@ -274,10 +323,11 @@
     <script>
         function seatingApp() {
             return {
-                viewMode: 'map', // 'list' or 'map'
+                viewMode: 'map', 
                 guests: [],
                 tables: [],
                 newGuestName: '',
+                newGuestTags: { baby: false, veg: false },
                 printMode: '',
                 showBulkImport: false,
                 bulkNames: '',
@@ -300,7 +350,6 @@
                         this.tables.push({ id: 1, name: '主桌', seats: 10, isMain: true, x: 100, y: 100 });
                         this.tables.push({ id: 2, name: '第 2 桌', seats: 10, isMain: false, x: 350, y: 100 });
                     }
-                    // Fix missing coordinates for old data
                     this.tables.forEach((t, i) => {
                         if (t.x === undefined) t.x = (i % 3) * 250 + 50;
                         if (t.y === undefined) t.y = Math.floor(i / 3) * 300 + 50;
@@ -308,7 +357,6 @@
                     
                     this.$nextTick(() => {
                         this.initDragAndDrop();
-                        // Center scroll on load
                         const container = document.getElementById('map-scroll-container');
                         if(container) container.scrollTop = 0;
                     });
@@ -338,8 +386,15 @@
                 },
                 addGuest() {
                     if (!this.newGuestName.trim()) return;
-                    this.guests.push({ id: Date.now() + Math.random().toString(36).substr(2, 5), name: this.newGuestName.trim(), tableId: null });
+                    this.guests.push({ 
+                        id: Date.now() + Math.random().toString(36).substr(2, 5), 
+                        name: this.newGuestName.trim(), 
+                        tableId: null,
+                        isBaby: this.newGuestTags.baby,
+                        isVeg: this.newGuestTags.veg
+                    });
                     this.newGuestName = '';
+                    this.newGuestTags = { baby: false, veg: false };
                     this.saveData();
                 },
                 deleteGuest(id) {
@@ -349,12 +404,11 @@
                 toggleBulkImport() { this.showBulkImport = !this.showBulkImport; },
                 processBulkImport() {
                     const names = this.bulkNames.split('\n').filter(n => n.trim());
-                    names.forEach(n => this.guests.push({ id: Date.now() + Math.random().toString(36).substr(2, 5), name: n.trim(), tableId: null }));
+                    names.forEach(n => this.guests.push({ id: Date.now() + Math.random().toString(36).substr(2, 5), name: n.trim(), tableId: null, isBaby: false, isVeg: false }));
                     this.bulkNames = ''; this.showBulkImport = false; this.saveData();
                 },
                 addTable() {
                     const nextId = this.tables.length > 0 ? Math.max(...this.tables.map(t => t.id)) + 1 : 1;
-                    // Smart placement: find spot or random
                     const last = this.tables[this.tables.length-1];
                     const newX = last ? last.x + 250 : 100;
                     const newY = last ? last.y : 100;
@@ -382,19 +436,67 @@
                 moveTo(tableId) {
                     if (this.assignModal.guest) { this.assignModal.guest.tableId = tableId; this.saveData(); this.assignModal.show = false; }
                 },
+                
+                // --- Print Logic with Auto-Centering ---
                 print(mode = 'map') {
                     this.printMode = 'print-' + mode;
-                    if (mode === 'map') this.viewMode = 'map';
+                    if (mode === 'map') {
+                        this.viewMode = 'map';
+                        // Auto Fit Logic
+                        const canvas = document.getElementById('venue-canvas');
+                        if (canvas && this.tables.length > 0) {
+                            // Find bounds
+                            let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+                            this.tables.forEach(t => {
+                                if (t.x < minX) minX = t.x;
+                                if (t.y < minY) minY = t.y;
+                                if (t.x + 220 > maxX) maxX = t.x + 220; // 220 is approx width
+                                if (t.y + 300 > maxY) maxY = t.y + 300; // 300 is approx height with guests
+                            });
+                            
+                            // Add padding
+                            const padding = 50;
+                            minX -= padding; minY -= padding; maxX += padding; maxY += padding;
+                            
+                            const contentWidth = maxX - minX;
+                            const contentHeight = maxY - minY;
+                            
+                            // Viewport size (approx A4 landscape in px)
+                            const vpWidth = 1100; 
+                            const vpHeight = 750;
+                            
+                            const scaleX = vpWidth / contentWidth;
+                            const scaleY = vpHeight / contentHeight;
+                            const scale = Math.min(scaleX, scaleY, 1); // Don't zoom in, only out
+                            
+                            // Center
+                            const translateX = (vpWidth - contentWidth * scale) / 2 - minX * scale;
+                            const translateY = (vpHeight - contentHeight * scale) / 2 - minY * scale;
+
+                            // Apply to canvas for printing
+                            canvas.style.transform = `translate(${translateX}px, ${translateY}px) scale(${scale})`;
+                            canvas.style.transformOrigin = 'top left';
+                        }
+                    }
+                    
                     this.$nextTick(() => {
                         window.print();
-                        setTimeout(() => this.printMode = '', 1000);
+                        // Reset
+                        setTimeout(() => {
+                            this.printMode = '';
+                            const canvas = document.getElementById('venue-canvas');
+                            if(canvas) {
+                                canvas.style.transform = '';
+                                canvas.style.transformOrigin = '';
+                            }
+                        }, 1000);
                     });
                 },
+                
                 showToast(msg, icon) { this.toast = { show: true, msg, icon }; setTimeout(() => this.toast.show = false, 2000); },
 
                 // --- Dragging Tables ---
                 startDragTable(e, table) {
-                    // Prevent sortable conflict logic if needed, but handle is separated
                     this.isDraggingTable = table.id;
                     const rect = e.target.closest('.draggable-table').getBoundingClientRect();
                     const container = document.querySelector('.venue-canvas').getBoundingClientRect();
@@ -402,13 +504,12 @@
                     
                     const moveHandler = (moveEvent) => {
                         const containerRect = document.querySelector('.venue-canvas').getBoundingClientRect();
+                        // Adjust for canvas transform if present (but dragging usually happens in normal mode)
+                        // Simple logic assumes scale 1 during edit
                         let x = moveEvent.clientX - containerRect.left - this.dragOffset.x;
                         let y = moveEvent.clientY - containerRect.top - this.dragOffset.y;
-                        
-                        // Snap to grid (optional)
                         x = Math.round(x / 10) * 10;
                         y = Math.round(y / 10) * 10;
-                        
                         table.x = Math.max(0, x);
                         table.y = Math.max(0, y);
                     };
@@ -426,14 +527,13 @@
                 
                 // Touch Drag for Tables
                 startDragTableTouch(e, table) {
-                   // Similar logic but for touch events
                    const touch = e.touches[0];
                    const rect = e.target.closest('.draggable-table').getBoundingClientRect();
                    this.dragOffset = { x: touch.clientX - rect.left, y: touch.clientY - rect.top };
                    this.isDraggingTable = table.id;
 
                    const moveHandler = (moveEvent) => {
-                       moveEvent.preventDefault(); // Stop scrolling
+                       moveEvent.preventDefault();
                        const t = moveEvent.touches[0];
                        const containerRect = document.querySelector('.venue-canvas').getBoundingClientRect();
                        table.x = t.clientX - containerRect.left - this.dragOffset.x;
@@ -481,7 +581,6 @@
                         new Sortable(poolEl, { group: 'shared', animation: 150, delay: 200, delayOnTouchOnly: true, ghostClass: 'opacity-50', onEnd: (evt) => this.handleDrop(evt) });
                     }
                     
-                    // Re-init for list mode
                     this.tables.forEach(table => {
                         const ids = [`list-table-${table.id}`, `map-table-${table.id}`];
                         ids.forEach(id => {
