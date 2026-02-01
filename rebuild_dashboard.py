@@ -225,7 +225,7 @@ def scan_repos(prefix, type_label, icon):
 def generate_page(out, key, data, header_info=None, hide=""):
     hdrs = {
         "home": {"title_zh": "SimonLiu OpenClaw Works", "title_en": "SimonLiu OpenClaw Works", "desc_zh": "AI 中心樞紐。", "desc_en": "AI Central Hub."},
-        "tools": {"title_zh": "網頁工具集", "title_en": "Web Tools", "desc_zh": "實用工具。", "desc_en": "Useful tools."},
+        "tools": {"title_zh": "🇹🇼 台灣日常工具集", "title_en": "🇹🇼 Daily Taiwan Web Tools", "desc_zh": "解決台灣生活痛點的實用小工具。", "desc_en": "Useful tools for daily life in Taiwan."},
         "gallery": {"title_zh": "藝術畫廊", "title_en": "AI Gallery", "desc_zh": "AI 藝術。", "desc_en": "AI Art."},
         "mcp": {"title_zh": "MCP 服務", "title_en": "MCP Services", "desc_zh": "後端服務。", "desc_en": "Backend services."},
         "adk": {"title_zh": "ADK 代理人", "title_en": "ADK Agents", "desc_zh": "自主代理。", "desc_en": "Autonomous agents."}
