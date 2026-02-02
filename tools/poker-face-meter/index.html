@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>職場生存：臭臉指數計量器 | Daily Taiwan Web Tools</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Noto Sans TC', sans-serif; }
+        .glass { background: rgba(255, 255, 255, 0.2); backdrop-filter: blur(10px); }
+        .progress-bar { transition: width 0.5s ease-out; }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-gray-800 to-gray-900 min-h-screen text-white flex flex-col items-center p-4">
+
+    <div class="w-full max-w-md">
+        <a href="../../index.html" class="inline-block mb-6 text-gray-300 hover:text-white transition">🏠 回首頁</a>
+        
+        <div class="glass border border-white/20 rounded-3xl p-8 shadow-2xl">
+            <h1 class="text-3xl font-bold mb-2 text-center text-blue-400">臭臉指數計量器</h1>
+            <p class="text-gray-400 text-sm text-center mb-8">「我沒在生氣，我只是長得兇。」</p>
+
+            <div class="space-y-6">
+                <div>
+                    <label class="block text-sm font-medium mb-2 text-gray-300">目前心境</label>
+                    <select id="mood" class="w-full bg-gray-700 border border-gray-600 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500 outline-none">
+                        <option value="0">剛領完薪水 (快樂)</option>
+                        <option value="20">午餐吃得很飽 (平靜)</option>
+                        <option value="50">下午三點 (昏沉)</option>
+                        <option value="80">週一下午 (厭世)</option>
+                        <option value="100">準備開週會 (極度暴躁)</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium mb-2 text-gray-300">嘴角上揚程度</label>
+                    <input type="range" id="smile" min="0" max="100" value="50" class="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer accent-blue-500">
+                    <div class="flex justify-between text-xs text-gray-500 mt-1">
+                        <span>微笑</span>
+                        <span>僵硬</span>
+                        <span>下垂</span>
+                    </div>
+                </div>
+
+                <div class="flex items-center space-x-2">
+                    <input type="checkbox" id="eyebrows" class="w-4 h-4 rounded text-blue-500 focus:ring-blue-500">
+                    <label for="eyebrows" class="text-sm text-gray-300">眉頭是否緊鎖？</label>
+                </div>
+
+                <button id="calculate" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-3 rounded-xl transition transform active:scale-95 shadow-lg">
+                    立即檢測
+                </button>
+            </div>
+
+            <div id="resultArea" class="mt-8 hidden">
+                <div class="bg-black/30 rounded-2xl p-6 text-center">
+                    <div class="text-sm text-gray-400 mb-1">您的臭臉指數</div>
+                    <div id="scoreDisplay" class="text-5xl font-black text-red-500 mb-4">0%</div>
+                    
+                    <div class="w-full bg-gray-700 h-4 rounded-full overflow-hidden mb-6">
+                        <div id="scoreBar" class="progress-bar bg-gradient-to-r from-yellow-400 via-orange-500 to-red-600 h-full" style="width: 0%"></div>
+                    </div>
+
+                    <div id="comment" class="text-lg font-bold text-white mb-2"></div>
+                    <p id="advice" class="text-gray-400 text-sm italic"></p>
+                </div>
+                
+                <div class="mt-6 text-center text-xs text-gray-500">
+                    *僅供娛樂。若長期臉臭建議諮詢老闆或提職。
+                </div>
+            </div>
+        </div>
+        
+        <footer class="mt-8 text-center text-gray-600 text-xs">
+            Created by AI Agent on 2026-02-02
+        </footer>
+    </div>
+
+    <script>
+        const calcBtn = document.getElementById('calculate');
+        const resultArea = document.getElementById('resultArea');
+        const scoreDisplay = document.getElementById('scoreDisplay');
+        const scoreBar = document.getElementById('scoreBar');
+        const comment = document.getElementById('comment');
+        const advice = document.getElementById('advice');
+
+        calcBtn.addEventListener('click', () => {
+            const mood = parseInt(document.getElementById('mood').value);
+            const smile = parseInt(document.getElementById('smile').value);
+            const eyebrows = document.getElementById('eyebrows').checked ? 30 : 0;
+
+            // 算法：(厭世感 * 0.4) + (嘴角下垂 * 0.4) + (眉頭 * 0.2)
+            let score = Math.round((mood * 0.4) + (smile * 0.4) + eyebrows);
+            if (score > 100) score = 100;
+
+            scoreDisplay.innerText = `${score}%`;
+            scoreBar.style.width = `${score}%`;
+            resultArea.classList.remove('hidden');
+
+            let c = "";
+            let a = "";
+
+            if (score < 20) {
+                c = "佛系微笑";
+                a = "你看起來太好欺負了，小心同事把工作都丟給你。";
+            } else if (score < 40) {
+                c = "親切有禮";
+                a = "標準的櫃檯服務臉，面具戴得很成功。";
+            } else if (score < 60) {
+                c = "放空模式";
+                a = "介於想離職與不想上班之間，這是職場最安全的狀態。";
+            } else if (score < 80) {
+                c = "生人勿近";
+                a = "你的臉已經在說『再問我就報警』，有效減少無效會議。";
+            } else {
+                c = "主管殺手";
+                a = "這張臉可以直接去收債。老闆走過來都會不自覺避開你的視線。";
+            }
+
+            comment.innerText = c;
+            advice.innerText = a;
+
+            // 平滑滾動到結果
+            window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+        });
+    </script>
+</body>
+</html>
