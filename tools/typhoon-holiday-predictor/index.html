@@ -16,41 +16,54 @@
         <!-- Header -->
         <div class="bg-blue-600 p-6 text-white relative">
             <a href="../../index.html" class="absolute top-4 left-4 text-blue-100 hover:text-white transition-colors">🏠 回首頁</a>
-            <h1 class="text-2xl md:text-3xl font-bold text-center mt-6">🌀 颱風假預測器</h1>
-            <p class="text-center text-blue-100 mt-2 text-sm">輸入颱風數據，預測市長宣布放假的機率</p>
+            <h1 class="text-2xl md:text-3xl font-bold text-center mt-6">🌀 颱風假機率模擬器</h1>
+            <p class="text-center text-blue-100 mt-2 text-sm">輸入模擬數據，純屬娛樂性質</p>
         </div>
 
         <div class="p-6 space-y-8">
+            <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-4">
+                <div class="flex">
+                    <div class="flex-shrink-0">
+                        <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
+                    </div>
+                    <div class="ml-3">
+                        <p class="text-sm text-yellow-700">
+                            <strong>重要提示：</strong>本工具僅為「數據模擬練習」，不代表真實天氣狀況或政府決策。正式停班停課資訊請務必以行政院人事行政總處及各縣市政府公告為準。
+                        </p>
+                    </div>
+                </div>
+            </div>
+
             <!-- Form -->
             <div class="space-y-6">
                 <!-- Wind Speed -->
                 <div>
                     <div class="slider-label">
-                        <label class="font-medium text-gray-700">💨 風力等級 (Bf)</label>
+                        <label class="font-medium text-gray-700">💨 模擬風力等級 (Bf)</label>
                         <span id="wind-val" class="text-blue-600 font-bold">7</span>
                     </div>
                     <input type="range" id="wind" min="0" max="17" value="7" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-blue-600">
-                    <p class="text-xs text-gray-500 mt-1">法規基準：平均風力 7 級以上或陣風 10 級以上。</p>
+                    <p class="text-xs text-gray-500 mt-1">模擬標準：平均風力 7 級以上或陣風 10 級以上。</p>
                 </div>
 
                 <!-- Rainfall -->
                 <div>
                     <div class="slider-label">
-                        <label class="font-medium text-gray-700">🌧️ 24h 累積雨量 (mm)</label>
+                        <label class="font-medium text-gray-700">🌧️ 模擬 24h 累積雨量 (mm)</label>
                         <span id="rain-val" class="text-blue-600 font-bold">200</span>
                     </div>
                     <input type="range" id="rain" min="0" max="1000" step="50" value="200" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-blue-600">
-                    <p class="text-xs text-gray-500 mt-1">山區與平地基準不同，通常 350mm 以上機率大增。</p>
+                    <p class="text-xs text-gray-500 mt-1">不同地形基準不同，僅供模擬參考。</p>
                 </div>
 
-                <!-- Mayor's Pressure / K-point -->
+                <!-- Social Factor -->
                 <div>
                     <div class="slider-label">
-                        <label class="font-medium text-gray-700">🗳️ 市長民調/選舉壓力</label>
-                        <span id="pressure-val" class="text-blue-600 font-bold">普通</span>
+                        <label class="font-medium text-gray-700">☕ 模擬社會氣氛壓力</label>
+                        <span id="pressure-val" class="text-blue-600 font-bold">中等</span>
                     </div>
                     <input type="range" id="pressure" min="0" max="100" value="50" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-blue-600">
-                    <p class="text-xs text-gray-500 mt-1">選情告急或剛上任時，放假機率有加成效果。</p>
+                    <p class="text-xs text-gray-500 mt-1">模擬群眾期待值對決策心理的影響。</p>
                 </div>
 
                 <!-- Day of Week -->
@@ -124,7 +137,7 @@
             setTimeout(() => {
                 calculate();
                 predictBtn.disabled = false;
-                predictBtn.innerText = '重新觀測天氣狀況';
+                predictBtn.innerText = '重新模擬計算';
                 resultArea.classList.remove('hidden');
                 resultArea.scrollIntoView({ behavior: 'smooth' });
             }, 800);
@@ -164,20 +177,20 @@
             let badgeClass = '';
 
             if (prob < 20) {
-                status = '洗洗睡吧';
-                comment = '「乖乖去上班吧，別想了。市長說他現在沒空理你。」';
+                status = '穩定上班日';
+                comment = '「數據顯示風平浪靜，乖乖上班才是王道。」';
                 badgeClass = 'bg-red-100 text-red-600';
             } else if (prob < 50) {
-                status = '有點機會';
-                comment = '「市長還在糾結，可能要等晚上 10 點甚至明天早上 5 點才宣布。」';
+                status = '觀望中';
+                comment = '「模擬數值在邊緣徘徊，現實中通常要等很晚才會知道。」';
                 badgeClass = 'bg-yellow-100 text-yellow-600';
             } else if (prob < 80) {
-                status = '很有希望';
-                comment = '「KTV 訂位電話可以先拿起來準備了，雖然還沒正式宣布，但風聲很大。」';
+                status = '模擬機率高';
+                comment = '「模擬顯示風雨強勁，這只是個計算練習，別真的跑去慶祝喔。」';
                 badgeClass = 'bg-blue-100 text-blue-600';
             } else {
-                status = '不放會被罵死';
-                comment = '「這機率市長不放假可能要準備被罷免了，安心睡覺吧！」';
+                status = '模擬機率極高';
+                comment = '「數據已達上限，但請記住這只是模擬，一切以官方公告為準！」';
                 badgeClass = 'bg-green-100 text-green-600';
             }
 
