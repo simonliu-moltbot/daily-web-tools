@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>追垃圾車戰略分析儀 | Garbage Truck Strategy Analyzer</title>
+    <!-- Vue 3 -->
+    <script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700;900&display=swap" rel="stylesheet">
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        body { font-family: 'Noto Sans TC', sans-serif; }
+        .hazard-stripe {
+            background: repeating-linear-gradient(
+                45deg,
+                #FCD34D,
+                #FCD34D 10px,
+                #1F2937 10px,
+                #1F2937 20px
+            );
+        }
+        .animate-pulse-fast {
+            animation: pulse 1s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+        [v-cloak] { display: none; }
+    </style>
+</head>
+<body class="bg-gray-900 min-h-screen text-gray-100 pb-12">
+
+    <div id="app" v-cloak class="max-w-xl mx-auto min-h-screen flex flex-col relative bg-gray-800 shadow-2xl overflow-hidden">
+        
+        <!-- Header -->
+        <header class="bg-yellow-400 text-gray-900 p-4 border-b-4 border-black text-center relative overflow-hidden">
+            <div class="absolute top-0 left-0 w-full h-2 hazard-stripe opacity-50"></div>
+            <h1 class="text-3xl font-black mt-2 uppercase tracking-tighter flex items-center justify-center gap-2">
+                <i class="fas fa-truck-moving transform -scale-x-100"></i>
+                追垃圾車戰略室
+            </h1>
+            <p class="text-sm font-bold opacity-80">Garbage Truck Interception System</p>
+        </header>
+
+        <!-- Main Content -->
+        <main class="flex-grow p-6 space-y-8">
+            
+            <!-- Intro Text -->
+            <div v-if="!result" class="bg-gray-700 rounded-lg p-4 border-l-4 border-yellow-400 text-sm text-gray-300 shadow-lg">
+                <p>當《給愛麗絲》響起，每一秒都是生死關鍵。請誠實輸入當下狀況，系統將計算您的攔截成功率。</p>
+            </div>
+
+            <!-- Input Form -->
+            <div class="space-y-6">
+                
+                <!-- 1. Music Volume (Distance) -->
+                <section>
+                    <label class="block text-yellow-400 font-bold mb-3 text-lg">
+                        <i class="fas fa-volume-up mr-2"></i>目前音樂音量 (距離判定)
+                    </label>
+                    <div class="grid grid-cols-2 gap-3">
+                        <button v-for="opt in volumeOptions" :key="opt.val"
+                            @click="form.volume = opt.val"
+                            :class="[
+                                'p-3 rounded-lg border-2 font-bold transition-all text-sm flex flex-col items-center justify-center h-24',
+                                form.volume === opt.val 
+                                    ? 'bg-yellow-500 border-yellow-300 text-black scale-105 shadow-[0_0_15px_rgba(234,179,8,0.5)]' 
+                                    : 'bg-gray-700 border-gray-600 text-gray-400 hover:bg-gray-600'
+                            ]">
+                            <span class="text-2xl mb-1">{{ opt.icon }}</span>
+                            {{ opt.label }}
+                        </button>
+                    </div>
+                </section>
+
+                <!-- 2. Location (Vertical Distance) -->
+                <section>
+                    <label class="block text-yellow-400 font-bold mb-3 text-lg">
+                        <i class="fas fa-building mr-2"></i>所在樓層 (垂直移動)
+                    </label>
+                    <select v-model="form.floor" class="w-full bg-gray-700 border-2 border-gray-600 rounded-lg p-3 text-white focus:border-yellow-400 focus:outline-none transition-colors font-bold text-lg">
+                        <option value="1">1F (地面層)</option>
+                        <option value="stairs_low">2F - 5F (樓梯衝刺)</option>
+                        <option value="stairs_high">6F+ (必須搭電梯)</option>
+                        <option value="rooftop">頂樓 (正在收衣服)</option>
+                    </select>
+                </section>
+
+                <!-- 3. Readiness (Prep Time) -->
+                <section>
+                    <label class="block text-yellow-400 font-bold mb-3 text-lg">
+                        <i class="fas fa-user-clock mr-2"></i>整備狀態
+                    </label>
+                    <div class="space-y-3">
+                        <label v-for="opt in statusOptions" :key="opt.val" 
+                            class="flex items-center p-3 rounded-lg border-2 cursor-pointer transition-colors"
+                            :class="form.status === opt.val ? 'bg-gray-600 border-yellow-500' : 'bg-gray-700 border-gray-600 hover:bg-gray-600'">
+                            <input type="radio" v-model="form.status" :value="opt.val" class="form-radio text-yellow-500 h-5 w-5 mr-3 focus:ring-yellow-500 bg-gray-900 border-gray-500">
+                            <span :class="form.status === opt.val ? 'text-white font-bold' : 'text-gray-300'">{{ opt.label }}</span>
+                        </label>
+                    </div>
+                </section>
+            </div>
+
+            <!-- Analyze Button -->
+            <button @click="analyze" 
+                class="w-full bg-gradient-to-r from-red-600 to-red-500 hover:from-red-500 hover:to-red-400 text-white text-xl font-black py-4 rounded-xl shadow-lg transform active:scale-95 transition-all border-b-4 border-red-800 flex items-center justify-center gap-2">
+                <i class="fas fa-calculator"></i>
+                開始戰略分析
+            </button>
+            
+            <!-- Result Modal (Overlay) -->
+            <div v-if="result" class="fixed inset-0 bg-black bg-opacity-90 z-50 flex items-center justify-center p-4 backdrop-blur-sm" @click.self="result = null">
+                <div class="bg-gray-800 rounded-2xl w-full max-w-md border-4 shadow-2xl overflow-hidden relative" :class="resultColorBorder">
+                    
+                    <!-- Result Header -->
+                    <div class="p-6 text-center text-black" :class="resultColorBg">
+                        <h2 class="text-4xl font-black uppercase italic tracking-tighter">{{ result.verdict }}</h2>
+                        <div class="text-xs font-bold mt-1 opacity-75">SUCCESS PROBABILITY: {{ result.probability }}%</div>
+                    </div>
+
+                    <!-- Result Body -->
+                    <div class="p-6 space-y-4">
+                        <div class="flex items-center justify-between text-sm text-gray-400 border-b border-gray-700 pb-2">
+                            <span>預估剩餘時間:</span>
+                            <span class="font-mono text-white">{{ result.timeRemaining }}s</span>
+                        </div>
+                        <div class="flex items-center justify-between text-sm text-gray-400 border-b border-gray-700 pb-2">
+                            <span>所需行動時間:</span>
+                            <span class="font-mono text-white">{{ result.timeNeeded }}s</span>
+                        </div>
+                        
+                        <div class="bg-black bg-opacity-30 rounded-lg p-4 mt-4">
+                            <p class="text-lg font-bold text-center leading-relaxed" :class="resultColorText">
+                                <i class="fas fa-bullhorn mr-1"></i>
+                                {{ result.advice }}
+                            </p>
+                        </div>
+                        
+                        <div v-if="result.probability > 0 && result.probability < 100" class="text-xs text-center text-gray-500 mt-2">
+                            * 本系統不負責因奔跑導致的拖鞋遺失或跌倒受傷。
+                        </div>
+                    </div>
+
+                    <!-- Retry Button -->
+                    <div class="p-4 bg-gray-900 border-t border-gray-700">
+                        <button @click="result = null" class="w-full py-3 rounded-lg font-bold bg-gray-700 hover:bg-gray-600 text-white transition-colors">
+                            重設狀況 (Reset)
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+        </main>
+
+        <footer class="bg-gray-900 text-gray-500 text-center py-6 text-xs border-t border-gray-800">
+            <a href="../../index.html" class="hover:text-yellow-400 transition-colors">🏠 Daily Web Tools</a>
+            <span class="mx-2">•</span>
+            <span>Made with <i class="fas fa-bolt text-yellow-500"></i> in Taiwan</span>
+        </footer>
+    </div>
+
+    <script>
+        const { createApp, ref, computed } = Vue;
+
+        createApp({
+            setup() {
+                const form = ref({
+                    volume: 'clear',
+                    floor: '1',
+                    status: 'dressed_bagged'
+                });
+                
+                const result = ref(null);
+
+                const volumeOptions = [
+                    { val: 'faint', label: '若有似無', icon: '👂' }, // Far away (~5 mins)
+                    { val: 'clear', label: '旋律清晰', icon: '🎵' }, // Approaching (~90s)
+                    { val: 'loud', label: '就在樓下', icon: '📢' }, // Imminent (~30s)
+                    { val: 'fading', label: '聲音漸遠', icon: '👋' }  // Departing (-10s)
+                ];
+
+                const statusOptions = [
+                    { val: 'dressed_bagged', label: '著裝完畢，垃圾已包好' },
+                    { val: 'bag_needed', label: '穿著整齊，但垃圾還沒包' },
+                    { val: 'underwear', label: '穿著內褲/睡衣，垃圾已包好' },
+                    { val: 'chaos', label: '穿內褲，且垃圾散落一地' }
+                ];
+
+                const resultColorBorder = computed(() => {
+                    if (!result.value) return '';
+                    if (result.value.level === 'success') return 'border-green-500';
+                    if (result.value.level === 'warning') return 'border-yellow-500';
+                    return 'border-red-600';
+                });
+
+                const resultColorBg = computed(() => {
+                    if (!result.value) return '';
+                    if (result.value.level === 'success') return 'bg-green-500';
+                    if (result.value.level === 'warning') return 'bg-yellow-500';
+                    return 'bg-red-600 text-white';
+                });
+
+                const resultColorText = computed(() => {
+                    if (!result.value) return '';
+                    if (result.value.level === 'success') return 'text-green-400';
+                    if (result.value.level === 'warning') return 'text-yellow-400';
+                    return 'text-red-400';
+                });
+
+                const analyze = () => {
+                    // 1. Calculate Time Remaining (TR)
+                    let tr = 0;
+                    switch(form.value.volume) {
+                        case 'faint': tr = 300; break; // 5 mins
+                        case 'clear': tr = 90; break;  // 1.5 mins
+                        case 'loud': tr = 45; break;   // 45 secs
+                        case 'fading': tr = 0; break;  // Gone
+                    }
+
+                    // 2. Calculate Time Needed (TN)
+                    let tn = 0;
+                    
+                    // Floor factor
+                    switch(form.value.floor) {
+                        case '1': tn += 10; break;
+                        case 'stairs_low': tn += 40; break; // Run down stairs
+                        case 'stairs_high': tn += 120; break; // Wait elevator + travel
+                        case 'rooftop': tn += 150; break;
+                    }
+
+                    // Status factor
+                    switch(form.value.status) {
+                        case 'dressed_bagged': tn += 5; break; // Shoe time
+                        case 'bag_needed': tn += 30; break; // Bagging panic
+                        case 'underwear': tn += 45; break; // Pants time
+                        case 'chaos': tn += 80; break; // Total disaster
+                    }
+
+                    // 3. Logic
+                    let prob = 0;
+                    let verdict = "";
+                    let advice = "";
+                    let level = ""; // success, warning, fail
+
+                    if (form.value.volume === 'fading') {
+                        prob = 0;
+                        verdict = "任務失敗";
+                        advice = "別追了，很危險。拿去冷凍庫冰起來，明天請早。";
+                        level = "fail";
+                        tn = 0; // Irrelevant
+                    } else {
+                        const buffer = tr - tn;
+                        
+                        if (buffer >= 60) {
+                            prob = 99;
+                            verdict = "優雅倒光";
+                            advice = "時間充裕，您可以慢慢穿鞋，甚至順便去超商買個飲料。";
+                            level = "success";
+                        } else if (buffer >= 30) {
+                            prob = 85;
+                            verdict = "穩操勝券";
+                            advice = "保持平常心，檢查鑰匙帶了沒，從容下樓。";
+                            level = "success";
+                        } else if (buffer >= 0) {
+                            prob = 50;
+                            verdict = "極限衝刺";
+                            advice = "不要猶豫！穿拖鞋就好！電梯如果沒來就走樓梯！跑起來！";
+                            level = "warning";
+                        } else if (buffer > -20) {
+                            prob = 10;
+                            verdict = "聽天由命";
+                            advice = "除非你是奧運短跑選手，或者是司機的親戚，否則機會渺茫。";
+                            level = "fail";
+                        } else {
+                            prob = 0;
+                            verdict = "放棄治療";
+                            advice = "沒救了。你下樓時只會吸到廢氣。繼續看電視吧。";
+                            level = "fail";
+                        }
+                    }
+
+                    result.value = {
+                        timeRemaining: tr,
+                        timeNeeded: tn,
+                        probability: prob,
+                        verdict,
+                        advice,
+                        level
+                    };
+                };
+
+                return {
+                    form,
+                    volumeOptions,
+                    statusOptions,
+                    analyze,
+                    result,
+                    resultColorBorder,
+                    resultColorBg,
+                    resultColorText
+                };
+            }
+        }).mount('#app');
+    </script>
+</body>
+</html>
