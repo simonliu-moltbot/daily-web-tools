@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>颱風假預測器 | Daily Taiwan Web Tools</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Noto Sans TC', sans-serif; background-color: #f3f4f6; }
+        .slider-label { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem; }
+    </style>
+</head>
+<body class="min-h-screen p-4 md:p-8">
+    <div class="max-w-2xl mx-auto bg-white rounded-2xl shadow-xl overflow-hidden">
+        <!-- Header -->
+        <div class="bg-blue-600 p-6 text-white relative">
+            <a href="../../index.html" class="absolute top-4 left-4 text-blue-100 hover:text-white transition-colors">🏠 回首頁</a>
+            <h1 class="text-2xl md:text-3xl font-bold text-center mt-6">🌀 颱風假預測器</h1>
+            <p class="text-center text-blue-100 mt-2 text-sm">輸入颱風數據，預測市長宣布放假的機率</p>
+        </div>
+
+        <div class="p-6 space-y-8">
+            <!-- Form -->
+            <div class="space-y-6">
+                <!-- Wind Speed -->
+                <div>
+                    <div class="slider-label">
+                        <label class="font-medium text-gray-700">💨 風力等級 (Bf)</label>
+                        <span id="wind-val" class="text-blue-600 font-bold">7</span>
+                    </div>
+                    <input type="range" id="wind" min="0" max="17" value="7" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-blue-600">
+                    <p class="text-xs text-gray-500 mt-1">法規基準：平均風力 7 級以上或陣風 10 級以上。</p>
+                </div>
+
+                <!-- Rainfall -->
+                <div>
+                    <div class="slider-label">
+                        <label class="font-medium text-gray-700">🌧️ 24h 累積雨量 (mm)</label>
+                        <span id="rain-val" class="text-blue-600 font-bold">200</span>
+                    </div>
+                    <input type="range" id="rain" min="0" max="1000" step="50" value="200" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-blue-600">
+                    <p class="text-xs text-gray-500 mt-1">山區與平地基準不同，通常 350mm 以上機率大增。</p>
+                </div>
+
+                <!-- Mayor's Pressure / K-point -->
+                <div>
+                    <div class="slider-label">
+                        <label class="font-medium text-gray-700">🗳️ 市長民調/選舉壓力</label>
+                        <span id="pressure-val" class="text-blue-600 font-bold">普通</span>
+                    </div>
+                    <input type="range" id="pressure" min="0" max="100" value="50" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-blue-600">
+                    <p class="text-xs text-gray-500 mt-1">選情告急或剛上任時，放假機率有加成效果。</p>
+                </div>
+
+                <!-- Day of Week -->
+                <div>
+                    <label class="font-medium text-gray-700 block mb-2">📅 星期幾？</label>
+                    <select id="weekday" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none">
+                        <option value="1">週一 (憂鬱救星)</option>
+                        <option value="2">週二</option>
+                        <option value="3">週三</option>
+                        <option value="4">週四</option>
+                        <option value="5">週五 (連假誘惑)</option>
+                        <option value="6">週六 (加班狗的小確幸)</option>
+                        <option value="0">週日 (放了跟沒放一樣)</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Predict Button -->
+            <button id="predict-btn" class="w-full py-4 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl transition-all transform active:scale-95 shadow-lg">
+                開始觀測天氣狀況
+            </button>
+
+            <!-- Result Section -->
+            <div id="result-area" class="hidden animate-fade-in">
+                <div class="border-t-2 border-dashed border-gray-200 pt-8 text-center">
+                    <div class="text-gray-500 text-sm mb-1 uppercase tracking-widest">預估放假機率</div>
+                    <div id="prob-display" class="text-6xl font-black text-blue-600 mb-4">0%</div>
+                    <div id="status-badge" class="inline-block px-4 py-1 rounded-full text-sm font-bold bg-gray-100 text-gray-600 mb-4">
+                        等待數據輸入
+                    </div>
+                    <div id="comment" class="text-gray-700 italic bg-gray-50 p-4 rounded-lg border border-gray-100">
+                        「市長正在看氣象雲圖...」
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <footer class="p-6 bg-gray-50 text-center text-xs text-gray-400">
+            本工具純屬娛樂與模擬，實際放假訊息請以行政院人事行政總處為準。<br>
+            Created by AI Agent on 2025-05-13
+        </footer>
+    </div>
+
+    <script>
+        const windInput = document.getElementById('wind');
+        const rainInput = document.getElementById('rain');
+        const pressureInput = document.getElementById('pressure');
+        const weekdayInput = document.getElementById('weekday');
+        const predictBtn = document.getElementById('predict-btn');
+        const resultArea = document.getElementById('result-area');
+        const probDisplay = document.getElementById('prob-display');
+        const statusBadge = document.getElementById('status-badge');
+        const commentDisplay = document.getElementById('comment');
+
+        // Update values
+        windInput.oninput = () => document.getElementById('wind-val').innerText = windInput.value;
+        rainInput.oninput = () => document.getElementById('rain-val').innerText = rainInput.value;
+        pressureInput.oninput = () => {
+            const v = pressureInput.value;
+            let text = '普通';
+            if (v < 30) text = '穩定 (無欲則剛)';
+            else if (v > 70) text = '告急 (加倍奉還)';
+            document.getElementById('pressure-val').innerText = text;
+        };
+
+        predictBtn.onclick = () => {
+            predictBtn.disabled = true;
+            predictBtn.innerText = '正在撥打電話給氣象局...';
+            
+            setTimeout(() => {
+                calculate();
+                predictBtn.disabled = false;
+                predictBtn.innerText = '重新觀測天氣狀況';
+                resultArea.classList.remove('hidden');
+                resultArea.scrollIntoView({ behavior: 'smooth' });
+            }, 800);
+        };
+
+        function calculate() {
+            const wind = parseInt(windInput.value);
+            const rain = parseInt(rainInput.value);
+            const pressure = parseInt(pressureInput.value);
+            const weekday = parseInt(weekdayInput.value);
+
+            let prob = 0;
+
+            // Base probability from weather
+            if (wind >= 7) prob += (wind - 6) * 10;
+            if (wind >= 10) prob += 20;
+            
+            prob += (rain / 1000) * 50;
+
+            // Pressure bonus
+            prob += (pressure / 100) * 20;
+
+            // Weekday modifiers
+            if (weekday === 1) prob += 5; // Monday bonus
+            if (weekday === 5) prob += 10; // Friday bonus
+            if (weekday === 0 || weekday === 6) prob -= 15; // Weekend penalty
+
+            // Cap
+            prob = Math.min(Math.max(Math.round(prob), 0), 100);
+
+            // Display
+            probDisplay.innerText = prob + '%';
+
+            // Comment and Badge
+            let status = '';
+            let comment = '';
+            let badgeClass = '';
+
+            if (prob < 20) {
+                status = '洗洗睡吧';
+                comment = '「乖乖去上班吧，別想了。市長說他現在沒空理你。」';
+                badgeClass = 'bg-red-100 text-red-600';
+            } else if (prob < 50) {
+                status = '有點機會';
+                comment = '「市長還在糾結，可能要等晚上 10 點甚至明天早上 5 點才宣布。」';
+                badgeClass = 'bg-yellow-100 text-yellow-600';
+            } else if (prob < 80) {
+                status = '很有希望';
+                comment = '「KTV 訂位電話可以先拿起來準備了，雖然還沒正式宣布，但風聲很大。」';
+                badgeClass = 'bg-blue-100 text-blue-600';
+            } else {
+                status = '不放會被罵死';
+                comment = '「這機率市長不放假可能要準備被罷免了，安心睡覺吧！」';
+                badgeClass = 'bg-green-100 text-green-600';
+            }
+
+            statusBadge.innerText = status;
+            statusBadge.className = 'inline-block px-4 py-1 rounded-full text-sm font-bold mb-4 ' + badgeClass;
+            commentDisplay.innerText = comment;
+        }
+    </script>
+</body>
+</html>
