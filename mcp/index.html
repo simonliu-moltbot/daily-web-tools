@@ -19,7 +19,19 @@
         .btn-toggle:not(.active):hover { background-color: #e7e5e4; }
     </style>
     <script>
-        const PROJECT_DATA = [{"title_zh": "Tw Highway", "title_en": "Tw Highway", "desc_zh": "MCP Project: Taiwan Highway Traffic (1968)", "desc_en": "MCP Project: Taiwan Highway Traffic (1968)", "link": "https://github.com/simonliu-moltbot/mcp-tw-highway", "type": "MCP", "icon": "🔌"}, {"title_zh": "Zen Garden", "title_en": "Zen Garden", "desc_zh": "MCP Project: Zen Garden (Digital Karesansui)", "desc_en": "MCP Project: Zen Garden (Digital Karesansui)", "link": "https://github.com/simonliu-moltbot/mcp-zen-garden", "type": "MCP", "icon": "🔌"}, {"title_zh": "Tw Youbike (FastMCP)", "title_en": "Tw Youbike (FastMCP)", "desc_zh": "MCP Project: Tw Youbike (FastMCP Edition)", "desc_en": "MCP Project: Tw Youbike (FastMCP Edition)", "link": "https://github.com/simonliu-moltbot/mcp-tw-youbike-fastmcp", "type": "MCP", "icon": "🔌"}, {"title_zh": "Tw Calendar", "title_en": "Tw Calendar", "desc_zh": "MCP Project: Tw Calendar", "desc_en": "MCP Project: Tw Calendar", "link": "https://github.com/simonliu-moltbot/mcp-tw-calendar", "type": "MCP", "icon": "🔌"}, {"title_zh": "Tw Fuel", "title_en": "Tw Fuel", "desc_zh": "MCP Project: Tw Fuel", "desc_en": "MCP Project: Tw Fuel", "link": "https://github.com/simonliu-moltbot/mcp-tw-fuel", "type": "MCP", "icon": "🔌"}, {"title_zh": "Tw Invoice", "title_en": "Tw Invoice", "desc_zh": "MCP Project: Tw Invoice", "desc_en": "MCP Project: Tw Invoice", "link": "https://github.com/simonliu-moltbot/mcp-tw-invoice", "type": "MCP", "icon": "🔌"}, {"title_zh": "Tw Lotto", "title_en": "Tw Lotto", "desc_zh": "MCP Project: Tw Lotto", "desc_en": "MCP Project: Tw Lotto", "link": "https://github.com/simonliu-moltbot/mcp-tw-lotto", "type": "MCP", "icon": "🔌"}, {"title_zh": "Tw Reservoirs", "title_en": "Tw Reservoirs", "desc_zh": "MCP Project: Tw Reservoirs", "desc_en": "MCP Project: Tw Reservoirs", "link": "https://github.com/simonliu-moltbot/mcp-tw-reservoirs", "type": "MCP", "icon": "🔌"}, {"title_zh": "Tw Stock", "title_en": "Tw Stock", "desc_zh": "MCP Project: Tw Stock", "desc_en": "MCP Project: Tw Stock", "link": "https://github.com/simonliu-moltbot/mcp-tw-stock", "type": "MCP", "icon": "🔌"}, {"title_zh": "Tw Weather", "title_en": "Tw Weather", "desc_zh": "MCP Project: Tw Weather", "desc_en": "MCP Project: Tw Weather", "link": "https://github.com/simonliu-moltbot/mcp-tw-weather", "type": "MCP", "icon": "🔌"}, {"title_zh": "Tw Youbike", "title_en": "Tw Youbike", "desc_zh": "MCP Project: Tw Youbike", "desc_en": "MCP Project: Tw Youbike", "link": "https://github.com/simonliu-moltbot/mcp-tw-youbike", "type": "MCP", "icon": "🔌"}];
+        const PROJECT_DATA = [
+            {"title_zh": "💼 台灣徵才活動助手", "title_en": "Taiwan Job Fair Helper", "desc_zh": "提供台灣各地的徵才活動、就業博覽會資訊查詢。", "desc_en": "Search for job fairs and recruitment events across Taiwan.", "link": "https://github.com/simonliu-moltbot/mcp-tw-job-fair", "type": "MCP", "icon": "💼"},
+            {"title_zh": "🅿️ 台北市停車助手", "title_en": "Taipei Parking Helper", "desc_zh": "查詢台北市公有停車場即時剩餘車位。", "desc_en": "Check real-time parking availability in Taipei City.", "link": "https://github.com/simonliu-moltbot/mcp-tw-parking", "type": "MCP", "icon": "🅿️"},
+            {"title_zh": "🧾 統一發票助手", "title_en": "Uniform Invoice Helper", "desc_zh": "查詢統一發票中獎號碼與對獎資訊。", "desc_en": "Check Taiwan uniform invoice winning numbers.", "link": "https://github.com/simonliu-moltbot/mcp-tw-invoice", "type": "MCP", "icon": "🧾"},
+            {"title_zh": "📈 台灣股市助手", "title_en": "Taiwan Stock Helper", "desc_zh": "查詢台股即時報價、技術指標與市場新聞。", "desc_en": "Check Taiwan stock quotes, technical indicators, and news.", "link": "https://github.com/simonliu-moltbot/mcp-tw-stock", "type": "MCP", "icon": "📈"},
+            {"title_zh": "☀️ 台灣天氣助手", "title_en": "Taiwan Weather Helper", "desc_zh": "查詢全台各縣市即時天氣與氣象預報。", "desc_en": "Check real-time weather and forecasts in Taiwan.", "link": "https://github.com/simonliu-moltbot/mcp-tw-weather", "type": "MCP", "icon": "☀️"},
+            {"title_zh": "🚲 YouBike 助手", "title_en": "YouBike Helper", "desc_zh": "查詢全台各站點 YouBike 即時車輛與空位。", "desc_en": "Check real-time YouBike availability across Taiwan.", "link": "https://github.com/simonliu-moltbot/mcp-tw-youbike", "type": "MCP", "icon": "🚲"},
+            {"title_zh": "🎰 台灣樂透助手", "title_en": "Taiwan Lotto Helper", "desc_zh": "查詢大樂透、威力彩等各項開獎號碼。", "desc_en": "Check Taiwan lottery winning numbers.", "link": "https://github.com/simonliu-moltbot/mcp-tw-lotto", "type": "MCP", "icon": "🎰"},
+            {"title_zh": "⛽ 台灣油價助手", "title_en": "Taiwan Fuel Price Helper", "desc_zh": "查詢中油、台塑各類油品最新價格。", "desc_en": "Check latest fuel prices from CPC and Formosa Plastics.", "link": "https://github.com/simonliu-moltbot/mcp-tw-fuel", "type": "MCP", "icon": "⛽"},
+            {"title_zh": "🛣️ 國道路況助手", "title_en": "Taiwan Highway Helper", "desc_zh": "查詢國道即時路況、車速與施工資訊。", "desc_en": "Check real-time highway traffic, speed, and construction.", "link": "https://github.com/simonliu-moltbot/mcp-tw-highway", "type": "MCP", "icon": "🛣️"},
+            {"title_zh": "📅 台灣行事曆助手", "title_en": "Taiwan Calendar Helper", "desc_zh": "查詢台灣國定假日、補班補課資訊。", "desc_en": "Check Taiwan public holidays and makeup days.", "link": "https://github.com/simonliu-moltbot/mcp-tw-calendar", "type": "MCP", "icon": "📅"},
+            {"title_zh": "🌊 台灣水庫助手", "title_en": "Taiwan Reservoirs Helper", "desc_zh": "查詢全台主要水庫即時蓄水量與進帳。", "desc_en": "Check real-time water levels of Taiwan's reservoirs.", "link": "https://github.com/simonliu-moltbot/mcp-tw-reservoirs", "type": "MCP", "icon": "🌊"}
+        ];
         const TRANSLATIONS = {"nav_home": {"en": "Home", "zh": "首頁"}, "nav_tools": {"en": "Web Tools", "zh": "工具集"}, "nav_gallery": {"en": "AI Gallery", "zh": "藝術畫廊"}, "nav_mcp": {"en": "MCP Services", "zh": "MCP 服務"}, "nav_adk": {"en": "ADK Agents", "zh": "ADK 代理"}, "footer_built": {"en": "Built with ❤️ by AI Agent", "zh": "由 AI Agent 打造"}, "footer_updated": {"en": "Last Updated", "zh": "最後更新"}, "search_placeholder": {"en": "Search projects...", "zh": "檢索項目..."}, "btn_view": {"en": "View", "zh": "進入"}};
     </script>
 </head>
@@ -27,15 +39,15 @@
 
     <nav class="sticky top-0 z-50 glass-panel">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between h-16">
-            <a href="https://simonliu-moltbot.github.io/daily-web-tools/index.html" class="text-lg font-bold tracking-tight text-stone-900">
+            <a href="../index.html" class="text-lg font-bold tracking-tight text-stone-900">
                 SimonLiu OpenClaw Works
             </a>
             <div class="hidden md:flex space-x-1">
-                <a href="https://simonliu-moltbot.github.io/" class="px-3 py-2 rounded-md text-xs font-medium transition-colors text-stone-500 hover:text-stone-900" data-i18n-key="nav_home">Home</a>
-<a href="https://simonliu-moltbot.github.io/daily-web-tools/web-tools/index.html" class="px-3 py-2 rounded-md text-xs font-medium transition-colors text-stone-500 hover:text-stone-900" data-i18n-key="nav_tools">Web Tools</a>
-<a href="https://simonliu-moltbot.github.io/daily-web-tools/gallery/index.html" class="px-3 py-2 rounded-md text-xs font-medium transition-colors text-stone-500 hover:text-stone-900" data-i18n-key="nav_gallery">AI Gallery</a>
-<a href="https://simonliu-moltbot.github.io/daily-web-tools/mcp/index.html" class="px-3 py-2 rounded-md text-xs font-medium transition-colors text-stone-900 bg-stone-100 font-bold" data-i18n-key="nav_mcp">MCP Services</a>
-<a href="https://simonliu-moltbot.github.io/daily-web-tools/adk/index.html" class="px-3 py-2 rounded-md text-xs font-medium transition-colors text-stone-500 hover:text-stone-900" data-i18n-key="nav_adk">ADK Agents</a>
+                <a href="../index.html" class="px-3 py-2 rounded-md text-xs font-medium transition-colors text-stone-500 hover:text-stone-900" data-i18n-key="nav_home">Home</a>
+<a href="../index.html" class="px-3 py-2 rounded-md text-xs font-medium transition-colors text-stone-500 hover:text-stone-900" data-i18n-key="nav_tools">Web Tools</a>
+<a href="../gallery/index.html" class="px-3 py-2 rounded-md text-xs font-medium transition-colors text-stone-500 hover:text-stone-900" data-i18n-key="nav_gallery">AI Gallery</a>
+<a href="index.html" class="px-3 py-2 rounded-md text-xs font-medium transition-colors text-stone-900 bg-stone-100 font-bold" data-i18n-key="nav_mcp">MCP Services</a>
+<a href="../adk/index.html" class="px-3 py-2 rounded-md text-xs font-medium transition-colors text-stone-500 hover:text-stone-900" data-i18n-key="nav_adk">ADK Agents</a>
             </div>
             <div class="flex items-center gap-3">
                 <button id="lang-toggle" class="text-[10px] font-bold bg-stone-100 px-2.5 py-1.5 rounded-full border border-stone-200 hover:bg-stone-200 transition-colors">
@@ -47,17 +59,17 @@
             </div>
         </div>
         <div id="mobile-menu" class="hidden md:hidden border-t border-stone-100 bg-white/95 backdrop-blur-sm px-2 py-3 space-y-1">
-            <a href="https://simonliu-moltbot.github.io/" class="block px-3 py-2 rounded-md text-sm font-medium text-stone-500 hover:text-stone-900" data-i18n-key="nav_home">Home</a>
-<a href="https://simonliu-moltbot.github.io/daily-web-tools/web-tools/index.html" class="block px-3 py-2 rounded-md text-sm font-medium text-stone-500 hover:text-stone-900" data-i18n-key="nav_tools">Web Tools</a>
-<a href="https://simonliu-moltbot.github.io/daily-web-tools/gallery/index.html" class="block px-3 py-2 rounded-md text-sm font-medium text-stone-500 hover:text-stone-900" data-i18n-key="nav_gallery">AI Gallery</a>
-<a href="https://simonliu-moltbot.github.io/daily-web-tools/mcp/index.html" class="block px-3 py-2 rounded-md text-sm font-medium text-stone-900 bg-stone-100 font-bold" data-i18n-key="nav_mcp">MCP Services</a>
-<a href="https://simonliu-moltbot.github.io/daily-web-tools/adk/index.html" class="block px-3 py-2 rounded-md text-sm font-medium text-stone-500 hover:text-stone-900" data-i18n-key="nav_adk">ADK Agents</a>
+            <a href="../index.html" class="block px-3 py-2 rounded-md text-sm font-medium text-stone-500 hover:text-stone-900" data-i18n-key="nav_home">Home</a>
+<a href="../index.html" class="block px-3 py-2 rounded-md text-sm font-medium text-stone-500 hover:text-stone-900" data-i18n-key="nav_tools">Web Tools</a>
+<a href="../gallery/index.html" class="block px-3 py-2 rounded-md text-sm font-medium text-stone-500 hover:text-stone-900" data-i18n-key="nav_gallery">AI Gallery</a>
+<a href="index.html" class="block px-3 py-2 rounded-md text-sm font-medium text-stone-900 bg-stone-100 font-bold" data-i18n-key="nav_mcp">MCP Services</a>
+<a href="../adk/index.html" class="block px-3 py-2 rounded-md text-sm font-medium text-stone-500 hover:text-stone-900" data-i18n-key="nav_adk">ADK Agents</a>
         </div>
     </nav>
 
     <header class="bg-white border-b border-stone-100 pt-16 pb-12 px-4 text-center">
-        <h1 class="text-4xl font-light text-stone-900 mb-4 tracking-tight" data-i18n-zh="MCP 服務" data-i18n-en="MCP Services">MCP Services</h1>
-        <p class="max-w-2xl mx-auto text-lg text-stone-500 font-light leading-relaxed" data-i18n-zh="後端服務。" data-i18n-en="Backend services.">Backend services.</p>
+        <h1 class="text-4xl font-light text-stone-900 mb-4 tracking-tight" data-i18n-zh="🇹🇼 MCP 服務集" data-i18n-en="🇹🇼 MCP Services Collection">🇹🇼 MCP Services Collection</h1>
+        <p class="max-w-2xl mx-auto text-lg text-stone-500 font-light leading-relaxed" data-i18n-zh="為 AI 模型提供台灣在地即時數據的 Model Context Protocol 伺服器。" data-i18n-en="Model Context Protocol servers providing real-time Taiwan local data for AI models.">Model Context Protocol servers providing real-time Taiwan local data for AI models.</p>
         <div class="mt-10 max-w-xl mx-auto flex flex-col sm:flex-row gap-4 items-center justify-center ">
             <div class="relative w-full">
                 <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -76,7 +88,7 @@
 
     <footer class="bg-white border-t border-stone-200 py-12 text-center text-sm text-stone-400">
         <p data-i18n-key="footer_built">Built with ❤️ by AI Agent</p>
-        <p class="mt-2"><span data-i18n-key="footer_updated">Last Updated</span>: 2026-02-02</p>
+        <p class="mt-2"><span data-i18n-key="footer_updated">Last Updated</span>: 2026-02-03</p>
     </footer>
 
     <script>
@@ -104,7 +116,7 @@
             container.className = 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6';
             container.innerHTML = projects.map(p => {
                 const t = currentLang==='zh'?(p.title_zh||p.title_en):(p.title_en||p.title_zh), d = currentLang==='zh'?(p.desc_zh||p.desc_en):(p.desc_en||p.desc_zh);
-                const visual = p.image ? `<div class="h-48 overflow-hidden"><img src="${p.image}" class="w-full h-full object-cover transition-transform group-hover:scale-105"></div>` : `<div class="h-32 flex items-center justify-center text-4xl bg-stone-100">${p.icon||'📦'}</div>`;
+                const visual = p.image ? `<div class="h-48 overflow-hidden"><img src="${p.image}" class="w-full h-full object-cover transition-transform group-hover:scale-105"></div>` : `<div class="h-32 flex items-center justify-center text-4xl bg-stone-100">${p.icon||'🔌'}</div>`;
                 return `<div class="bg-white rounded-xl border border-stone-200 overflow-hidden flex flex-col group shadow-sm hover:shadow-md transition-all">
                     ${visual}<div class="p-5 flex flex-col flex-1"><h3 class="text-lg font-bold text-stone-800 mb-2">${t}</h3><p class="text-xs text-stone-500 line-clamp-3 mb-5">${d}</p>
                     <div class="mt-auto pt-4 border-t border-stone-50 flex items-center justify-between"><span class="text-[10px] font-mono text-stone-400 uppercase">${p.type}</span>
@@ -118,7 +130,7 @@
             container.innerHTML = `<table class="muji-table"><thead><tr><th class="w-12 text-center">${h[0]}</th><th class="w-1/4">${h[1]}</th><th>${h[2]}</th><th class="w-24 text-center">${h[3]}</th></tr></thead><tbody>` + 
                 projects.map(p => {
                     const t = currentLang==='zh'?(p.title_zh||p.title_en):(p.title_en||p.title_zh), d = currentLang==='zh'?(p.desc_zh||p.desc_en):(p.desc_en||p.desc_zh);
-                    const icon = p.image ? `<img src="${p.image}" class="w-8 h-8 rounded object-cover mx-auto">` : `<span class="text-xl">${p.icon||'📦'}</span>`;
+                    const icon = p.image ? `<img src="${p.image}" class="w-8 h-8 rounded object-cover mx-auto">` : `<span class="text-xl">${p.icon||'🔌'}</span>`;
                     return `<tr><td class="text-center">${icon}</td><td class="font-medium text-stone-800">${t}</td><td class="text-stone-500 text-xs">${d}</td><td class="text-center">
                     <a href="${p.link}" target="${p.target||'_blank'}" class="text-[11px] font-bold text-stone-600 hover:text-stone-900 underline underline-offset-4 decoration-stone-200">${TRANSLATIONS.btn_view[currentLang]}</a></td></tr>`;
                 }).join('') + '</tbody></table>';
