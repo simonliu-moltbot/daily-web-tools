@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🀄️ 台灣 16 張麻將台數計算器 | SimonLiu OpenClaw Tools</title>
+    <title>🀄️ 台灣 16 張麻將台數計算器 (官方規則版) | SimonLiu OpenClaw Tools</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
     <style>
@@ -15,19 +15,20 @@
         .btn-primary:hover { background-color: #44403c; transform: translateY(-1px); }
         .chip { display: inline-flex; align-items: center; padding: 0.25rem 0.75rem; border-radius: 9999px; font-size: 0.75rem; font-weight: 500; border: 1px solid #e7e5e4; cursor: pointer; transition: all 0.2s; }
         .chip.active { background-color: #292524; color: white; border-color: #292524; }
+        .section-title { font-size: 0.7rem; font-weight: 700; color: #a8a29e; text-transform: uppercase; letter-spacing: 0.15em; margin-bottom: 1.5rem; display: block; }
     </style>
 </head>
 <body class="min-h-screen flex flex-col p-4 sm:p-8">
     <header class="max-w-3xl mx-auto w-full mb-12 text-center">
         <a href="../../index.html" class="text-xs font-bold text-stone-400 hover:text-stone-900 transition-colors uppercase tracking-widest">&larr; Back to Tools</a>
         <h1 class="text-3xl font-light text-stone-900 mt-6 mb-2 tracking-tight">🀄️ 台灣 16 張麻將台數計算器</h1>
-        <p class="text-stone-500 font-light">精準判定台數，過年胡牌不求人。</p>
+        <p class="text-stone-500 font-light text-sm">參考「中華麻將競技協會」標準計台規則</p>
     </header>
 
     <main class="max-w-3xl mx-auto w-full space-y-6">
-        <!-- Step 1: Base Context -->
+        <!-- 1. 基礎設定 -->
         <div class="input-card">
-            <h2 class="text-sm font-bold text-stone-900 uppercase tracking-widest mb-6">1. 基礎設定</h2>
+            <span class="section-title">1. 基礎設定</span>
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-8">
                 <div>
                     <label class="block text-xs font-medium text-stone-400 mb-3 uppercase tracking-wider">圈風</label>
@@ -67,18 +68,24 @@
                     </div>
                 </div>
                 <div>
-                    <label class="block text-xs font-medium text-stone-400 mb-3 uppercase tracking-wider">胡牌方式</label>
-                    <label class="flex items-center cursor-pointer">
-                        <input type="checkbox" id="is-self-drawn" class="w-4 h-4 rounded border-gray-300 text-stone-900 focus:ring-stone-900">
-                        <span class="ml-2 text-sm text-stone-600">自摸</span>
-                    </label>
+                    <label class="block text-xs font-medium text-stone-400 mb-3 uppercase tracking-wider">特殊加台</label>
+                    <div class="flex flex-wrap gap-3">
+                        <label class="flex items-center cursor-pointer">
+                            <input type="checkbox" id="is-self-drawn" class="w-4 h-4 rounded border-gray-300 text-stone-900 focus:ring-stone-900">
+                            <span class="ml-2 text-sm text-stone-600">自摸</span>
+                        </label>
+                        <label class="flex items-center cursor-pointer">
+                            <input type="checkbox" id="is-concealed" class="w-4 h-4 rounded border-gray-300 text-stone-900 focus:ring-stone-900">
+                            <span class="ml-2 text-sm text-stone-600">門清</span>
+                        </label>
+                    </div>
                 </div>
             </div>
         </div>
 
-        <!-- Step 2: Flowers -->
+        <!-- 2. 花牌 -->
         <div class="input-card">
-            <h2 class="text-sm font-bold text-stone-900 uppercase tracking-widest mb-6">2. 花牌</h2>
+            <span class="section-title">2. 花牌</span>
             <div id="flower-tiles" class="flex flex-wrap gap-2">
                 <span class="chip" onclick="toggleChip(this)" data-val="f1">1 春</span>
                 <span class="chip" onclick="toggleChip(this)" data-val="f2">2 夏</span>
@@ -91,30 +98,48 @@
             </div>
         </div>
 
-        <!-- Step 3: Hand -->
+        <!-- 3. 牌型組成 -->
         <div class="input-card">
-            <h2 class="text-sm font-bold text-stone-900 uppercase tracking-widest mb-6">3. 牌型組成</h2>
-            <p class="text-[10px] text-stone-400 mb-4">請輸入各組面子與將，例如：中中中, 1m2m3m, 4s5s6s... (可用中文或簡寫)</p>
+            <span class="section-title">3. 牌型組成</span>
+            <p class="text-[10px] text-stone-400 mb-4">請輸入各組面子與將，例如：中中中, 1m2m3m... (系統會偵測對子與刻子)</p>
             <div class="space-y-4">
                 <textarea id="hand-list" class="w-full h-32 p-4 bg-stone-50 border border-stone-200 rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-stone-400 transition-colors" placeholder="例如：紅中紅中紅中, 1萬2萬3萬, 5條5條5條, 發財發財發財, 1筒2筒3筒 + 將：白板白板"></textarea>
             </div>
+            
+            <div class="mt-6">
+                <label class="block text-xs font-medium text-stone-400 mb-3 uppercase tracking-wider">聽牌與胡法</label>
+                <div class="flex flex-wrap gap-4">
+                    <label class="flex items-center cursor-pointer">
+                        <input type="radio" name="wait-type" value="normal" checked class="w-4 h-4 text-stone-900">
+                        <span class="ml-2 text-sm text-stone-600">一般</span>
+                    </label>
+                    <label class="flex items-center cursor-pointer">
+                        <input type="radio" name="wait-type" value="edge" class="w-4 h-4 text-stone-900">
+                        <span class="ml-2 text-sm text-stone-600">邊張/嵌張/單吊 (+1)</span>
+                    </label>
+                    <label class="flex items-center cursor-pointer">
+                        <input type="checkbox" id="is-robbing-kong" class="w-4 h-4 text-stone-900">
+                        <span class="ml-2 text-sm text-stone-600">搶槓 (+1)</span>
+                    </label>
+                </div>
+            </div>
         </div>
 
-        <button onclick="calculate()" class="w-full btn-primary text-sm tracking-widest uppercase">計算台數</button>
+        <button onclick="calculate()" class="w-full btn-primary text-sm tracking-widest uppercase shadow-lg">計算台數</button>
 
         <!-- Result -->
-        <div id="result-area" class="hidden glass-panel rounded-xl p-8 animate-in fade-in duration-500">
+        <div id="result-area" class="hidden glass-panel rounded-xl p-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
             <div class="text-center mb-8">
                 <span class="text-xs font-bold text-stone-400 uppercase tracking-widest">總計台數</span>
                 <div id="total-tai" class="text-6xl font-light text-stone-900 mt-2">0</div>
             </div>
             <div id="reasons" class="space-y-3 border-t border-stone-100 pt-6">
-                <!-- Reasons will be injected here -->
+                <!-- Reasons injected here -->
             </div>
         </div>
 
         <footer class="py-12 text-center">
-            <p class="text-[10px] text-stone-300 uppercase tracking-widest">此工具僅供娛樂，打牌請切莫過度沉迷。</p>
+            <p class="text-[10px] text-stone-300 uppercase tracking-widest">參考 中華麻將競技協會 規範製作</p>
         </footer>
     </main>
 
@@ -141,13 +166,16 @@
             const isDealer = document.getElementById('is-dealer').checked;
             const dealerCount = parseInt(document.getElementById('dealer-count').value);
             const isSelfDrawn = document.getElementById('is-self-drawn').checked;
+            const isConcealed = document.getElementById('is-concealed').checked;
             const flowers = Array.from(document.querySelectorAll('#flower-tiles .active')).map(el => el.dataset.val);
             const handRaw = document.getElementById('hand-list').value;
+            const waitType = document.querySelector('input[name="wait-type"]:checked').value;
+            const isRobbingKong = document.getElementById('is-robbing-kong').checked;
 
             let totalTai = 0;
             let reasons = [];
 
-            // 1. 基礎
+            // 1. 莊家相關
             if (isDealer) {
                 totalTai += 1;
                 reasons.push("莊家 (+1)");
@@ -157,12 +185,25 @@
                     reasons.push(`連 ${dealerCount} 拉 ${dealerCount} (+${t})`);
                 }
             }
+
+            // 2. 胡法相關
             if (isSelfDrawn) {
+                if (isConcealed) {
+                    totalTai += 3; // 門清自摸 = 門清(1) + 自摸(1) + 門清自摸(1) = 3台
+                    reasons.push("門清自摸 (+3)");
+                } else {
+                    totalTai += 1;
+                    reasons.push("自摸 (+1)");
+                }
+            } else if (isConcealed) {
                 totalTai += 1;
-                reasons.push("自摸 (+1)");
+                reasons.push("門清 (+1)");
             }
 
-            // 2. 風牌/花牌
+            if (waitType === 'edge') { totalTai += 1; reasons.push("邊/嵌/獨聽 (+1)"); }
+            if (isRobbingKong) { totalTai += 1; reasons.push("搶槓 (+1)"); }
+
+            // 3. 花牌
             const seatToFlowers = {'東': ['f1', 'f5'], '南': ['f2', 'f6'], '西': ['f3', 'f7'], '北': ['f4', 'f8']};
             const correctFlowers = seatToFlowers[windSeat] || [];
             flowers.forEach(f => {
@@ -174,7 +215,7 @@
             if (flowers.length === 8) { totalTai += 8; reasons.push("八仙過海 (+8)"); }
             else if (flowers.length === 7) { totalTai += 8; reasons.push("七搶一 (+8)"); }
 
-            // 3. 字牌判定 (大三元/小三元判定)
+            // 4. 字牌判定 (大三元/小三元)
             const hasZhong = (handRaw.match(/中/g) || []).length >= 3;
             const hasFa = (handRaw.match(/發/g) || []).length >= 3;
             const hasBai = (handRaw.match(/白/g) || []).length >= 3;
@@ -205,10 +246,34 @@
                 if (hasBai) { totalTai += 1; reasons.push("白板 (+1)"); }
             }
             
-            if ((handRaw.match(new RegExp(windRound, 'g')) || []).length >= 3) { totalTai += 1; reasons.push(`圈風 ${windRound} (+1)`); }
-            if ((handRaw.match(new RegExp(windSeat, 'g')) || []).length >= 3) { totalTai += 1; reasons.push(`門風 ${windSeat} (+1)`); }
+            // 四喜判定
+            const hasEast = (handRaw.match(/東/g) || []).length >= 3;
+            const hasSouth = (handRaw.match(/南/g) || []).length >= 3;
+            const hasWest = (handRaw.match(/西/g) || []).length >= 3;
+            const hasNorth = (handRaw.match(/北/g) || []).length >= 3;
+            let windTriplets = [hasEast, hasSouth, hasWest, hasNorth].filter(Boolean).length;
+            
+            if (windTriplets === 4) {
+                totalTai += 16;
+                reasons.push("大四喜 (+16)");
+            } else if (windTriplets === 3) {
+                const eyeEast = (handRaw.match(/東/g) || []).length === 2;
+                const eyeSouth = (handRaw.match(/南/g) || []).length === 2;
+                const eyeWest = (handRaw.match(/西/g) || []).length === 2;
+                const eyeNorth = (handRaw.match(/北/g) || []).length === 2;
+                if ((!hasEast && eyeEast) || (!hasSouth && eyeSouth) || (!hasWest && eyeWest) || (!hasNorth && eyeNorth)) {
+                    totalTai += 8;
+                    reasons.push("小四喜 (+8)");
+                }
+            }
+            
+            // 圈風門風 (若已計入四喜則不重複計)
+            if (windTriplets < 3) {
+                if ((handRaw.match(new RegExp(windRound, 'g')) || []).length >= 3) { totalTai += 1; reasons.push(`圈風 ${windRound} (+1)`); }
+                if ((handRaw.match(new RegExp(windSeat, 'g')) || []).length >= 3) { totalTai += 1; reasons.push(`門風 ${windSeat} (+1)`); }
+            }
 
-            // 4. 清一色判定
+            // 5. 牌型判定 (清一色 / 湊一色 / 字一色)
             const hasWan = /[萬m]/.test(handRaw);
             const hasTiao = /[條s]/.test(handRaw);
             const hasTong = /[筒p]/.test(handRaw);
@@ -226,15 +291,22 @@
                 reasons.push("字一色 (+16)");
             }
 
+            // 6. 碰碰胡 (簡單偵測 5 組刻子)
+            const triplets = (handRaw.match(/.../g) || []).filter(s => s[0] === s[1] && s[1] === s[2]).length;
+            if (triplets >= 5) {
+                totalTai += 4;
+                reasons.push("碰碰胡 (+4)");
+            }
+
             // 展示結果
             document.getElementById('total-tai').innerText = totalTai;
             const reasonsList = document.getElementById('reasons');
-            reasonsList.innerHTML = reasons.map(r => `
-                <div class="flex justify-between items-center text-sm">
+            reasonsList.innerHTML = reasons.length ? reasons.map(r => `
+                <div class="flex justify-between items-center text-sm py-1 border-b border-stone-50 last:border-none">
                     <span class="text-stone-600">${r.split(' (')[0]}</span>
-                    <span class="font-mono text-stone-400">${r.match(/\+\d+/)?.[0] || '+1'}</span>
+                    <span class="font-mono text-stone-900 font-bold">${r.match(/\+\d+/)?.[0] || '+1'}</span>
                 </div>
-            `).join('');
+            `).join('') : '<div class="text-center text-stone-300 text-xs">無加台</div>';
             
             document.getElementById('result-area').classList.remove('hidden');
             window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
