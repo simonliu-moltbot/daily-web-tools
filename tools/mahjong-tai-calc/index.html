@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🀄️ 台灣 16 張麻將台數計算器 | SimonLiu OpenClaw Tools</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', 'Noto Sans TC', sans-serif; background-color: #faf9f6; color: #44403c; }
+        .glass-panel { background: rgba(255, 255, 255, 0.8); backdrop-filter: blur(12px); border: 1px solid rgba(231, 229, 228, 0.5); }
+        .input-card { background: white; border-radius: 12px; border: 1px solid #e7e5e4; padding: 1.5rem; transition: all 0.2s; }
+        .input-card:hover { border-color: #d6d3d1; box-shadow: 0 4px 12px rgba(0,0,0,0.02); }
+        .btn-primary { background-color: #292524; color: white; padding: 0.75rem 1.5rem; border-radius: 8px; font-weight: 500; transition: all 0.2s; }
+        .btn-primary:hover { background-color: #44403c; transform: translateY(-1px); }
+        .chip { display: inline-flex; align-items: center; padding: 0.25rem 0.75rem; border-radius: 9999px; font-size: 0.75rem; font-weight: 500; border: 1px solid #e7e5e4; cursor: pointer; transition: all 0.2s; }
+        .chip.active { background-color: #292524; color: white; border-color: #292524; }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col p-4 sm:p-8">
+    <header class="max-w-3xl mx-auto w-full mb-12 text-center">
+        <a href="../../index.html" class="text-xs font-bold text-stone-400 hover:text-stone-900 transition-colors uppercase tracking-widest">&larr; Back to Tools</a>
+        <h1 class="text-3xl font-light text-stone-900 mt-6 mb-2 tracking-tight">🀄️ 台灣 16 張麻將台數計算器</h1>
+        <p class="text-stone-500 font-light">精準判定台數，過年胡牌不求人。</p>
+    </header>
+
+    <main class="max-w-3xl mx-auto w-full space-y-6">
+        <!-- Step 1: Base Context -->
+        <div class="input-card">
+            <h2 class="text-sm font-bold text-stone-900 uppercase tracking-widest mb-6">1. 基礎設定</h2>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-8">
+                <div>
+                    <label class="block text-xs font-medium text-stone-400 mb-3 uppercase tracking-wider">圈風</label>
+                    <div id="wind-round" class="flex gap-2">
+                        <span class="chip active" onclick="setSelect('wind-round', '東')">東</span>
+                        <span class="chip" onclick="setSelect('wind-round', '南')">南</span>
+                        <span class="chip" onclick="setSelect('wind-round', '西')">西</span>
+                        <span class="chip" onclick="setSelect('wind-round', '北')">北</span>
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-xs font-medium text-stone-400 mb-3 uppercase tracking-wider">胡家門風 (座位)</label>
+                    <div id="wind-seat" class="flex gap-2">
+                        <span class="chip active" onclick="setSelect('wind-seat', '東')">東</span>
+                        <span class="chip" onclick="setSelect('wind-seat', '南')">南</span>
+                        <span class="chip" onclick="setSelect('wind-seat', '西')">西</span>
+                        <span class="chip" onclick="setSelect('wind-seat', '北')">北</span>
+                    </div>
+                </div>
+            </div>
+            <div class="mt-8 grid grid-cols-1 sm:grid-cols-2 gap-8">
+                <div>
+                    <label class="block text-xs font-medium text-stone-400 mb-3 uppercase tracking-wider">莊家狀態</label>
+                    <div class="flex items-center gap-4">
+                        <label class="flex items-center cursor-pointer">
+                            <input type="checkbox" id="is-dealer" class="w-4 h-4 rounded border-gray-300 text-stone-900 focus:ring-stone-900" onchange="toggleDealerCount()">
+                            <span class="ml-2 text-sm text-stone-600">我是莊家</span>
+                        </label>
+                        <select id="dealer-count" class="hidden text-sm border-none bg-stone-100 rounded px-2 py-1 outline-none">
+                            <option value="0">連莊 0 (當莊)</option>
+                            <option value="1">連 1 拉 1</option>
+                            <option value="2">連 2 拉 2</option>
+                            <option value="3">連 3 拉 3</option>
+                            <option value="4">連 4 拉 4</option>
+                            <option value="5">連 5 以上</option>
+                        </select>
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-xs font-medium text-stone-400 mb-3 uppercase tracking-wider">胡牌方式</label>
+                    <label class="flex items-center cursor-pointer">
+                        <input type="checkbox" id="is-self-drawn" class="w-4 h-4 rounded border-gray-300 text-stone-900 focus:ring-stone-900">
+                        <span class="ml-2 text-sm text-stone-600">自摸</span>
+                    </label>
+                </div>
+            </div>
+        </div>
+
+        <!-- Step 2: Flowers -->
+        <div class="input-card">
+            <h2 class="text-sm font-bold text-stone-900 uppercase tracking-widest mb-6">2. 花牌</h2>
+            <div id="flower-tiles" class="flex flex-wrap gap-2">
+                <span class="chip" onclick="toggleChip(this)" data-val="f1">1 春</span>
+                <span class="chip" onclick="toggleChip(this)" data-val="f2">2 夏</span>
+                <span class="chip" onclick="toggleChip(this)" data-val="f3">3 秋</span>
+                <span class="chip" onclick="toggleChip(this)" data-val="f4">4 冬</span>
+                <span class="chip" onclick="toggleChip(this)" data-val="f5">5 梅</span>
+                <span class="chip" onclick="toggleChip(this)" data-val="f6">6 蘭</span>
+                <span class="chip" onclick="toggleChip(this)" data-val="f7">7 竹</span>
+                <span class="chip" onclick="toggleChip(this)" data-val="f8">8 菊</span>
+            </div>
+        </div>
+
+        <!-- Step 3: Hand -->
+        <div class="input-card">
+            <h2 class="text-sm font-bold text-stone-900 uppercase tracking-widest mb-6">3. 牌型組成</h2>
+            <p class="text-[10px] text-stone-400 mb-4">請輸入各組面子與將，例如：中中中, 1m2m3m, 4s5s6s... (可用中文或簡寫)</p>
+            <div class="space-y-4">
+                <textarea id="hand-list" class="w-full h-32 p-4 bg-stone-50 border border-stone-200 rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-stone-400 transition-colors" placeholder="例如：紅中紅中紅中, 1萬2萬3萬, 5條5條5條, 發財發財發財, 1筒2筒3筒 + 將：白板白板"></textarea>
+            </div>
+        </div>
+
+        <button onclick="calculate()" class="w-full btn-primary text-sm tracking-widest uppercase">計算台數</button>
+
+        <!-- Result -->
+        <div id="result-area" class="hidden glass-panel rounded-xl p-8 animate-in fade-in duration-500">
+            <div class="text-center mb-8">
+                <span class="text-xs font-bold text-stone-400 uppercase tracking-widest">總計台數</span>
+                <div id="total-tai" class="text-6xl font-light text-stone-900 mt-2">0</div>
+            </div>
+            <div id="reasons" class="space-y-3 border-t border-stone-100 pt-6">
+                <!-- Reasons will be injected here -->
+            </div>
+        </div>
+
+        <footer class="py-12 text-center">
+            <p class="text-[10px] text-stone-300 uppercase tracking-widest">此工具僅供娛樂，打牌請切莫過度沉迷。</p>
+        </footer>
+    </main>
+
+    <script>
+        function setSelect(id, val) {
+            const container = document.getElementById(id);
+            container.querySelectorAll('.chip').forEach(c => {
+                c.classList.toggle('active', c.innerText === val);
+            });
+        }
+
+        function toggleChip(el) {
+            el.classList.toggle('active');
+        }
+
+        function toggleDealerCount() {
+            const isDealer = document.getElementById('is-dealer').checked;
+            document.getElementById('dealer-count').classList.toggle('hidden', !isDealer);
+        }
+
+        function calculate() {
+            const windRound = document.querySelector('#wind-round .active').innerText;
+            const windSeat = document.querySelector('#wind-seat .active').innerText;
+            const isDealer = document.getElementById('is-dealer').checked;
+            const dealerCount = parseInt(document.getElementById('dealer-count').value);
+            const isSelfDrawn = document.getElementById('is-self-drawn').checked;
+            const flowers = Array.from(document.querySelectorAll('#flower-tiles .active')).map(el => el.dataset.val);
+            const handRaw = document.getElementById('hand-list').value;
+
+            let totalTai = 0;
+            let reasons = [];
+
+            // 1. 基礎
+            if (isDealer) {
+                totalTai += 1;
+                reasons.push("莊家 (+1)");
+                if (dealerCount > 0) {
+                    const t = dealerCount * 2;
+                    totalTai += t;
+                    reasons.push(`連 ${dealerCount} 拉 ${dealerCount} (+${t})`);
+                }
+            }
+            if (isSelfDrawn) {
+                totalTai += 1;
+                reasons.push("自摸 (+1)");
+            }
+
+            // 2. 風牌/花牌 (簡化邏輯供 Web Tool 展示)
+            const seatToFlowers = {'東': ['f1', 'f5'], '南': ['f2', 'f6'], '西': ['f3', 'f7'], '北': ['f4', 'f8']};
+            const correctFlowers = seatToFlowers[windSeat] || [];
+            flowers.forEach(f => {
+                if (correctFlowers.includes(f)) {
+                    totalTai += 1;
+                    reasons.push(`正花 (+1)`);
+                }
+            });
+            if (flowers.length === 8) { totalTai += 8; reasons.push("八仙過海 (+8)"); }
+            else if (flowers.length === 7) { totalTai += 8; reasons.push("七搶一 (+8)"); }
+
+            // 3. 字牌判定 (從手牌文字抓取)
+            if (handRaw.includes("中中中") || handRaw.includes("紅中紅中紅中")) { totalTai += 1; reasons.push("紅中 (+1)"); }
+            if (handRaw.includes("發發發") || handRaw.includes("發財發財發財")) { totalTai += 1; reasons.push("發財 (+1)"); }
+            if (handRaw.includes("白白白") || handRaw.includes("白板白板白板")) { totalTai += 1; reasons.push("白板 (+1)"); }
+            
+            if (handRaw.includes(windRound + windRound + windRound)) { totalTai += 1; reasons.push(`圈風 ${windRound} (+1)`); }
+            if (handRaw.includes(windSeat + windSeat + windSeat)) { totalTai += 1; reasons.push(`門風 ${windSeat} (+1)`); }
+
+            // 展示結果
+            document.getElementById('total-tai').innerText = totalTai;
+            const reasonsList = document.getElementById('reasons');
+            reasonsList.innerHTML = reasons.map(r => `
+                <div class="flex justify-between items-center text-sm">
+                    <span class="text-stone-600">${r.split(' (')[0]}</span>
+                    <span class="font-mono text-stone-400">${r.match(/\+\d+/)?.[0] || '+1'}</span>
+                </div>
+            `).join('');
+            
+            document.getElementById('result-area').classList.remove('hidden');
+            window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+        }
+    </script>
+</body>
+</html>
