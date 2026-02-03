@@ -162,7 +162,7 @@
                 reasons.push("自摸 (+1)");
             }
 
-            // 2. 風牌/花牌 (簡化邏輯供 Web Tool 展示)
+            // 2. 風牌/花牌
             const seatToFlowers = {'東': ['f1', 'f5'], '南': ['f2', 'f6'], '西': ['f3', 'f7'], '北': ['f4', 'f8']};
             const correctFlowers = seatToFlowers[windSeat] || [];
             flowers.forEach(f => {
@@ -174,13 +174,57 @@
             if (flowers.length === 8) { totalTai += 8; reasons.push("八仙過海 (+8)"); }
             else if (flowers.length === 7) { totalTai += 8; reasons.push("七搶一 (+8)"); }
 
-            // 3. 字牌判定 (從手牌文字抓取)
-            if (handRaw.includes("中中中") || handRaw.includes("紅中紅中紅中")) { totalTai += 1; reasons.push("紅中 (+1)"); }
-            if (handRaw.includes("發發發") || handRaw.includes("發財發財發財")) { totalTai += 1; reasons.push("發財 (+1)"); }
-            if (handRaw.includes("白白白") || handRaw.includes("白板白板白板")) { totalTai += 1; reasons.push("白板 (+1)"); }
+            // 3. 字牌判定 (大三元/小三元判定)
+            const hasZhong = (handRaw.match(/中/g) || []).length >= 3;
+            const hasFa = (handRaw.match(/發/g) || []).length >= 3;
+            const hasBai = (handRaw.match(/白/g) || []).length >= 3;
             
-            if (handRaw.includes(windRound + windRound + windRound)) { totalTai += 1; reasons.push(`圈風 ${windRound} (+1)`); }
-            if (handRaw.includes(windSeat + windSeat + windSeat)) { totalTai += 1; reasons.push(`門風 ${windSeat} (+1)`); }
+            let dragonTriplets = 0;
+            if (hasZhong) dragonTriplets++;
+            if (hasFa) dragonTriplets++;
+            if (hasBai) dragonTriplets++;
+
+            if (dragonTriplets === 3) {
+                totalTai += 8;
+                reasons.push("大三元 (+8)");
+            } else if (dragonTriplets === 2) {
+                const eyeZhong = (handRaw.match(/中/g) || []).length === 2;
+                const eyeFa = (handRaw.match(/發/g) || []).length === 2;
+                const eyeBai = (handRaw.match(/白/g) || []).length === 2;
+                if ((!hasZhong && eyeZhong) || (!hasFa && eyeFa) || (!hasBai && eyeBai)) {
+                    totalTai += 4;
+                    reasons.push("小三元 (+4)");
+                } else {
+                    if (hasZhong) { totalTai += 1; reasons.push("紅中 (+1)"); }
+                    if (hasFa) { totalTai += 1; reasons.push("發財 (+1)"); }
+                    if (hasBai) { totalTai += 1; reasons.push("白板 (+1)"); }
+                }
+            } else {
+                if (hasZhong) { totalTai += 1; reasons.push("紅中 (+1)"); }
+                if (hasFa) { totalTai += 1; reasons.push("發財 (+1)"); }
+                if (hasBai) { totalTai += 1; reasons.push("白板 (+1)"); }
+            }
+            
+            if ((handRaw.match(new RegExp(windRound, 'g')) || []).length >= 3) { totalTai += 1; reasons.push(`圈風 ${windRound} (+1)`); }
+            if ((handRaw.match(new RegExp(windSeat, 'g')) || []).length >= 3) { totalTai += 1; reasons.push(`門風 ${windSeat} (+1)`); }
+
+            // 4. 清一色判定
+            const hasWan = /[萬m]/.test(handRaw);
+            const hasTiao = /[條s]/.test(handRaw);
+            const hasTong = /[筒p]/.test(handRaw);
+            const hasZi = /[中發白東西南北]/.test(handRaw);
+            const suitCount = [hasWan, hasTiao, hasTong].filter(Boolean).length;
+
+            if (suitCount === 1 && !hasZi) {
+                totalTai += 8;
+                reasons.push("清一色 (+8)");
+            } else if (suitCount === 1 && hasZi) {
+                totalTai += 2;
+                reasons.push("湊一色 (+2)");
+            } else if (suitCount === 0 && hasZi) {
+                totalTai += 16;
+                reasons.push("字一色 (+16)");
+            }
 
             // 展示結果
             document.getElementById('total-tai').innerText = totalTai;
