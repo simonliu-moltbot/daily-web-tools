@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🛵 機車族雨衣指數 | Scooter Raincoat Index</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Noto Sans TC', sans-serif; background-color: #f3f4f6; }
+        .card { background: white; border-radius: 1rem; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); }
+    </style>
+</head>
+<body class="min-h-screen p-4 md:p-8">
+    <div class="max-w-md mx-auto">
+        <a href="../../index.html" class="inline-flex items-center text-gray-600 hover:text-gray-900 mb-6 transition-colors">
+            <span class="mr-2">🏠</span> 回首頁
+        </a>
+
+        <div class="card p-6 text-center">
+            <h1 class="text-2xl font-bold text-gray-800 mb-2">🛵 機車族雨衣指數</h1>
+            <p class="text-gray-500 text-sm mb-6">根據即時降雨機率，決定你的著裝策略</p>
+
+            <div id="loading" class="py-12">
+                <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto"></div>
+                <p class="mt-4 text-gray-400">正在偵測位置與天氣...</p>
+            </div>
+
+            <div id="result" class="hidden">
+                <div id="index-emoji" class="text-7xl mb-4">☀️</div>
+                <div id="index-level" class="text-3xl font-black mb-2">安全無憂</div>
+                <div id="weather-info" class="text-gray-600 mb-6">
+                    <span id="location">台北市</span> · <span id="temp">25°C</span><br>
+                    降雨機率：<span id="pop">0%</span>
+                </div>
+
+                <div class="bg-gray-50 rounded-lg p-4 text-left mb-6">
+                    <h3 class="font-bold text-gray-700 mb-1">💡 建議策略：</h3>
+                    <p id="advice" class="text-gray-600">目前天氣晴朗，放心騎車吧！但記得防曬。</p>
+                </div>
+
+                <div class="space-y-3">
+                    <div class="flex items-center justify-between text-sm p-3 border rounded-lg" id="gear-suit">
+                        <span>兩截式雨衣 (Suit)</span>
+                        <span id="gear-suit-status">❌ 不建議</span>
+                    </div>
+                    <div class="flex items-center justify-between text-sm p-3 border rounded-lg" id="gear-poncho">
+                        <span>小飛俠披肩雨衣 (Poncho)</span>
+                        <span id="gear-poncho-status">❌ 不建議</span>
+                    </div>
+                    <div id="gear-warning" class="text-xs text-red-500 font-medium hidden">⚠️ 注意：強風時請穿兩截式雨衣避免危險！</div>
+                </div>
+            </div>
+
+            <button onclick="fetchWeather()" class="mt-8 w-full bg-blue-600 text-white font-bold py-3 rounded-lg hover:bg-blue-700 transition-colors">
+                🔄 重新整理
+            </button>
+        </div>
+
+        <footer class="mt-12 text-center text-gray-400 text-xs">
+            <p>數據來源：Open-Meteo (CWA 觀測數據參考)</p>
+            <p class="mt-1">Created by AI Agent on 2026-02-03</p>
+        </footer>
+    </div>
+
+    <script>
+        async function fetchWeather() {
+            const loading = document.getElementById('loading');
+            const result = document.getElementById('result');
+            loading.classList.remove('hidden');
+            result.classList.add('hidden');
+
+            try {
+                // Default to Taipei
+                let lat = 25.0330, lon = 121.5654;
+                
+                if (navigator.geolocation) {
+                    const pos = await new Promise((res, rej) => {
+                        navigator.geolocation.getCurrentPosition(res, rej, { timeout: 5000 });
+                    }).catch(() => null);
+                    if (pos) {
+                        lat = pos.coords.latitude;
+                        lon = pos.coords.longitude;
+                    }
+                }
+
+                const res = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&daily=precipitation_probability_max&current_weather=true&timezone=Asia%2FTaipei`);
+                const data = await res.json();
+                
+                const temp = data.current_weather.temperature;
+                const pop = data.daily.precipitation_probability_max[0];
+                const wind = data.current_weather.windspeed;
+
+                updateUI(temp, pop, wind);
+            } catch (err) {
+                console.error(err);
+                alert('無法取得天氣數據，請檢查網路連線。');
+            } finally {
+                loading.classList.add('hidden');
+                result.classList.remove('hidden');
+            }
+        }
+
+        function updateUI(temp, pop, wind) {
+            document.getElementById('temp').textContent = `${temp}°C`;
+            document.getElementById('pop').textContent = `${pop}%`;
+
+            const emoji = document.getElementById('index-emoji');
+            const level = document.getElementById('index-level');
+            const advice = document.getElementById('advice');
+            const gearSuit = document.getElementById('gear-suit-status');
+            const gearPoncho = document.getElementById('gear-poncho-status');
+            const warning = document.getElementById('gear-warning');
+
+            warning.classList.add('hidden');
+
+            if (pop < 20) {
+                emoji.textContent = '☀️';
+                level.textContent = '安全無憂';
+                level.className = 'text-3xl font-black mb-2 text-green-500';
+                advice.textContent = '目前降雨機率極低，放心騎車。天氣不錯，注意路面三寶。';
+                gearSuit.textContent = '❌ 穿了會中暑';
+                gearPoncho.textContent = '❌ 不需要';
+            } else if (pop < 50) {
+                emoji.textContent = '☁️';
+                level.textContent = '備戰狀態';
+                level.className = 'text-3xl font-black mb-2 text-yellow-500';
+                advice.textContent = '可能有零星降雨。建議車廂內備妥雨衣，避免突然被「偷襲」。';
+                gearSuit.textContent = '⌛ 車廂待命';
+                gearPoncho.textContent = '✅ 建議攜帶';
+            } else if (pop < 80) {
+                emoji.textContent = '🌦️';
+                level.textContent = '雨衣必備';
+                level.className = 'text-3xl font-black mb-2 text-orange-500';
+                advice.textContent = '下雨機率很高！出發前直接穿上吧，不要賭那 30% 的運氣。';
+                gearSuit.textContent = '✅ 推薦使用';
+                gearPoncho.textContent = '✅ 堪用';
+            } else {
+                emoji.textContent = '🌧️';
+                level.textContent = '全面武裝';
+                level.className = 'text-3xl font-black mb-2 text-red-600';
+                advice.textContent = '大雨警戒！強烈建議穿兩截式雨衣，防水性與安全性較佳。';
+                gearSuit.textContent = '🏆 唯一首選';
+                gearPoncho.textContent = '⚠️ 容易進水';
+            }
+
+            if (wind > 30) {
+                warning.classList.remove('hidden');
+                warning.textContent = `⚠️ 當前風速較大 (${wind}km/h)，穿披肩雨衣易飄起遮擋視線，極度危險！`;
+            }
+        }
+
+        fetchWeather();
+    </script>
+</body>
+</html>
