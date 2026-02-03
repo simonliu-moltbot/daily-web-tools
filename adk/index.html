@@ -19,7 +19,19 @@
         .btn-toggle:not(.active):hover { background-color: #e7e5e4; }
     </style>
     <script>
-        const PROJECT_DATA = [{"title_zh": "Tw Aqi", "title_en": "Tw Aqi", "desc_zh": "ADK Project: Tw Aqi", "desc_en": "ADK Project: Tw Aqi", "link": "https://github.com/simonliu-moltbot/adk-tw-aqi", "type": "ADK", "icon": "🤖"}, {"title_zh": "Tw Cafe", "title_en": "Tw Cafe", "desc_zh": "ADK Project: Tw Cafe", "desc_en": "ADK Project: Tw Cafe", "link": "https://github.com/simonliu-moltbot/adk-tw-cafe", "type": "ADK", "icon": "🤖"}, {"title_zh": "Tw Forex", "title_en": "Tw Forex", "desc_zh": "ADK Project: Tw Forex", "desc_en": "ADK Project: Tw Forex", "link": "https://github.com/simonliu-moltbot/adk-tw-forex", "type": "ADK", "icon": "🤖"}, {"title_zh": "Tw Power", "title_en": "Tw Power", "desc_zh": "ADK Project: Tw Power", "desc_en": "ADK Project: Tw Power", "link": "https://github.com/simonliu-moltbot/adk-tw-power", "type": "ADK", "icon": "🤖"}, {"title_zh": "Tw Ptt", "title_en": "Tw Ptt", "desc_zh": "ADK Project: Tw Ptt", "desc_en": "ADK Project: Tw Ptt", "link": "https://github.com/simonliu-moltbot/adk-tw-ptt", "type": "ADK", "icon": "🤖"}];
+        const PROJECT_DATA = [
+            {"title_zh": "🏥 醫院看診進度助手", "title_en": "Hospital Queue Assistant", "desc_zh": "查詢全台主要醫院的實時看診進度。", "desc_en": "Check real-time hospital appointment queues across Taiwan.", "link": "https://github.com/simonliu-moltbot/adk-tw-hospital-queue", "type": "ADK", "icon": "🏥"},
+            {"title_zh": "🌽 農產品市場價格助理", "title_en": "Agri Market Assistant", "desc_zh": "查詢全台農產品（蔬菜、水果）實時批發交易價格。", "desc_en": "Check real-time wholesale agricultural prices in Taiwan.", "link": "https://github.com/simonliu-moltbot/adk-tw-agri", "type": "ADK", "icon": "🌽"},
+            {"title_zh": "🎬 台灣電影小助手", "title_en": "Taiwan Movie Helper", "desc_zh": "查詢台灣上映電影資訊、場次與熱門影評。", "desc_en": "Search for movies, showtimes, and reviews in Taiwan.", "link": "https://github.com/simonliu-moltbot/adk-tw-movie", "type": "ADK", "icon": "🎬"},
+            {"title_zh": "💰 金融徵信分析助手", "title_en": "Financial Credit Assistant", "desc_zh": "串接 JCIC OpenAPI 分析房貸與信貸趨勢。", "desc_en": "Analyze JCIC credit and mortgage trends using OpenAPI.", "link": "https://github.com/simonliu-moltbot/adk-tw-jcic", "type": "ADK", "icon": "💰"},
+            {"title_zh": "💬 PTT 熱門話題助手", "title_en": "PTT Hot Topics Assistant", "desc_zh": "追蹤 PTT 各板熱門討論話題與爆文。", "desc_en": "Track trending topics and hot posts on PTT boards.", "link": "https://github.com/simonliu-moltbot/adk-tw-ptt", "type": "ADK", "icon": "💬"},
+            {"title_zh": "🍃 空氣品質監測助手", "title_en": "Air Quality Monitor", "desc_zh": "查詢全台各站點的 AQI 指數與空氣品質預報。", "desc_en": "Check real-time AQI and air quality forecasts in Taiwan.", "link": "https://github.com/simonliu-moltbot/adk-tw-aqi", "type": "ADK", "icon": "🍃"},
+            {"title_zh": "💹 外幣匯率小助手", "title_en": "Taiwan Forex Helper", "desc_zh": "提供台灣主要銀行外幣匯率比價與換算。", "desc_en": "Compare bank forex rates and currency conversion in Taiwan.", "link": "https://github.com/simonliu-moltbot/adk-tw-forex", "type": "ADK", "icon": "💹"},
+            {"title_zh": "⚡️ 台灣電力狀態助手", "title_en": "Taiwan Power Status Helper", "desc_zh": "即時監控台灣發電、備轉容量與用電負載。", "desc_en": "Monitor Taiwan power generation and reserve capacity.", "link": "https://github.com/simonliu-moltbot/adk-tw-power", "type": "ADK", "icon": "⚡️"},
+            {"title_zh": "🎨 台灣文化活動助手", "title_en": "Taiwan Culture Events Helper", "desc_zh": "探索全台展覽、演出與各類文化藝術活動。", "desc_en": "Explore cultural events, exhibitions, and performances.", "link": "https://github.com/simonliu-moltbot/adk-tw-culture", "type": "ADK", "icon": "🎨"},
+            {"title_zh": "☕️ 台灣咖啡廳助手", "title_en": "Taiwan Cafe Finder", "desc_zh": "尋找全台適合工作的咖啡廳，包含插座與 WiFi 資訊。", "desc_en": "Find work-friendly cafes in Taiwan with WiFi and outlets.", "link": "https://github.com/simonliu-moltbot/adk-tw-cafe", "type": "ADK", "icon": "☕️"},
+            {"title_zh": "₿ 加密貨幣行情助手", "title_en": "Crypto Price Assistant", "desc_zh": "即時追蹤主要加密貨幣報價與市場趨勢。", "desc_en": "Track real-time cryptocurrency prices and market trends.", "link": "https://github.com/simonliu-moltbot/adk-tw-crypto", "type": "ADK", "icon": "₿"}
+        ];
         const TRANSLATIONS = {"nav_home": {"en": "Home", "zh": "首頁"}, "nav_tools": {"en": "Web Tools", "zh": "工具集"}, "nav_gallery": {"en": "AI Gallery", "zh": "藝術畫廊"}, "nav_mcp": {"en": "MCP Services", "zh": "MCP 服務"}, "nav_adk": {"en": "ADK Agents", "zh": "ADK 代理"}, "footer_built": {"en": "Built with ❤️ by AI Agent", "zh": "由 AI Agent 打造"}, "footer_updated": {"en": "Last Updated", "zh": "最後更新"}, "search_placeholder": {"en": "Search projects...", "zh": "檢索項目..."}, "btn_view": {"en": "View", "zh": "進入"}};
     </script>
 </head>
@@ -27,15 +39,15 @@
 
     <nav class="sticky top-0 z-50 glass-panel">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between h-16">
-            <a href="https://simonliu-moltbot.github.io/daily-web-tools/index.html" class="text-lg font-bold tracking-tight text-stone-900">
+            <a href="../index.html" class="text-lg font-bold tracking-tight text-stone-900">
                 SimonLiu OpenClaw Works
             </a>
             <div class="hidden md:flex space-x-1">
-                <a href="https://simonliu-moltbot.github.io/" class="px-3 py-2 rounded-md text-xs font-medium transition-colors text-stone-500 hover:text-stone-900" data-i18n-key="nav_home">Home</a>
-<a href="https://simonliu-moltbot.github.io/daily-web-tools/web-tools/index.html" class="px-3 py-2 rounded-md text-xs font-medium transition-colors text-stone-500 hover:text-stone-900" data-i18n-key="nav_tools">Web Tools</a>
-<a href="https://simonliu-moltbot.github.io/daily-web-tools/gallery/index.html" class="px-3 py-2 rounded-md text-xs font-medium transition-colors text-stone-500 hover:text-stone-900" data-i18n-key="nav_gallery">AI Gallery</a>
-<a href="https://simonliu-moltbot.github.io/daily-web-tools/mcp/index.html" class="px-3 py-2 rounded-md text-xs font-medium transition-colors text-stone-500 hover:text-stone-900" data-i18n-key="nav_mcp">MCP Services</a>
-<a href="https://simonliu-moltbot.github.io/daily-web-tools/adk/index.html" class="px-3 py-2 rounded-md text-xs font-medium transition-colors text-stone-900 bg-stone-100 font-bold" data-i18n-key="nav_adk">ADK Agents</a>
+                <a href="../index.html" class="px-3 py-2 rounded-md text-xs font-medium transition-colors text-stone-500 hover:text-stone-900" data-i18n-key="nav_home">Home</a>
+<a href="../index.html" class="px-3 py-2 rounded-md text-xs font-medium transition-colors text-stone-500 hover:text-stone-900" data-i18n-key="nav_tools">Web Tools</a>
+<a href="../gallery/index.html" class="px-3 py-2 rounded-md text-xs font-medium transition-colors text-stone-500 hover:text-stone-900" data-i18n-key="nav_gallery">AI Gallery</a>
+<a href="../mcp/index.html" class="px-3 py-2 rounded-md text-xs font-medium transition-colors text-stone-500 hover:text-stone-900" data-i18n-key="nav_mcp">MCP Services</a>
+<a href="index.html" class="px-3 py-2 rounded-md text-xs font-medium transition-colors text-stone-900 bg-stone-100 font-bold" data-i18n-key="nav_adk">ADK Agents</a>
             </div>
             <div class="flex items-center gap-3">
                 <button id="lang-toggle" class="text-[10px] font-bold bg-stone-100 px-2.5 py-1.5 rounded-full border border-stone-200 hover:bg-stone-200 transition-colors">
@@ -47,17 +59,17 @@
             </div>
         </div>
         <div id="mobile-menu" class="hidden md:hidden border-t border-stone-100 bg-white/95 backdrop-blur-sm px-2 py-3 space-y-1">
-            <a href="https://simonliu-moltbot.github.io/" class="block px-3 py-2 rounded-md text-sm font-medium text-stone-500 hover:text-stone-900" data-i18n-key="nav_home">Home</a>
-<a href="https://simonliu-moltbot.github.io/daily-web-tools/web-tools/index.html" class="block px-3 py-2 rounded-md text-sm font-medium text-stone-500 hover:text-stone-900" data-i18n-key="nav_tools">Web Tools</a>
-<a href="https://simonliu-moltbot.github.io/daily-web-tools/gallery/index.html" class="block px-3 py-2 rounded-md text-sm font-medium text-stone-500 hover:text-stone-900" data-i18n-key="nav_gallery">AI Gallery</a>
-<a href="https://simonliu-moltbot.github.io/daily-web-tools/mcp/index.html" class="block px-3 py-2 rounded-md text-sm font-medium text-stone-500 hover:text-stone-900" data-i18n-key="nav_mcp">MCP Services</a>
-<a href="https://simonliu-moltbot.github.io/daily-web-tools/adk/index.html" class="block px-3 py-2 rounded-md text-sm font-medium text-stone-900 bg-stone-100 font-bold" data-i18n-key="nav_adk">ADK Agents</a>
+            <a href="../index.html" class="block px-3 py-2 rounded-md text-sm font-medium text-stone-500 hover:text-stone-900" data-i18n-key="nav_home">Home</a>
+<a href="../index.html" class="block px-3 py-2 rounded-md text-sm font-medium text-stone-500 hover:text-stone-900" data-i18n-key="nav_tools">Web Tools</a>
+<a href="../gallery/index.html" class="block px-3 py-2 rounded-md text-sm font-medium text-stone-500 hover:text-stone-900" data-i18n-key="nav_gallery">AI Gallery</a>
+<a href="../mcp/index.html" class="block px-3 py-2 rounded-md text-sm font-medium text-stone-500 hover:text-stone-900" data-i18n-key="nav_mcp">MCP Services</a>
+<a href="index.html" class="block px-3 py-2 rounded-md text-sm font-medium text-stone-900 bg-stone-100 font-bold" data-i18n-key="nav_adk">ADK Agents</a>
         </div>
     </nav>
 
     <header class="bg-white border-b border-stone-100 pt-16 pb-12 px-4 text-center">
-        <h1 class="text-4xl font-light text-stone-900 mb-4 tracking-tight" data-i18n-zh="ADK 代理人" data-i18n-en="ADK Agents">ADK Agents</h1>
-        <p class="max-w-2xl mx-auto text-lg text-stone-500 font-light leading-relaxed" data-i18n-zh="自主代理。" data-i18n-en="Autonomous agents.">Autonomous agents.</p>
+        <h1 class="text-4xl font-light text-stone-900 mb-4 tracking-tight" data-i18n-zh="🇹🇼 ADK 代理程式集" data-i18n-en="🇹🇼 ADK Agents Collection">🇹🇼 ADK Agents Collection</h1>
+        <p class="max-w-2xl mx-auto text-lg text-stone-500 font-light leading-relaxed" data-i18n-zh="基於 Google ADK 開發的自主 AI 代理程式。" data-i18n-en="Autonomous AI agents built with Google ADK.">Autonomous AI agents built with Google ADK.</p>
         <div class="mt-10 max-w-xl mx-auto flex flex-col sm:flex-row gap-4 items-center justify-center ">
             <div class="relative w-full">
                 <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -76,7 +88,7 @@
 
     <footer class="bg-white border-t border-stone-200 py-12 text-center text-sm text-stone-400">
         <p data-i18n-key="footer_built">Built with ❤️ by AI Agent</p>
-        <p class="mt-2"><span data-i18n-key="footer_updated">Last Updated</span>: 2026-02-01</p>
+        <p class="mt-2"><span data-i18n-key="footer_updated">Last Updated</span>: 2026-02-03</p>
     </footer>
 
     <script>
@@ -104,7 +116,7 @@
             container.className = 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6';
             container.innerHTML = projects.map(p => {
                 const t = currentLang==='zh'?(p.title_zh||p.title_en):(p.title_en||p.title_zh), d = currentLang==='zh'?(p.desc_zh||p.desc_en):(p.desc_en||p.desc_zh);
-                const visual = p.image ? `<div class="h-48 overflow-hidden"><img src="${p.image}" class="w-full h-full object-cover transition-transform group-hover:scale-105"></div>` : `<div class="h-32 flex items-center justify-center text-4xl bg-stone-100">${p.icon||'📦'}</div>`;
+                const visual = p.image ? `<div class="h-48 overflow-hidden"><img src="${p.image}" class="w-full h-full object-cover transition-transform group-hover:scale-105"></div>` : `<div class="h-32 flex items-center justify-center text-4xl bg-stone-100">${p.icon||'🤖'}</div>`;
                 return `<div class="bg-white rounded-xl border border-stone-200 overflow-hidden flex flex-col group shadow-sm hover:shadow-md transition-all">
                     ${visual}<div class="p-5 flex flex-col flex-1"><h3 class="text-lg font-bold text-stone-800 mb-2">${t}</h3><p class="text-xs text-stone-500 line-clamp-3 mb-5">${d}</p>
                     <div class="mt-auto pt-4 border-t border-stone-50 flex items-center justify-between"><span class="text-[10px] font-mono text-stone-400 uppercase">${p.type}</span>
@@ -118,7 +130,7 @@
             container.innerHTML = `<table class="muji-table"><thead><tr><th class="w-12 text-center">${h[0]}</th><th class="w-1/4">${h[1]}</th><th>${h[2]}</th><th class="w-24 text-center">${h[3]}</th></tr></thead><tbody>` + 
                 projects.map(p => {
                     const t = currentLang==='zh'?(p.title_zh||p.title_en):(p.title_en||p.title_zh), d = currentLang==='zh'?(p.desc_zh||p.desc_en):(p.desc_en||p.desc_zh);
-                    const icon = p.image ? `<img src="${p.image}" class="w-8 h-8 rounded object-cover mx-auto">` : `<span class="text-xl">${p.icon||'📦'}</span>`;
+                    const icon = p.image ? `<img src="${p.image}" class="w-8 h-8 rounded object-cover mx-auto">` : `<span class="text-xl">${p.icon||'🤖'}</span>`;
                     return `<tr><td class="text-center">${icon}</td><td class="font-medium text-stone-800">${t}</td><td class="text-stone-500 text-xs">${d}</td><td class="text-center">
                     <a href="${p.link}" target="${p.target||'_blank'}" class="text-[11px] font-bold text-stone-600 hover:text-stone-900 underline underline-offset-4 decoration-stone-200">${TRANSLATIONS.btn_view[currentLang]}</a></td></tr>`;
                 }).join('') + '</tbody></table>';
