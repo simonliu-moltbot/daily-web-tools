@@ -8,11 +8,71 @@
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;900&display=swap" rel="stylesheet">
     <style>
-        body { font-family: 'Noto Sans TC', sans-serif; background-color: #800000; }
-        .wheel-container { position: relative; width: 320px; height: 320px; margin: 0 auto; }
-        #wheel { width: 100%; height: 100%; border-radius: 50%; border: 8px solid #ffd700; transition: transform 4s cubic-bezier(0.15, 0, 0.15, 1); overflow: hidden; position: relative; background: white; }
-        .pointer { position: absolute; top: -20px; left: 50%; transform: translateX(-50%); width: 40px; height: 40px; background: #ffd700; clip-path: polygon(50% 100%, 0 0, 100% 0); z-index: 10; filter: drop-shadow(0 4px 4px rgba(0,0,0,0.5)); }
-        .slice { position: absolute; width: 50%; height: 50%; transform-origin: 100% 100%; left: 0; top: 0; display: flex; align-items: center; justify-content: center; font-weight: bold; color: white; text-shadow: 1px 1px 2px rgba(0,0,0,0.5); font-size: 14px; padding-left: 40px; }
+        body { font-family: 'Noto Sans TC', sans-serif; background-color: #800000; overflow-x: hidden; }
+        
+        .wheel-wrapper {
+            position: relative;
+            width: 320px;
+            height: 320px;
+            margin: 0 auto;
+            user-select: none;
+        }
+
+        #wheel {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            border: 8px solid #ffd700;
+            position: relative;
+            overflow: hidden;
+            transition: transform 4s cubic-bezier(0.15, 0, 0.15, 1);
+            background: #d40000;
+            box-shadow: 0 0 20px rgba(0,0,0,0.5);
+        }
+
+        .slice {
+            position: absolute;
+            width: 50%;
+            height: 50%;
+            left: 50%;
+            top: 50%;
+            transform-origin: 0 0;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            padding-right: 20px;
+            color: white;
+            font-weight: 900;
+            font-size: 14px;
+            text-shadow: 1px 1px 3px rgba(0,0,0,0.8);
+        }
+
+        .pointer {
+            position: absolute;
+            top: -15px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 40px;
+            height: 50px;
+            background: #ffd700;
+            clip-path: polygon(50% 100%, 0 0, 100% 0);
+            z-index: 50;
+            filter: drop-shadow(0 4px 4px rgba(0,0,0,0.5));
+        }
+
+        .center-dot {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 40px;
+            height: 40px;
+            background: #ffd700;
+            border-radius: 50%;
+            z-index: 40;
+            border: 4px solid #800000;
+            box-shadow: 0 0 10px rgba(0,0,0,0.3);
+        }
     </style>
 </head>
 <body class="min-h-screen flex items-center justify-center p-4">
@@ -23,10 +83,10 @@
         </div>
 
         <div class="p-8 space-y-8">
-            <!-- 轉盤區 -->
             <div id="game-view" class="text-center space-y-8">
-                <div class="wheel-container">
+                <div class="wheel-wrapper">
                     <div class="pointer"></div>
+                    <div class="center-dot"></div>
                     <div id="wheel"></div>
                 </div>
 
@@ -35,23 +95,29 @@
                 </button>
                 
                 <div class="flex gap-2">
-                    <button onclick="showSetup()" class="flex-1 bg-red-800 text-white py-2 rounded-xl text-sm opacity-70 hover:opacity-100">⚙️ 修改獎項</button>
-                    <button onclick="addWinnerLog()" class="flex-1 bg-red-800 text-white py-2 rounded-xl text-sm opacity-70 hover:opacity-100">📋 獲獎紀錄</button>
+                    <button onclick="showSetup()" class="flex-1 bg-red-800 text-white py-3 rounded-xl text-sm opacity-80 hover:opacity-100">⚙️ 修改獎項</button>
+                    <button onclick="toggleLog()" class="flex-1 bg-red-800 text-white py-3 rounded-xl text-sm opacity-80 hover:opacity-100">📋 獲獎紀錄</button>
                 </div>
             </div>
 
             <!-- 設定區 -->
             <div id="setup-view" class="hidden space-y-4">
-                <label class="block text-yellow-200 font-bold">請輸入獎項 (逗號分隔或每行一個)：</label>
-                <textarea id="items-input" class="w-full h-32 p-3 rounded-xl bg-red-900 text-white border-2 border-red-500 outline-none" placeholder="加碼 1000&#10;加碼 5000&#10;自喝三杯&#10;老闆請假一天"></textarea>
-                <button onclick="saveSetup()" class="w-full bg-yellow-500 text-red-900 font-bold py-3 rounded-xl">確認修改</button>
+                <label class="block text-yellow-200 font-bold">請輸入獎項 (每行一個)：</label>
+                <textarea id="items-input" class="w-full h-48 p-4 rounded-2xl bg-red-900 text-white border-2 border-red-500 outline-none resize-none font-mono" placeholder="加碼 1000&#10;加碼 5000&#10;自喝三杯"></textarea>
+                <div class="flex gap-2">
+                    <button onclick="saveSetup()" class="flex-1 bg-yellow-500 text-red-900 font-black py-4 rounded-xl shadow-lg active:scale-95">💾 確認保存</button>
+                    <button onclick="hideSetup()" class="px-6 bg-red-900 text-white py-4 rounded-xl border border-red-500">取消</button>
+                </div>
             </div>
-        </div>
 
-        <div id="log-view" class="hidden p-6 bg-red-900 text-yellow-100 text-sm">
-            <h3 class="font-bold border-b border-red-700 mb-2 pb-1">🏆 獲獎紀錄</h3>
-            <ul id="winners-list" class="space-y-1 h-24 overflow-y-auto"></ul>
-            <button onclick="hideLog()" class="mt-4 w-full text-center text-xs opacity-50">返回遊戲</button>
+            <!-- 紀錄區 -->
+            <div id="log-view" class="hidden space-y-4">
+                <div class="bg-red-900 rounded-2xl p-4 max-h-60 overflow-y-auto">
+                    <h3 class="text-yellow-200 font-black border-b border-red-500 pb-2 mb-2 text-lg">🏆 獲獎紀錄</h3>
+                    <ul id="winners-list" class="text-yellow-100 text-sm space-y-2"></ul>
+                </div>
+                <button onclick="hideLog()" class="w-full py-2 text-red-300 text-sm">返回遊戲</button>
+            </div>
         </div>
 
         <div class="bg-red-800 p-4 text-center text-xs text-red-400">
@@ -60,11 +126,11 @@
     </div>
 
     <script>
-        let items = ["加碼 1000", "加碼 2000", "加碼 5000", "再來一次", "自喝一杯", "老闆發紅包", "銘謝惠顧", "全場歡呼"];
+        let items = ["加碼 1000", "加碼 2000", "加碼 5000", "再來一次", "自喝三杯", "老闆發紅包", "銘謝惠顧", "全場尖叫"];
         let currentRotation = 0;
         let isSpinning = false;
 
-        function renderWheel() {
+        function initWheel() {
             const wheel = document.getElementById('wheel');
             wheel.innerHTML = '';
             const sliceDeg = 360 / items.length;
@@ -72,14 +138,22 @@
             items.forEach((item, i) => {
                 const slice = document.createElement('div');
                 slice.className = 'slice';
+                // 修正定位邏輯：使用旋轉與 skew 來模擬扇形
                 slice.style.transform = `rotate(${sliceDeg * i}deg) skewY(${sliceDeg - 90}deg)`;
                 slice.style.backgroundColor = i % 2 === 0 ? '#d40000' : '#b30000';
                 
-                const text = document.createElement('div');
-                text.style.transform = `skewY(-${sliceDeg - 90}deg) rotate(${sliceDeg / 2}deg)`;
-                text.textContent = item;
+                const textContainer = document.createElement('div');
+                // 反向 skew 與旋轉讓文字水平且位於扇形中央
+                textContainer.style.transform = `skewY(${90 - sliceDeg}deg) rotate(${sliceDeg / 2}deg)`;
+                textContainer.style.position = 'absolute';
+                textContainer.style.right = '10px';
+                textContainer.style.top = '20px';
+                textContainer.style.width = '120px';
+                textContainer.style.textAlign = 'right';
+                textContainer.style.whiteSpace = 'nowrap';
+                textContainer.textContent = item;
                 
-                slice.appendChild(text);
+                slice.appendChild(textContainer);
                 wheel.appendChild(slice);
             });
         }
@@ -91,7 +165,7 @@
             btn.disabled = true;
             btn.classList.add('opacity-50');
 
-            const extraDeg = Math.floor(Math.random() * 360) + 1440; // 至少轉4圈
+            const extraDeg = Math.floor(Math.random() * 360) + 1800; // 轉 5 圈以上
             currentRotation += extraDeg;
             
             const wheel = document.getElementById('wheel');
@@ -100,10 +174,11 @@
             setTimeout(() => {
                 const actualDeg = currentRotation % 360;
                 const sliceDeg = 360 / items.length;
+                // 計算指針指向的獎項 (指針在正上方 0度)
                 const itemIndex = items.length - 1 - Math.floor(actualDeg / sliceDeg);
                 const winner = items[itemIndex];
                 
-                announceWinner(winner);
+                showResult(winner);
                 
                 isSpinning = false;
                 btn.disabled = false;
@@ -111,38 +186,44 @@
             }, 4000);
         }
 
-        function announceWinner(winner) {
+        function showResult(winner) {
             confetti({
-                particleCount: 200,
-                spread: 90,
-                origin: { y: 0.7 },
+                particleCount: 250,
+                spread: 100,
+                origin: { y: 0.6 },
                 colors: ['#ffd700', '#ffffff', '#ff0000']
             });
             
             const log = document.getElementById('winners-list');
             const li = document.createElement('li');
-            li.textContent = `${new Date().toLocaleTimeString()} - 抽中了：${winner}`;
+            li.className = 'border-b border-red-800 pb-1 flex justify-between';
+            li.innerHTML = `<span>${winner}</span><span class="opacity-50 text-xs">${new Date().toLocaleTimeString()}</span>`;
             log.prepend(li);
             
-            alert(`🎊 恭喜抽中：${winner} 🎊`);
+            setTimeout(() => alert(`🎊 恭喜抽中：${winner} 🎊`), 100);
         }
 
         function showSetup() {
             document.getElementById('game-view').classList.add('hidden');
+            document.getElementById('log-view').classList.add('hidden');
             document.getElementById('setup-view').classList.remove('hidden');
             document.getElementById('items-input').value = items.join('\n');
+        }
+
+        function hideSetup() {
+            document.getElementById('game-view').classList.remove('hidden');
+            document.getElementById('setup-view').classList.add('hidden');
         }
 
         function saveSetup() {
             const input = document.getElementById('items-input').value.trim();
             if (!input) return;
-            items = input.split(/\n|,/).map(s => s.trim()).filter(s => s.length > 0);
-            renderWheel();
-            document.getElementById('game-view').classList.remove('hidden');
-            document.getElementById('setup-view').classList.add('hidden');
+            items = input.split('\n').map(s => s.trim()).filter(s => s.length > 0);
+            initWheel();
+            hideSetup();
         }
 
-        function addWinnerLog() {
+        function toggleLog() {
             document.getElementById('game-view').classList.add('hidden');
             document.getElementById('log-view').classList.remove('hidden');
         }
@@ -152,7 +233,7 @@
             document.getElementById('log-view').classList.add('hidden');
         }
 
-        renderWheel();
+        initWheel();
     </script>
 </body>
 </html>
