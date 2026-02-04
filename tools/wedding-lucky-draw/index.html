@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>💍 婚禮幸福大抽獎 | Wedding Lucky Draw</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700&family=Dancing+Script:wght@700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Noto Sans TC', sans-serif; background: linear-gradient(135deg, #fff5f5 0%, #fed7e2 100%); }
+        .wedding-title { font-family: 'Dancing Script', cursive; color: #c53030; }
+        .spinner { transition: transform 4s cubic-bezier(0.15, 0, 0.15, 1); }
+        .card { backdrop-filter: blur(10px); background: rgba(255, 255, 255, 0.9); }
+    </style>
+</head>
+<body class="min-h-screen flex items-center justify-center p-4">
+    <div class="max-w-xl w-full card rounded-3xl shadow-2xl overflow-hidden border-4 border-red-200">
+        <div class="bg-red-500 p-8 text-center text-white">
+            <h1 class="wedding-title text-5xl mb-2">Happy Wedding</h1>
+            <h2 class="text-2xl font-bold">💍 婚禮幸福大抽獎</h2>
+        </div>
+
+        <div class="p-8 space-y-8">
+            <!-- 輸入區 -->
+            <div id="setup-view">
+                <label class="block text-red-800 font-bold mb-3 text-lg">❤️ 請輸入參加名單 (每行一個名子或桌號)：</label>
+                <textarea id="candidates" class="w-full h-48 p-4 border-2 border-red-100 rounded-2xl focus:border-red-400 outline-none resize-none text-gray-700" placeholder="範例：&#10;王小明&#10;第 8 桌&#10;美麗伴娘團&#10;帥氣伴郎 A"></textarea>
+                <button onclick="startDraw()" class="mt-6 w-full bg-red-500 hover:bg-red-600 text-white font-black py-4 rounded-2xl shadow-lg transition-all active:scale-95 text-xl">
+                    ✨ 進入抽獎模式
+                </button>
+            </div>
+
+            <!-- 抽獎區 -->
+            <div id="draw-view" class="hidden text-center space-y-8">
+                <div class="relative py-12 bg-red-50 rounded-3xl border-2 border-dashed border-red-200">
+                    <div id="display-name" class="text-5xl font-black text-red-600 tracking-widest h-16 flex items-center justify-center">
+                        準備就緒
+                    </div>
+                </div>
+
+                <div class="flex gap-4">
+                    <button id="btn-spin" onclick="runSpin()" class="flex-1 bg-red-500 hover:bg-red-600 text-white font-black py-5 rounded-2xl shadow-xl transition-all active:scale-95 text-2xl">
+                        🔥 開始抽獎
+                    </button>
+                    <button onclick="resetSetup()" class="px-6 bg-gray-200 hover:bg-gray-300 text-gray-600 font-bold rounded-2xl transition-all">
+                        ⚙️ 修改名單
+                    </button>
+                </div>
+
+                <div class="text-red-400 text-sm italic">點擊開始後，將隨機選出一位幸運兒！</div>
+            </div>
+        </div>
+
+        <!-- 獲獎彈窗 -->
+        <div id="winner-overlay" class="fixed inset-0 bg-black/60 hidden flex items-center justify-center z-50 p-4">
+            <div class="bg-white rounded-3xl p-10 text-center max-w-sm w-full shadow-2xl scale-0 transition-transform duration-300" id="winner-card">
+                <div class="text-6xl mb-4">🎉</div>
+                <h3 class="text-2xl font-bold text-gray-500 mb-2">恭喜獲獎</h3>
+                <div id="winner-name" class="text-5xl font-black text-red-600 mb-8 underline">王小明</div>
+                <button onclick="closeWinner()" class="w-full bg-red-500 text-white font-bold py-4 rounded-xl">繼續抽下一位</button>
+            </div>
+        </div>
+
+        <div class="bg-red-50 p-4 text-center text-xs text-red-300">
+            👰🤵 祝新人百年好合，永結同心
+        </div>
+    </div>
+
+    <script>
+        let list = [];
+        let isSpinning = false;
+
+        function startDraw() {
+            const raw = document.getElementById('candidates').value.trim();
+            if (!raw) {
+                alert('請至少輸入一個名字！');
+                return;
+            }
+            list = raw.split('\n').map(s => s.trim()).filter(s => s.length > 0);
+            document.getElementById('setup-view').classList.add('hidden');
+            document.getElementById('draw-view').classList.remove('hidden');
+        }
+
+        function resetSetup() {
+            document.getElementById('setup-view').classList.remove('hidden');
+            document.getElementById('draw-view').classList.add('hidden');
+        }
+
+        function runSpin() {
+            if (isSpinning) return;
+            isSpinning = true;
+            const btn = document.getElementById('btn-spin');
+            const display = document.getElementById('display-name');
+            btn.disabled = true;
+            btn.classList.add('opacity-50');
+
+            let count = 0;
+            const duration = 3000;
+            const interval = 50;
+            const steps = duration / interval;
+
+            const timer = setInterval(() => {
+                const randomName = list[Math.floor(Math.random() * list.length)];
+                display.textContent = randomName;
+                count++;
+
+                if (count >= steps) {
+                    clearInterval(timer);
+                    showWinner(display.textContent);
+                }
+            }, interval);
+        }
+
+        function showWinner(name) {
+            const overlay = document.getElementById('winner-overlay');
+            const card = document.getElementById('winner-card');
+            const winnerName = document.getElementById('winner-name');
+            
+            winnerName.textContent = name;
+            overlay.classList.remove('hidden');
+            setTimeout(() => card.classList.add('scale-100'), 10);
+
+            // 噴灑彩帶
+            confetti({
+                particleCount: 150,
+                spread: 70,
+                origin: { y: 0.6 },
+                colors: ['#ff0000', '#ffd700', '#ffffff', '#ff69b4']
+            });
+        }
+
+        function closeWinner() {
+            const overlay = document.getElementById('winner-overlay');
+            const card = document.getElementById('winner-card');
+            const btn = document.getElementById('btn-spin');
+            
+            card.classList.remove('scale-100');
+            setTimeout(() => {
+                overlay.classList.add('hidden');
+                isSpinning = false;
+                btn.disabled = false;
+                btn.classList.remove('opacity-50');
+            }, 300);
+        }
+    </script>
+</body>
+</html>
