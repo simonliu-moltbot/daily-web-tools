@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🧾 台灣發票含稅/未稅計算機 | Invoice Tax Calculator</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Noto Sans TC', sans-serif; background-color: #f8fafc; }
+        .input-focus:focus { border-color: #3b82f6; box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1); }
+    </style>
+</head>
+<body class="min-h-screen flex items-center justify-center p-4">
+    <div class="max-w-md w-full bg-white rounded-3xl shadow-xl border border-gray-100 overflow-hidden">
+        <div class="bg-blue-600 p-6 text-center text-white">
+            <h1 class="text-2xl font-bold">🧾 發票稅額計算機</h1>
+            <p class="text-blue-100 text-sm mt-1">MLOps 與商務人士必備實用工具</p>
+        </div>
+
+        <div class="p-8 space-y-6">
+            <div class="flex bg-gray-100 p-1 rounded-xl">
+                <button id="mode-inc" onclick="setMode('inc')" class="flex-1 py-2 rounded-lg text-sm font-bold transition-all bg-white shadow-sm text-blue-600">已知總價 (含稅)</button>
+                <button id="mode-ex" onclick="setMode('ex')" class="flex-1 py-2 rounded-lg text-sm font-bold transition-all text-gray-500">已知單價 (未稅)</button>
+            </div>
+
+            <div class="space-y-4">
+                <div>
+                    <label id="input-label" class="block text-gray-600 font-bold mb-2 text-sm">💰 輸入總價 (含稅)：</label>
+                    <input type="number" id="main-input" oninput="calculate()" class="w-full p-4 bg-gray-50 border-2 border-gray-100 rounded-2xl outline-none input-focus text-2xl font-bold text-gray-800" placeholder="0">
+                </div>
+
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="bg-blue-50 p-4 rounded-2xl border border-blue-100 text-center">
+                        <div class="text-blue-400 text-xs font-bold uppercase mb-1">未稅金額</div>
+                        <div id="result-base" class="text-xl font-black text-blue-700">0</div>
+                    </div>
+                    <div class="bg-green-50 p-4 rounded-2xl border border-green-100 text-center">
+                        <div class="text-green-400 text-xs font-bold uppercase mb-1">5% 稅額</div>
+                        <div id="result-tax" class="text-xl font-black text-green-700">0</div>
+                    </div>
+                </div>
+
+                <div id="result-total-box" class="bg-gray-900 p-6 rounded-2xl text-center hidden">
+                    <div class="text-gray-400 text-xs font-bold uppercase mb-1">總計金額 (含稅)</div>
+                    <div id="result-total" class="text-3xl font-black text-white">0</div>
+                </div>
+            </div>
+
+            <div class="text-[10px] text-gray-400 leading-relaxed">
+                💡 提示：<br>
+                1. 台灣營業稅率固定為 5%。<br>
+                2. 計算公式：稅額 = 未稅價 × 0.05 (四捨五入)。<br>
+                3. 用於申報報帳或開立三聯式發票。
+            </div>
+        </div>
+
+        <button onclick="copyResults()" class="w-full bg-gray-50 hover:bg-gray-100 text-gray-500 py-4 text-sm font-bold border-t transition-colors">
+            📋 複製計算結果
+        </button>
+    </div>
+
+    <script>
+        let mode = 'inc';
+
+        function setMode(m) {
+            mode = m;
+            const btnInc = document.getElementById('mode-inc');
+            const btnEx = document.getElementById('mode-ex');
+            const label = document.getElementById('input-label');
+            const totalBox = document.getElementById('result-total-box');
+
+            if (m === 'inc') {
+                btnInc.className = "flex-1 py-2 rounded-lg text-sm font-bold transition-all bg-white shadow-sm text-blue-600";
+                btnEx.className = "flex-1 py-2 rounded-lg text-sm font-bold transition-all text-gray-500";
+                label.textContent = "💰 輸入總價 (含稅)：";
+                totalBox.classList.add('hidden');
+            } else {
+                btnEx.className = "flex-1 py-2 rounded-lg text-sm font-bold transition-all bg-white shadow-sm text-blue-600";
+                btnInc.className = "flex-1 py-2 rounded-lg text-sm font-bold transition-all text-gray-500";
+                label.textContent = "💰 輸入單價 (未稅)：";
+                totalBox.classList.remove('hidden');
+            }
+            calculate();
+        }
+
+        function calculate() {
+            const input = parseFloat(document.getElementById('main-input').value) || 0;
+            let base = 0;
+            let tax = 0;
+            let total = 0;
+
+            if (mode === 'inc') {
+                // 已知含稅價，求未稅與稅額
+                base = Math.round(input / 1.05);
+                tax = input - base;
+                total = input;
+            } else {
+                // 已知未稅價，求稅額與總價
+                tax = Math.round(input * 0.05);
+                base = input;
+                total = input + tax;
+            }
+
+            document.getElementById('result-base').textContent = base.toLocaleString();
+            document.getElementById('result-tax').textContent = tax.toLocaleString();
+            document.getElementById('result-total').textContent = total.toLocaleString();
+        }
+
+        function copyResults() {
+            const base = document.getElementById('result-base').textContent;
+            const tax = document.getElementById('result-tax').textContent;
+            const total = document.getElementById('result-total').textContent;
+            const text = `計算結果：\n未稅：${base}\n稅額：${tax}\n總計：${total}`;
+            navigator.clipboard.writeText(text).then(() => alert('已複製到剪貼簿！'));
+        }
+    </script>
+</body>
+</html>
