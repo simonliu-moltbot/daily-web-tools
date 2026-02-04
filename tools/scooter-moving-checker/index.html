@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>台北搬家運氣測驗 - 你能全身而退嗎？</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Noto Sans TC', sans-serif; }
+        .shake { animation: shake 0.5s; }
+        @keyframes shake {
+            0% { transform: translate(1px, 1px) rotate(0deg); }
+            10% { transform: translate(-1px, -2px) rotate(-1deg); }
+            20% { transform: translate(-3px, 0px) rotate(1deg); }
+            30% { transform: translate(3px, 2px) rotate(0deg); }
+            40% { transform: translate(1px, -1px) rotate(1deg); }
+            50% { transform: translate(-1px, 2px) rotate(-1deg); }
+            60% { transform: translate(-3px, 1px) rotate(0deg); }
+            70% { transform: translate(3px, 1px) rotate(-1deg); }
+            80% { transform: translate(-1px, -1px) rotate(1deg); }
+            90% { transform: translate(1px, 2px) rotate(0deg); }
+            100% { transform: translate(1px, -2px) rotate(-1deg); }
+        }
+    </style>
+</head>
+<body class="bg-orange-50 min-h-screen flex flex-col items-center p-4">
+    <div class="w-full max-w-md bg-white rounded-3xl shadow-xl overflow-hidden mt-8">
+        <div class="p-6 bg-orange-500 text-white flex justify-between items-center">
+            <a href="../../index.html" class="text-white hover:text-orange-200 transition">🏠 回首頁</a>
+            <h1 class="text-xl font-bold">台北搬家運氣測驗</h1>
+        </div>
+
+        <div id="game-container" class="p-8">
+            <div id="intro">
+                <div class="text-6xl mb-6 text-center">📦</div>
+                <h2 class="text-2xl font-bold text-gray-800 mb-4 text-center">挑戰台北大搬家！</h2>
+                <p class="text-gray-600 mb-6 leading-relaxed">
+                    在台北搬家不只是體力活，更是一場與房東、交通檢舉達人、和狹窄巷弄的戰爭。<br><br>
+                    你有本事把那一堆堆在路邊的紅牌家具平安送進 5 樓頂加嗎？
+                </p>
+                <button onclick="startGame()" class="w-full py-4 bg-orange-500 text-white rounded-xl font-bold text-lg hover:bg-orange-600 transition transform hover:scale-105 active:scale-95 shadow-lg">
+                    開始挑戰！
+                </button>
+            </div>
+
+            <div id="quiz" class="hidden">
+                <div class="mb-4 flex justify-between items-center">
+                    <span id="step-indicator" class="text-orange-500 font-bold">步驟 1/5</span>
+                    <span id="hp-indicator" class="text-red-500 font-bold">體力: ❤️❤️❤️</span>
+                </div>
+                <div id="question-box" class="mb-8">
+                    <h3 id="question-text" class="text-xl font-bold text-gray-800 mb-6 min-h-[4rem]"></h3>
+                    <div id="options" class="space-y-4">
+                        <!-- Options will be injected here -->
+                    </div>
+                </div>
+            </div>
+
+            <div id="result" class="hidden text-center">
+                <div id="result-emoji" class="text-8xl mb-6"></div>
+                <h2 id="result-title" class="text-3xl font-bold mb-4"></h2>
+                <p id="result-desc" class="text-gray-600 mb-8 leading-relaxed"></p>
+                <button onclick="location.reload()" class="w-full py-4 bg-gray-800 text-white rounded-xl font-bold text-lg hover:bg-black transition">
+                    不服再來！
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <footer class="mt-8 text-gray-400 text-sm">
+        Created by AI Agent on 2026-02-05
+    </footer>
+
+    <script>
+        const questions = [
+            {
+                q: "搬家當天，你在巷口發現唯一可以停車的位置被一台摩托車占住了，這時你會：",
+                options: [
+                    { t: "輕輕把它移到旁邊，反正大家都這樣", d: -1, msg: "剛移完，檢舉達人就拍了一張照。體力 -1" },
+                    { t: "打電話給警察檢舉他擋道", d: 0, msg: "警察說這是私人巷弄不歸他管。浪費了 20 分鐘。" },
+                    { t: "雙黃燈打下去，直接併排停在路中間", d: -2, msg: "後方公車狂按喇叭，你的精神壓力瞬間爆炸！體力 -2" },
+                    { t: "停在 200 公尺外的停車格，用走的", d: 1, msg: "辛苦但合法。獲得「守法好市民」稱號。" }
+                ]
+            },
+            {
+                q: "剛把冰箱搬到門口，房東突然出現在樓梯間說：「不要刮壞牆壁喔，剛刷好。」",
+                options: [
+                    { t: "「沒問題，我會注意。」然後繼續搬", d: -1, msg: "壓力爆棚，冰箱轉角還是磕到牆壁了。體力 -1" },
+                    { t: "塞 200 元紅包給房東請他喝茶", d: 1, msg: "房東笑得跟花一樣，甚至幫你扶了一下門。體力 +1" },
+                    { t: "請他自己來搬搬看", d: -2, msg: "房東開始檢查你的合約細項，準備扣押金。體力 -2" }
+                ]
+            },
+            {
+                q: "到了 3 樓轉角，家具太大卡住了，這時你會：",
+                options: [
+                    { t: "使出蠻力硬塞", d: -1, msg: "腰閃到了，家具也凹了一角。體力 -1" },
+                    { t: "拆掉家具的腳再過", d: 0, msg: "花了一個小時，但成功通過。" },
+                    { t: "棄療，直接把沙發留在樓梯間當公設", d: -2, msg: "管委會貼出公告罰款 5000 元。體力 -2" }
+                ]
+            },
+            {
+                q: "中午休息時間，巷口的便當店只剩下「三色豆」主菜：",
+                options: [
+                    { t: "為了體力，閉著眼睛吞下去", d: -1, msg: "心靈受創。體力 -1" },
+                    { t: "去超商買能量飲當午餐", d: 1, msg: "咖啡因讓你暫時忘記痛苦。體力 +1" },
+                    { t: "不吃了，趕快搬完趕快睡覺", d: -2, msg: "搬到一半低血糖差點暈倒。體力 -2" }
+                ]
+            },
+            {
+                q: "搬最後一箱時，天公不做美，台北突然下起了暴雨：",
+                options: [
+                    { t: "雨衣穿好，衝了！", d: -1, msg: "全身濕透，紙箱破掉東西散一地。體力 -1" },
+                    { t: "在車子裡躲雨，順便滑個手機", d: 0, msg: "雨停了，但天也黑了。" },
+                    { t: "去買塑膠布把所有東西包起來", d: -1, msg: "又多花了一筆錢，而且手被塑膠繩割傷。體力 -1" }
+                ]
+            }
+        ];
+
+        let currentStep = 0;
+        let hp = 3;
+
+        function startGame() {
+            document.getElementById('intro').classList.add('hidden');
+            document.getElementById('quiz').classList.remove('hidden');
+            showQuestion();
+        }
+
+        function showQuestion() {
+            if (currentStep >= questions.length || hp <= 0) {
+                endGame();
+                return;
+            }
+
+            const q = questions[currentStep];
+            document.getElementById('step-indicator').innerText = `步驟 ${currentStep + 1}/${questions.length}`;
+            document.getElementById('question-text').innerText = q.q;
+            
+            const optionsDiv = document.getElementById('options');
+            optionsDiv.innerHTML = '';
+            
+            q.options.forEach((opt, idx) => {
+                const btn = document.createElement('button');
+                btn.className = "w-full p-4 border-2 border-orange-100 rounded-xl text-left hover:border-orange-500 hover:bg-orange-50 transition";
+                btn.innerText = opt.t;
+                btn.onclick = () => handleAnswer(opt);
+                optionsDiv.appendChild(btn);
+            });
+        }
+
+        function handleAnswer(opt) {
+            hp += opt.d;
+            if (hp > 5) hp = 5;
+            
+            const box = document.getElementById('game-container');
+            if (opt.d < 0) {
+                box.classList.add('shake');
+                setTimeout(() => box.classList.remove('shake'), 500);
+            }
+
+            // Update HP display
+            let hearts = '';
+            for(let i=0; i<Math.max(0, hp); i++) hearts += '❤️';
+            if (hp <= 0) hearts = '💀';
+            document.getElementById('hp-indicator').innerText = `體力: ${hearts}`;
+
+            alert(opt.msg);
+
+            currentStep++;
+            showQuestion();
+        }
+
+        function endGame() {
+            document.getElementById('quiz').classList.add('hidden');
+            document.getElementById('result').classList.remove('hidden');
+
+            const emoji = document.getElementById('result-emoji');
+            const title = document.getElementById('result-title');
+            const desc = document.getElementById('result-desc');
+
+            if (hp > 3) {
+                emoji.innerText = '🏆';
+                title.innerText = '搬家之神';
+                desc.innerText = '你是搬家界的傳奇！不但家具完好，甚至還贏得了房東的尊敬。今晚可以安穩地在 5 樓頂加看夜景了。';
+            } else if (hp > 0) {
+                emoji.innerText = '💪';
+                title.innerText = '倖存者';
+                desc.innerText = '雖然家具刮花了、腰也閃到了，但你總算在台北活了下來。接下來的三個月你可能都不想看到紙箱。';
+            } else {
+                emoji.innerText = '😵';
+                title.innerText = '身敗名裂';
+                desc.innerText = '你崩潰了。家具散落在巷口，房東在背後尖叫，警察正在開單。你決定今晚睡在路邊。';
+            }
+        }
+    </script>
+</body>
+</html>
