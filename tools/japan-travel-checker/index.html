@@ -3,14 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🇯🇵 日本旅遊「盤子」偵測器 | Japan Value Checker</title>
+    <title>🇯🇵 日本旅遊「盤子」偵測器 (即時匯率版) | Japan Value Checker</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;900&display=swap" rel="stylesheet">
     <style>
         body { font-family: 'Noto Sans TC', sans-serif; background-color: #fff5f5; }
-        .panzi-red { color: #e53e3e; }
-        .zhen-xiang-green { color: #38a169; }
         .card { border-radius: 2rem; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04); }
+        .loading-pulse { animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
+        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: .5; } }
     </style>
 </head>
 <body class="min-h-screen flex items-center justify-center p-4">
@@ -21,14 +21,17 @@
         </div>
 
         <div class="p-8 space-y-6">
-            <div class="grid grid-cols-2 gap-4">
+            <div class="bg-blue-50 p-4 rounded-2xl flex items-center justify-between border border-blue-100">
+                <div class="flex items-center gap-2">
+                    <span class="text-blue-600 font-bold">💹 當前匯率 (JPY/TWD)</span>
+                </div>
+                <div id="rate-status" class="text-blue-700 font-black text-lg">讀取中...</div>
+            </div>
+
+            <div class="grid grid-cols-1 gap-4">
                 <div>
                     <label class="block text-gray-600 font-bold mb-2 text-xs uppercase tracking-wider">💴 日幣售價 (JPY)</label>
                     <input type="number" id="jpy-input" oninput="calculate()" class="w-full p-4 bg-gray-50 border-2 border-gray-100 rounded-2xl outline-none focus:border-red-400 text-xl font-bold" placeholder="5000">
-                </div>
-                <div>
-                    <label class="block text-gray-600 font-bold mb-2 text-xs uppercase tracking-wider">💹 匯率 (預設)</label>
-                    <input type="number" id="rate-input" value="0.215" step="0.001" oninput="calculate()" class="w-full p-4 bg-gray-50 border-2 border-gray-100 rounded-2xl outline-none focus:border-blue-400 text-xl font-bold" placeholder="0.215">
                 </div>
             </div>
 
@@ -37,7 +40,6 @@
             <div>
                 <label class="block text-gray-600 font-bold mb-2 text-xs uppercase tracking-wider">🇹🇼 台灣售價 (TWD參考)</label>
                 <input type="number" id="twd-ref" oninput="calculate()" class="w-full p-4 bg-gray-50 border-2 border-gray-100 rounded-2xl outline-none focus:border-green-400 text-xl font-bold" placeholder="1500">
-                <p class="text-[10px] text-gray-400 mt-1">※ 不知道的話可以留空，僅看台幣換算。</p>
             </div>
 
             <div id="result-box" class="p-6 rounded-3xl bg-gray-50 text-center space-y-2 transition-all">
@@ -48,24 +50,37 @@
             </div>
         </div>
 
-        <div class="px-8 pb-8">
+        <div class="px-8 pb-8 text-center">
+            <p class="text-[10px] text-gray-400 mb-4">數據來源：ExchangeRate-API (即時更新)</p>
             <button onclick="shareMeme()" class="w-full bg-red-500 hover:bg-red-600 text-white font-black py-4 rounded-2xl shadow-lg transition-transform active:scale-95">
                 📣 呼叫鄉民來評理
             </button>
         </div>
-
-        <div class="bg-gray-50 p-4 text-center text-[10px] text-gray-400">
-            謝謝你，日幣超人。| 幣值僅供參考，實際請看匯款單。
-        </div>
     </div>
 
     <script>
+        let currentRate = 0.215;
+
+        async function fetchRate() {
+            const statusEl = document.getElementById('rate-status');
+            try {
+                // 使用免費的公開 API 不需要 Key (或使用開放資料)
+                const response = await fetch('https://open.er-api.com/v6/latest/JPY');
+                const data = await response.json();
+                currentRate = data.rates.TWD;
+                statusEl.textContent = currentRate.toFixed(4);
+                calculate();
+            } catch (error) {
+                console.error('Rate fetch failed:', error);
+                statusEl.textContent = "0.215 (離線)";
+            }
+        }
+
         function calculate() {
             const jpy = parseFloat(document.getElementById('jpy-input').value) || 0;
-            const rate = parseFloat(document.getElementById('rate-input').value) || 0.215;
             const ref = parseFloat(document.getElementById('twd-ref').value) || 0;
             
-            const twd = Math.round(jpy * rate);
+            const twd = Math.round(jpy * currentRate);
             document.getElementById('twd-result').textContent = `NT$ ${twd.toLocaleString()}`;
 
             const status = document.getElementById('meme-status');
@@ -79,7 +94,7 @@
                 if (ref === 0) {
                     status.textContent = "🤔 換算完成";
                     status.className = "text-lg font-black mt-4 text-gray-600";
-                    desc.textContent = "這價格在 PTT 鄉民眼裡只是小意思。";
+                    desc.textContent = "匯率很漂亮，日幣超人萬歲。";
                     box.className = "p-6 rounded-3xl bg-gray-50 text-center space-y-2";
                 } else if (twd < ref * 0.6) {
                     status.textContent = "🔥 真香！哈日族狂喜";
@@ -109,6 +124,8 @@
             if (!status) return alert('請先輸入金額！');
             alert(`已複製評語：【${status}】\n趕快截圖傳給群組的人炫耀（或被笑）吧！`);
         }
+
+        fetchRate();
     </script>
 </body>
 </html>
