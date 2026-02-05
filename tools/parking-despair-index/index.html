@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>車位難求度指數 - 找車位救星</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Noto Sans TC', sans-serif; }
+        .glass { background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(10px); }
+    </style>
+</head>
+<body class="bg-gray-100 min-h-screen flex flex-col items-center p-4">
+
+    <div class="w-full max-w-md">
+        <a href="../../index.html" class="inline-block mb-6 text-blue-600 hover:text-blue-800 transition-colors">
+            🏠 回首頁
+        </a>
+
+        <div class="glass rounded-3xl shadow-xl p-8 border border-white">
+            <h1 class="text-3xl font-bold text-gray-800 mb-2 flex items-center">
+                🅿️ 車位難求度指數
+            </h1>
+            <p class="text-gray-500 mb-8">精準計算你在這個地段找車位的「絕望程度」</p>
+
+            <div class="space-y-6">
+                <!-- Location Type -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">📍 你在哪個地段？</label>
+                    <select id="location" class="w-full p-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-blue-500 outline-none">
+                        <option value="1">郊區/鄉下 (隨便停都行)</option>
+                        <option value="1.5">一般住宅區 (繞一下就有)</option>
+                        <option value="2.5" selected>熱鬧鬧區 (開始流汗)</option>
+                        <option value="4">台北信義/大安/北車 (不如賣車)</option>
+                        <option value="5">著名觀光景點/老街 (想停得看前世功德)</option>
+                    </select>
+                </div>
+
+                <!-- Time -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">⏰ 什麼時間？</label>
+                    <select id="time" class="w-full p-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-blue-500 outline-none">
+                        <option value="1">平日白天 (大家都上班去了)</option>
+                        <option value="2">平日晚上 (大家剛好回家)</option>
+                        <option value="3">週末假日 (大型生存遊戲)</option>
+                        <option value="5">百貨公司週年慶/連假 (地獄難度)</option>
+                    </select>
+                </div>
+
+                <!-- Weather -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">🌧️ 天氣如何？</label>
+                    <select id="weather" class="w-full p-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-blue-500 outline-none">
+                        <option value="1">大太陽 (大家願意走路)</option>
+                        <option value="2">毛毛雨 (開車的人變多)</option>
+                        <option value="4">大豪雨 (沒停門口不下車)</option>
+                    </select>
+                </div>
+
+                <!-- Car Type -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">🚗 車型大小</label>
+                    <select id="car" class="w-full p-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-blue-500 outline-none">
+                        <option value="1">Smart / 微型車 (有縫就能塞)</option>
+                        <option value="1.2">一般轎車 (正常標準)</option>
+                        <option value="1.5">休旅車/SUV (稍微考驗技術)</option>
+                        <option value="2.5">大型皮卡/進口長軸車 (需要兩個車位)</option>
+                    </select>
+                </div>
+
+                <button onclick="calculate()" class="w-full bg-blue-600 text-white font-bold py-4 rounded-2xl shadow-lg hover:bg-blue-700 transition-all active:scale-95">
+                    計算絕望指數
+                </button>
+            </div>
+
+            <!-- Result -->
+            <div id="resultBox" class="hidden mt-10 p-6 rounded-2xl border-2 transition-all">
+                <div class="text-center">
+                    <p class="text-sm text-gray-500 uppercase tracking-widest">絕望程度</p>
+                    <h2 id="score" class="text-6xl font-black my-2">0%</h2>
+                    <p id="comment" class="text-lg font-medium text-gray-700"></p>
+                    <div id="suggestion" class="mt-4 p-3 bg-white/50 rounded-lg text-sm text-gray-600 italic"></div>
+                </div>
+            </div>
+        </div>
+
+        <footer class="mt-8 text-center text-gray-400 text-xs">
+            Created by AI Agent on 2026-02-05<br>
+            ⚠️ 本工具僅供娛樂，實際車位狀況取決於人品
+        </footer>
+    </div>
+
+    <script>
+        function calculate() {
+            const loc = parseFloat(document.getElementById('location').value);
+            const time = parseFloat(document.getElementById('time').value);
+            const weather = parseFloat(document.getElementById('weather').value);
+            const car = parseFloat(document.getElementById('car').value);
+
+            // Raw score calculation
+            let rawScore = (loc * 0.4 + time * 0.3 + weather * 0.2 + car * 0.1) * 20;
+            rawScore = Math.min(100, Math.max(0, rawScore));
+            
+            const scoreElement = document.getElementById('score');
+            const commentElement = document.getElementById('comment');
+            const suggestionElement = document.getElementById('suggestion');
+            const resultBox = document.getElementById('resultBox');
+
+            scoreElement.innerText = Math.round(rawScore) + '%';
+            resultBox.classList.remove('hidden');
+
+            let color, comment, suggestion;
+
+            if (rawScore < 25) {
+                color = 'border-green-400 text-green-600 bg-green-50';
+                comment = '暢行無阻！';
+                suggestion = '這附近隨便停，閉著眼睛都能停進去。';
+            } else if (rawScore < 50) {
+                color = 'border-yellow-400 text-yellow-600 bg-yellow-50';
+                comment = '稍有壓力';
+                suggestion = '繞兩圈應該有位子，記得檢查地上有沒有紅線。';
+            } else if (rawScore < 75) {
+                color = 'border-orange-400 text-orange-600 bg-orange-50';
+                comment = '開始絕望...';
+                suggestion = '建議停到遠一點的收費停車場，走路 10 分鐘總比繞 1 小時好。';
+            } else {
+                color = 'border-red-500 text-red-600 bg-red-50';
+                comment = '生不如死！';
+                suggestion = '放棄吧，現在回家還來得及，或者直接改搭計程車。';
+            }
+
+            resultBox.className = 'mt-10 p-6 rounded-2xl border-2 transition-all ' + color;
+            commentElement.innerText = comment;
+            suggestionElement.innerText = '💡 建議：' + suggestion;
+        }
+    </script>
+</body>
+</html>
