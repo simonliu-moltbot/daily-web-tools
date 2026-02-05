@@ -2,7 +2,7 @@
 <html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Tetris - Simon's Arcade</title>
     <style>
         body {
@@ -12,35 +12,57 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: center;
+            justify-content: flex-start;
             height: 100vh;
             margin: 0;
             overflow: hidden;
+            touch-action: none;
         }
+        h1 { margin: 10px 0; font-size: 1.5rem; }
         #tetris-container {
             position: relative;
             border: 4px solid #fff;
             box-shadow: 0 0 20px rgba(0,0,0,0.5);
+            max-width: 90vw;
         }
         canvas {
             display: block;
             background-color: #000;
+            height: 60vh;
         }
         .stats {
             position: absolute;
             top: 0;
-            right: -150px;
-            width: 140px;
+            right: -80px;
+            width: 70px;
             text-align: left;
         }
-        .stat-label { font-size: 14px; color: #aaa; }
-        .stat-value { font-size: 24px; font-weight: bold; margin-bottom: 20px; }
-        .controls {
+        .stat-label { font-size: 10px; color: #aaa; }
+        .stat-value { font-size: 18px; font-weight: bold; margin-bottom: 10px; }
+        
+        /* Mobile Controls */
+        .mobile-controls {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
             margin-top: 20px;
-            font-size: 14px;
-            color: #888;
-            text-align: center;
+            width: 90vw;
+            max-width: 300px;
         }
+        .ctrl-btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid #fff;
+            color: #fff;
+            padding: 15px;
+            text-align: center;
+            border-radius: 10px;
+            user-select: none;
+            touch-action: manipulation;
+            font-size: 20px;
+        }
+        .ctrl-btn:active { background: rgba(255, 255, 255, 0.3); }
+        .span-3 { grid-column: span 3; }
+
         .overlay {
             position: absolute;
             top: 0;
@@ -53,9 +75,10 @@
             align-items: center;
             justify-content: center;
             visibility: hidden;
+            z-index: 100;
         }
         .overlay.visible { visibility: visible; }
-        button {
+        button#restart-btn {
             padding: 10px 20px;
             font-size: 18px;
             background: #4CAF50;
@@ -64,7 +87,6 @@
             border-radius: 5px;
             cursor: pointer;
         }
-        button:hover { background: #45a049; }
     </style>
 </head>
 <body>
@@ -79,11 +101,16 @@
         </div>
         <div id="game-over" class="overlay">
             <h2>GAME OVER</h2>
-            <button onclick="resetGame()">RESTART</button>
+            <button id="restart-btn">RESTART</button>
         </div>
     </div>
-    <div class="controls">
-        Arrows to Move & Rotate | Space to Drop
+
+    <div class="mobile-controls">
+        <div class="ctrl-btn" id="left">⬅️</div>
+        <div class="ctrl-btn" id="rotate">🔄</div>
+        <div class="ctrl-btn" id="right">➡️</div>
+        <div class="ctrl-btn" id="down">⬇️</div>
+        <div class="ctrl-btn span-3" id="drop">SPACE / HARD DROP</div>
     </div>
 
     <script>
@@ -312,6 +339,25 @@
             updateScore();
             update();
         }
+
+        document.getElementById('restart-btn').addEventListener('click', resetGame);
+
+        // Touch Controls
+        document.getElementById('left').addEventListener('touchstart', (e) => { e.preventDefault(); playerMove(-1); });
+        document.getElementById('right').addEventListener('touchstart', (e) => { e.preventDefault(); playerMove(1); });
+        document.getElementById('rotate').addEventListener('touchstart', (e) => { e.preventDefault(); playerRotate(1); });
+        document.getElementById('down').addEventListener('touchstart', (e) => { e.preventDefault(); playerDrop(); });
+        document.getElementById('drop').addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            while (!collide(arena, player)) {
+                player.pos.y++;
+            }
+            player.pos.y--;
+            merge(arena, player);
+            playerReset();
+            arenaSweep();
+            updateScore();
+        });
 
         const colors = [
             null,
