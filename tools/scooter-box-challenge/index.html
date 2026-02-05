@@ -18,10 +18,13 @@
             100% { transform: translate(0, 0) rotate(0deg); }
         }
         .scooter {
-            font-size: 3rem;
-            transition: all 0.1s ease-out;
+            font-size: 2.5rem;
+            position: absolute;
+            transition: transform 0.1s ease-out;
             cursor: pointer;
             user-select: none;
+            pointer-events: none; /* Make clicking the box easier */
+            transform-origin: center;
         }
         .shake {
             animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both;
@@ -110,23 +113,41 @@
             "警察來了！快跑！"
         ];
 
-        function addScooter() {
+        function addScooter(e) {
             if (gameOver) return;
 
-            placeholder.style.display = 'none';
+            const placeholder = document.getElementById('placeholder');
+            if (placeholder) placeholder.style.display = 'none';
+            
             count++;
             
-            // Space logic: 
-            // First 10 are easy. Then it gets harder.
-            let shrinkFactor = count > 10 ? (count - 10) * 2 : 0;
-            space = Math.max(0, 100 - (count * 4) - shrinkFactor);
+            // Space logic
+            let shrinkFactor = count > 15 ? (count - 15) * 3 : 0;
+            space = Math.max(0, 100 - (count * 2) - shrinkFactor);
 
             const scooter = document.createElement('div');
             scooter.className = 'scooter shake';
             scooter.innerText = emojis[Math.floor(Math.random() * emojis.length)];
             
+            // Positioning
+            let x, y;
+            if (e && e.currentTarget === box) {
+                const rect = box.getBoundingClientRect();
+                x = e.clientX - rect.left;
+                y = e.clientY - rect.top;
+            } else {
+                // Random position if triggered by button
+                x = Math.random() * (box.clientWidth - 40) + 20;
+                y = Math.random() * (box.clientHeight - 40) + 20;
+            }
+            
+            scooter.style.left = `${x}px`;
+            scooter.style.top = `${y}px`;
+            scooter.style.marginTop = '-1.25rem'; // Half of font size to center
+            scooter.style.marginLeft = '-1.25rem';
+            
             // Random slight rotation and scale
-            const rotation = Math.floor(Math.random() * 20) - 10;
+            const rotation = Math.floor(Math.random() * 40) - 20;
             const scale = 0.8 + (Math.random() * 0.4);
             scooter.style.transform = `rotate(${rotation}deg) scale(${scale})`;
             
