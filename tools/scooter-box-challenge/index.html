@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="zh-Hant-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>機車待轉區大挑戰 - Scooter Box Challenge</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Noto Sans TC', sans-serif; }
+        .scooter-box {
+            border: 4px white solid;
+            background: rgba(255, 255, 255, 0.1);
+        }
+        @keyframes drift {
+            0% { transform: translate(0, 0) rotate(0deg); }
+            50% { transform: translate(10px, 5px) rotate(2deg); }
+            100% { transform: translate(0, 0) rotate(0deg); }
+        }
+        .scooter {
+            font-size: 3rem;
+            transition: all 0.1s ease-out;
+            cursor: pointer;
+            user-select: none;
+        }
+        .shake {
+            animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both;
+        }
+        @keyframes shake {
+            10, 90% { transform: translate3d(-1px, 0, 0); }
+            20, 80% { transform: translate3d(2px, 0, 0); }
+            30, 50, 70% { transform: translate3d(-4px, 0, 0); }
+            40, 60% { transform: translate3d(4px, 0, 0); }
+        }
+    </style>
+</head>
+<body class="bg-gray-900 text-white min-h-screen flex flex-col items-center p-4">
+
+    <nav class="w-full max-w-2xl mb-8">
+        <a href="../../index.html" class="text-blue-400 hover:text-blue-300 transition-colors">🏠 回首頁</a>
+    </nav>
+
+    <header class="text-center mb-8">
+        <h1 class="text-4xl font-bold mb-2">🛵 機車待轉區大挑戰</h1>
+        <p class="text-gray-400">挑戰在極小待轉區擠入最多機車！</p>
+    </header>
+
+    <div class="relative w-full max-w-md aspect-square bg-gray-800 rounded-xl p-4 shadow-2xl overflow-hidden flex flex-col">
+        <div id="game-stats" class="flex justify-between mb-4 px-2">
+            <span class="text-lg">已擠入: <span id="count" class="font-bold text-yellow-400">0</span> 輛</span>
+            <span class="text-lg">剩餘空間: <span id="space" class="font-bold text-green-400">100%</span></span>
+        </div>
+
+        <div id="box" class="flex-grow scooter-box relative rounded-lg flex flex-wrap content-start items-start p-2 overflow-hidden">
+            <!-- Scooters go here -->
+             <div id="placeholder" class="absolute inset-0 flex items-center justify-center text-gray-500 pointer-events-none">
+                點擊待轉區塞入機車
+             </div>
+        </div>
+        
+        <div class="mt-4 flex gap-2">
+            <button id="add-btn" class="flex-1 bg-yellow-500 hover:bg-yellow-400 text-gray-900 font-bold py-3 rounded-lg shadow-lg active:scale-95 transition-all">
+                塞入一輛 (空格)
+            </button>
+             <button id="reset-btn" class="bg-gray-700 hover:bg-gray-600 px-4 py-3 rounded-lg">
+                重設
+            </button>
+        </div>
+    </div>
+
+    <div id="message" class="mt-6 text-xl font-bold text-center h-8"></div>
+
+    <div class="mt-12 max-w-md text-gray-500 text-sm bg-gray-800/50 p-4 rounded-lg">
+        <h3 class="font-bold mb-2 text-gray-400">遊戲說明：</h3>
+        <ul class="list-disc ml-5 space-y-1">
+            <li>台灣特色「兩段式左轉」，待轉區就是我們的生存空間。</li>
+            <li>隨著機車變多，待轉區會越來越擠，直到溢出！</li>
+            <li>溢出時會被檢舉達人拍下（Game Over）。</li>
+        </ul>
+    </div>
+
+    <footer class="mt-auto py-8 text-gray-600 text-sm">
+        Created by AI Agent on 2026-02-05
+    </footer>
+
+    <script>
+        const box = document.getElementById('box');
+        const countEl = document.getElementById('count');
+        const spaceEl = document.getElementById('space');
+        const messageEl = document.getElementById('message');
+        const addBtn = document.getElementById('add-btn');
+        const resetBtn = document.getElementById('reset-btn');
+        const placeholder = document.getElementById('placeholder');
+
+        let count = 0;
+        let space = 100;
+        let gameOver = false;
+
+        const emojis = ['🛵', '🏍️', '🛵', '🛵', '🚲'];
+        const comments = [
+            "這待轉區還很大，再塞！",
+            "技術不錯喔，還沒滿。",
+            "開始有點擠了，靠緊一點。",
+            "大家借過一下，再擠一台。",
+            "這就是台北的早晨嗎？",
+            "這是在考駕照嗎？",
+            "有人壓線了！小心！",
+            "這待轉區是給螞蟻用的嗎？",
+            "已經溢出到斑馬線了啦！",
+            "警察來了！快跑！"
+        ];
+
+        function addScooter() {
+            if (gameOver) return;
+
+            placeholder.style.display = 'none';
+            count++;
+            
+            // Space logic: 
+            // First 10 are easy. Then it gets harder.
+            let shrinkFactor = count > 10 ? (count - 10) * 2 : 0;
+            space = Math.max(0, 100 - (count * 4) - shrinkFactor);
+
+            const scooter = document.createElement('div');
+            scooter.className = 'scooter shake';
+            scooter.innerText = emojis[Math.floor(Math.random() * emojis.length)];
+            
+            // Random slight rotation and scale
+            const rotation = Math.floor(Math.random() * 20) - 10;
+            const scale = 0.8 + (Math.random() * 0.4);
+            scooter.style.transform = `rotate(${rotation}deg) scale(${scale})`;
+            
+            box.appendChild(scooter);
+            
+            countEl.innerText = count;
+            spaceEl.innerText = space + '%';
+            
+            if (space > 70) spaceEl.className = 'font-bold text-green-400';
+            else if (space > 30) spaceEl.className = 'font-bold text-yellow-400';
+            else spaceEl.className = 'font-bold text-red-400';
+
+            // Random comment
+            const commentIdx = Math.min(Math.floor(count / 3), comments.length - 1);
+            messageEl.innerText = comments[commentIdx];
+            messageEl.className = "mt-6 text-xl font-bold text-center h-8 text-white";
+
+            if (space === 0) {
+                endGame();
+            }
+        }
+
+        function endGame() {
+            gameOver = true;
+            messageEl.innerText = "🚨 溢出了！檢舉達人已拍照！";
+            messageEl.className = "mt-6 text-xl font-bold text-center h-8 text-red-500 animate-bounce";
+            addBtn.disabled = true;
+            addBtn.className = "flex-1 bg-gray-600 text-gray-400 font-bold py-3 rounded-lg cursor-not-allowed";
+            box.classList.add('border-red-500');
+        }
+
+        function reset() {
+            count = 0;
+            space = 100;
+            gameOver = false;
+            box.innerHTML = '<div id="placeholder" class="absolute inset-0 flex items-center justify-center text-gray-500 pointer-events-none">點擊待轉區塞入機車</div>';
+            countEl.innerText = '0';
+            spaceEl.innerText = '100%';
+            spaceEl.className = 'font-bold text-green-400';
+            messageEl.innerText = '';
+            addBtn.disabled = false;
+            addBtn.className = "flex-1 bg-yellow-500 hover:bg-yellow-400 text-gray-900 font-bold py-3 rounded-lg shadow-lg active:scale-95 transition-all";
+            box.classList.remove('border-red-500');
+        }
+
+        addBtn.addEventListener('click', addScooter);
+        box.addEventListener('click', addScooter);
+        resetBtn.addEventListener('click', reset);
+    </script>
+</body>
+</html>
