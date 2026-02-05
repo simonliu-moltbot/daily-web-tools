@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>台灣慣老闆黑話解碼器 | Corporate BS Decoder</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/alpinejs/3.13.3/cdn.min.js" defer></script>
+    <style>
+        body { font-family: 'Noto Sans TC', sans-serif; }
+        .bs-gradient { background: linear-gradient(135deg, #1a202c 0%, #2d3748 100%); }
+        .card-glass { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); }
+        .scan-line {
+            width: 100%;
+            height: 2px;
+            background: rgba(0, 255, 0, 0.5);
+            position: absolute;
+            top: 0;
+            left: 0;
+            animation: scan 2s linear infinite;
+            display: none;
+        }
+        @keyframes scan {
+            0% { top: 0%; opacity: 0; }
+            10% { opacity: 1; }
+            90% { opacity: 1; }
+            100% { top: 100%; opacity: 0; }
+        }
+        .analyzing .scan-line { display: block; }
+    </style>
+</head>
+<body class="bg-stone-100 min-h-screen flex flex-col text-stone-800" x-data="bsDecoder()">
+
+    <!-- Navigation -->
+    <nav class="bg-white border-b border-stone-200 shadow-sm sticky top-0 z-50">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-14">
+                <div class="flex items-center">
+                    <a href="../../index.html" class="flex items-center text-stone-600 hover:text-stone-900 transition-colors">
+                        <svg class="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
+                        <span class="text-sm font-medium">回首頁</span>
+                    </a>
+                </div>
+                <div class="flex items-center">
+                    <h1 class="text-lg font-bold text-stone-800">🕵️ 慣老闆黑話解碼器</h1>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="flex-grow p-4 sm:p-6">
+        <div class="max-w-2xl mx-auto space-y-8">
+            
+            <!-- Hero Section -->
+            <div class="text-center space-y-2">
+                <h2 class="text-3xl font-black text-stone-900 tracking-tight">聽不懂老闆在說什麼？</h2>
+                <p class="text-stone-600">輸入那些聽起來很美好、但總覺得哪裡怪怪的話，讓 AI (其實是資料庫) 幫你還原真相。</p>
+            </div>
+
+            <!-- Input Section -->
+            <div class="bg-white rounded-2xl shadow-xl p-6 relative overflow-hidden border border-stone-100" :class="{'analyzing': isScanning}">
+                <div class="scan-line z-10"></div>
+                
+                <label for="input" class="block text-sm font-medium text-stone-500 mb-2">請輸入老闆/主管的金句：</label>
+                <textarea 
+                    id="input" 
+                    x-model="inputText" 
+                    class="w-full h-32 p-4 bg-stone-50 border border-stone-200 rounded-xl focus:ring-2 focus:ring-stone-800 focus:border-stone-800 transition-all resize-none text-lg placeholder-stone-300"
+                    placeholder="例如：我們大家要共體時艱..."
+                    @keydown.enter.ctrl="analyze()"
+                ></textarea>
+
+                <div class="mt-4 flex flex-col sm:flex-row gap-3">
+                    <button 
+                        @click="analyze()" 
+                        class="flex-1 bg-stone-900 hover:bg-black text-white font-bold py-3 px-6 rounded-xl transition-transform transform active:scale-95 flex items-center justify-center gap-2 shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
+                        :disabled="!inputText.trim() || isScanning"
+                    >
+                        <span x-show="!isScanning">🔍 開始解碼</span>
+                        <span x-show="isScanning">分析成分中...</span>
+                    </button>
+                    <button 
+                        @click="randomFill()" 
+                        class="sm:w-auto w-full bg-stone-100 hover:bg-stone-200 text-stone-600 font-medium py-3 px-6 rounded-xl transition-colors"
+                    >
+                        🎲 隨機範例
+                    </button>
+                </div>
+            </div>
+
+            <!-- Result Section -->
+            <div x-show="result" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 translate-y-4" x-transition:enter-end="opacity-100 translate-y-0" class="space-y-4" style="display: none;">
+                
+                <!-- Danger Level -->
+                <div class="flex items-center justify-between bg-white p-4 rounded-xl shadow-sm border border-stone-100">
+                    <span class="text-stone-500 font-medium text-sm">奴性檢測指數</span>
+                    <div class="flex gap-1">
+                        <template x-for="i in 5">
+                            <svg class="w-6 h-6 transition-colors duration-500" :class="i <= result?.level ? 'text-red-500' : 'text-stone-200'" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
+                            </svg>
+                        </template>
+                    </div>
+                </div>
+
+                <!-- Translation Card -->
+                <div class="bg-white rounded-2xl shadow-xl border-l-8 border-red-500 overflow-hidden">
+                    <div class="p-6">
+                        <div class="uppercase tracking-wide text-xs text-red-500 font-bold mb-1">Decoded Meaning</div>
+                        <h3 class="text-2xl font-bold text-stone-900 mb-4">翻譯結果：</h3>
+                        <p class="text-xl text-stone-800 leading-relaxed font-medium" x-text="result?.meaning"></p>
+                    </div>
+                    <div class="bg-stone-50 px-6 py-4 border-t border-stone-100">
+                        <div class="flex items-start gap-3">
+                            <span class="text-xl">💡</span>
+                            <div>
+                                <span class="text-xs font-bold text-stone-400 uppercase">Pro Tip (生存建議)</span>
+                                <p class="text-sm text-stone-600 mt-1" x-text="result?.advice"></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Dictionary List -->
+            <div class="pt-8 border-t border-stone-200">
+                <h3 class="text-stone-400 font-medium text-sm mb-4 uppercase tracking-wider text-center">常見黑話收錄</h3>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 opacity-60 hover:opacity-100 transition-opacity">
+                    <template x-for="item in dictionary.slice(0, 6)" :key="item.key">
+                        <div @click="inputText = item.key; analyze()" class="cursor-pointer bg-white p-3 rounded-lg border border-stone-200 hover:border-stone-400 hover:shadow-md transition-all text-sm text-stone-600">
+                            <span class="text-stone-400 mr-2">❝</span>
+                            <span x-text="item.key"></span>
+                            <span class="text-stone-400 ml-1">❞</span>
+                        </div>
+                    </template>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-white border-t border-stone-200 mt-auto py-6">
+        <div class="text-center text-sm text-stone-400">
+            <p>Created by AI Agent on 2026-02-06</p>
+            <p class="mt-1 text-xs">純屬娛樂，請勿對號入座 (除非你老闆真的這樣說)</p>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('alpine:init', () => {
+            Alpine.data('bsDecoder', () => ({
+                inputText: '',
+                isScanning: false,
+                result: null,
+                dictionary: [
+                    { key: "共體時艱", meaning: "公司沒錢（或不想給你錢），但老闆剛剛換了新車。準備好無償加班吧。", level: 5, advice: "快逃，這通常是裁員或減薪的前奏。" },
+                    { key: "能者多勞", meaning: "因為你比較好用（或好欺負），所以別人的工作也丟給你做，但薪水不會變。", level: 4, advice: "學會適度「裝死」和「拒絕」，否則會累死。" },
+                    { key: "年輕人不要太計較薪水", meaning: "我只想用最低薪資請你，而且我給不起市場行情。", level: 5, advice: "薪水是工作的最主要動力，當然要計較。開始刷 104 吧。" },
+                    { key: "公司把你當家人", meaning: "既然是家人，那加班不用給錢，週末隨叫隨到也是應該的吧？公私不分。", level: 5, advice: "家裡有爸媽就好，公司是用來賺錢的。" },
+                    { key: "這是一個學習的機會", meaning: "這是一個屎缺，沒人要做，所以包裝成「學習機會」丟給你。", level: 3, advice: "評估是否真的能學到東西，如果只是打雜，就別騙自己了。" },
+                    { key: "彈性上下班", meaning: "上班不能遲到，但下班時間非常「彈性」，通常是指晚上九點以後。", level: 3, advice: "面試時請確認具體定義，通常是責任制的代名詞。" },
+                    { key: "年底會有一波大的", meaning: "畫大餅專用術語。通常指年終獎金，但最後可能只有幾百塊禮券。", level: 4, advice: "聽聽就好，拿到手的才是真的。" },
+                    { key: "很有發展潛力", meaning: "現在什麼資源都沒有，要你從零開始拚，但失敗算你的。", level: 3, advice: "確認公司是否有具體計畫和資金，否則只是空話。" },
+                    { key: "薪資面議", meaning: "薪水絕對低於你的預期，寫出來怕沒人投履歷。", level: 2, advice: "面試前先做好心理準備，或直接詢問薪資範圍。" },
+                    { key: "我們不鼓勵加班", meaning: "我們不付加班費，但工作量大到你不可能準時下班。", level: 4, advice: "保留加班證據，以備不時之需（勞資糾紛）。" },
+                    { key: "回去等通知", meaning: "基本上就是沒錄取，或是你是備胎中的備胎。", level: 1, advice: "繼續找下一家，不要抱太大期望。" },
+                    { key: "之後會補休", meaning: "先騙你加班，等到你想休的時候，會用各種理由（忙季、人手不足）拒絕你。", level: 4, advice: "堅持要加班費比較實際，補休通常是看得到吃不到。" },
+                    { key: "這是責任制", meaning: "你的時間是公司的，24小時待命，沒有加班費這回事。", level: 5, advice: "確認薪水是否高到值得賣命，否則這是違法的。" },
+                    { key: "眼光要放遠", meaning: "不要看現在薪水這麼低，雖然未來也不一定會高。", level: 4, advice: "未來的承諾不能當飯吃，現在的待遇才最重要。" },
+                    { key: "最近景氣不好", meaning: "不管景氣好不好，這都是不加薪的萬用理由。", level: 3, advice: "查查公司財報或同業狀況，別被唬住了。" }
+                ],
+                
+                randomFill() {
+                    const randomItem = this.dictionary[Math.floor(Math.random() * this.dictionary.length)];
+                    this.inputText = randomItem.key;
+                    this.result = null; // Clear result to encourage clicking decode
+                },
+
+                analyze() {
+                    if (!this.inputText.trim()) return;
+                    
+                    this.isScanning = true;
+                    this.result = null;
+
+                    // Simulate processing time
+                    setTimeout(() => {
+                        this.isScanning = false;
+                        
+                        // Simple exact match first
+                        const exactMatch = this.dictionary.find(item => this.inputText.includes(item.key));
+                        
+                        if (exactMatch) {
+                            this.result = exactMatch;
+                        } else {
+                            // Fallback generic response for unknown text
+                            this.result = {
+                                meaning: "這句話充滿了「慣老闆」的氣息，雖然資料庫暫時無法精確翻譯，但建議您保持警惕，通常話講得越漂亮，坑就越大。",
+                                level: 2,
+                                advice: "觀察其他資深同事的表情，如果他們在翻白眼，那就是在畫大餅無誤。"
+                            };
+                        }
+                    }, 800);
+                }
+            }))
+        });
+    </script>
+</body>
+</html>
