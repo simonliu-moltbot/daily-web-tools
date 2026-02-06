@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>早餐店阿姨記憶力大考驗 | 台灣日常工具</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Noto Sans TC', sans-serif; background-color: #fef3c7; }
+        .fade-out { animation: fadeOut 0.5s forwards; }
+        @keyframes fadeOut { to { opacity: 0; display: none; } }
+        .shake { animation: shake 0.5s; }
+        @keyframes shake { 0% { transform: translateX(0); } 25% { transform: translateX(-5px); } 50% { transform: translateX(5px); } 75% { transform: translateX(-5px); } 100% { transform: translateX(0); } }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col items-center">
+
+    <!-- Header -->
+    <div class="w-full bg-orange-500 text-white p-4 shadow-md">
+        <div class="max-w-md mx-auto flex justify-between items-center">
+            <a href="../../index.html" class="text-sm font-bold hover:underline">🏠 回首頁</a>
+            <h1 class="text-lg font-bold">早餐店阿姨記憶力大考驗</h1>
+        </div>
+    </div>
+
+    <!-- Game Container -->
+    <div class="flex-grow flex flex-col items-center w-full max-w-md p-4 space-y-4">
+        
+        <!-- Score & Status -->
+        <div class="w-full flex justify-between bg-white p-3 rounded-lg shadow text-stone-700 font-bold">
+            <span>🏆 連續答對: <span id="score" class="text-orange-600">0</span></span>
+            <span>❤️ 生命: <span id="lives">❤️❤️❤️</span></span>
+        </div>
+
+        <!-- Customer Scene -->
+        <div class="w-full bg-white rounded-xl shadow-lg p-6 flex flex-col items-center relative min-h-[200px] justify-center text-center">
+            
+            <!-- Customer Avatar -->
+            <div id="avatar" class="text-6xl mb-4">🧑</div>
+
+            <!-- Speech Bubble -->
+            <div id="speech-bubble" class="bg-gray-100 p-4 rounded-2xl relative border border-gray-200 shadow-sm hidden">
+                <p id="order-text" class="text-lg font-bold text-gray-800">...</p>
+                <div class="absolute bottom-[-10px] left-1/2 transform -translate-x-1/2 w-4 h-4 bg-gray-100 rotate-45 border-b border-r border-gray-200"></div>
+            </div>
+
+            <!-- Start Button -->
+            <button id="start-btn" onclick="startGame()" class="bg-orange-500 hover:bg-orange-600 text-white font-bold py-3 px-8 rounded-full shadow-lg transform transition hover:scale-105">
+                開始接單
+            </button>
+
+            <!-- Feedback -->
+            <div id="feedback" class="hidden text-xl font-bold mt-2"></div>
+        </div>
+
+        <!-- Order Controls (Hidden initially) -->
+        <div id="controls" class="w-full space-y-4 hidden">
+            <div class="bg-white p-4 rounded-lg shadow">
+                <h3 class="text-sm text-gray-500 mb-2 font-bold">目前選擇:</h3>
+                <div id="current-selection" class="flex flex-wrap gap-2 min-h-[40px]"></div>
+            </div>
+
+            <!-- Menu Grid -->
+            <div class="grid grid-cols-3 gap-2">
+                <!-- Main -->
+                <button class="menu-btn bg-yellow-100 hover:bg-yellow-200 text-yellow-900 py-3 rounded font-bold" onclick="addItem('原味蛋餅')">原味蛋餅</button>
+                <button class="menu-btn bg-yellow-100 hover:bg-yellow-200 text-yellow-900 py-3 rounded font-bold" onclick="addItem('培根蛋餅')">培根蛋餅</button>
+                <button class="menu-btn bg-yellow-100 hover:bg-yellow-200 text-yellow-900 py-3 rounded font-bold" onclick="addItem('蘿蔔糕')">蘿蔔糕</button>
+                <button class="menu-btn bg-yellow-100 hover:bg-yellow-200 text-yellow-900 py-3 rounded font-bold" onclick="addItem('豬肉漢堡')">豬肉漢堡</button>
+                <button class="menu-btn bg-yellow-100 hover:bg-yellow-200 text-yellow-900 py-3 rounded font-bold" onclick="addItem('鐵板麵')">鐵板麵</button>
+                <button class="menu-btn bg-yellow-100 hover:bg-yellow-200 text-yellow-900 py-3 rounded font-bold" onclick="addItem('總匯三明治')">總匯三明治</button>
+                
+                <!-- Drinks -->
+                <button class="menu-btn bg-blue-100 hover:bg-blue-200 text-blue-900 py-3 rounded font-bold" onclick="addItem('大冰奶')">大冰奶</button>
+                <button class="menu-btn bg-blue-100 hover:bg-blue-200 text-blue-900 py-3 rounded font-bold" onclick="addItem('中溫紅')">中溫紅</button>
+                <button class="menu-btn bg-blue-100 hover:bg-blue-200 text-blue-900 py-3 rounded font-bold" onclick="addItem('冰豆漿')">冰豆漿</button>
+                
+                <!-- Custom -->
+                <button class="menu-btn bg-red-100 hover:bg-red-200 text-red-900 py-3 rounded font-bold text-sm" onclick="addItem('不要洋蔥')">不要洋蔥</button>
+                <button class="menu-btn bg-red-100 hover:bg-red-200 text-red-900 py-3 rounded font-bold text-sm" onclick="addItem('切邊')">切邊</button>
+                <button class="menu-btn bg-red-100 hover:bg-red-200 text-red-900 py-3 rounded font-bold text-sm" onclick="addItem('加辣')">加辣</button>
+            </div>
+
+            <div class="flex gap-2 mt-4">
+                <button onclick="clearSelection()" class="flex-1 bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-3 rounded">重選</button>
+                <button onclick="submitOrder()" class="flex-1 bg-green-500 hover:bg-green-600 text-white font-bold py-3 rounded shadow">送單！</button>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Footer -->
+    <footer class="mt-8 mb-4 text-xs text-stone-500">
+        Created by AI Agent on <span id="date"></span>
+    </footer>
+
+    <script>
+        document.getElementById('date').innerText = new Date().toISOString().split('T')[0];
+
+        const CUSTOMERS = ["👨‍💼", "👩‍🎓", "👷", "👵", "🧒", "👱‍♂️"];
+        const GREETINGS = ["帥哥", "美女", "同學", "老闆"];
+        
+        const MENU_ITEMS = [
+            '原味蛋餅', '培根蛋餅', '蘿蔔糕', '豬肉漢堡', '鐵板麵', '總匯三明治',
+            '大冰奶', '中溫紅', '冰豆漿',
+            '不要洋蔥', '切邊', '加辣'
+        ];
+
+        let state = {
+            score: 0,
+            lives: 3,
+            currentOrder: [],
+            playerSelection: [],
+            isOrdering: false
+        };
+
+        function startGame() {
+            state.score = 0;
+            state.lives = 3;
+            updateUI();
+            document.getElementById('start-btn').classList.add('hidden');
+            document.getElementById('controls').classList.remove('hidden');
+            nextRound();
+        }
+
+        function generateOrder() {
+            // Difficulty scaling
+            const count = Math.min(2 + Math.floor(state.score / 3), 5);
+            const items = [];
+            const parts = [];
+
+            // Pick 1-2 mains
+            const mains = ['原味蛋餅', '培根蛋餅', '蘿蔔糕', '豬肉漢堡', '鐵板麵', '總匯三明治'];
+            const main = mains[Math.floor(Math.random() * mains.length)];
+            items.push(main);
+            parts.push(main);
+
+            // 50% chance for second main if score > 5
+            if (state.score > 5 && Math.random() > 0.5) {
+                const main2 = mains[Math.floor(Math.random() * mains.length)];
+                items.push(main2);
+                parts.push(main2);
+            }
+
+            // Always a drink
+            const drinks = ['大冰奶', '中溫紅', '冰豆漿'];
+            const drink = drinks[Math.floor(Math.random() * drinks.length)];
+            items.push(drink);
+            parts.push(drink);
+
+            // Modifications
+            if (Math.random() > 0.4) {
+                const mods = ['不要洋蔥', '切邊', '加辣'];
+                const mod = mods[Math.floor(Math.random() * mods.length)];
+                items.push(mod);
+                parts.push(mod);
+            }
+
+            // Shuffle display text logic slightly (optional, but keep simple for now)
+            const greeting = GREETINGS[Math.floor(Math.random() * GREETINGS.length)];
+            const text = `${greeting}，我要${parts.join('，')}！`;
+
+            return { items, text };
+        }
+
+        function nextRound() {
+            if (state.lives <= 0) {
+                endGame();
+                return;
+            }
+
+            // Reset UI
+            state.playerSelection = [];
+            state.isOrdering = true;
+            renderSelection();
+            document.getElementById('feedback').classList.add('hidden');
+            
+            // Random Customer
+            const avatar = CUSTOMERS[Math.floor(Math.random() * CUSTOMERS.length)];
+            document.getElementById('avatar').innerText = avatar;
+
+            // Generate Order
+            const order = generateOrder();
+            state.currentOrder = order.items;
+
+            // Show Speech
+            const speechBubble = document.getElementById('speech-bubble');
+            const orderText = document.getElementById('order-text');
+            
+            orderText.innerText = order.text;
+            speechBubble.classList.remove('hidden');
+
+            // Hide speech after time (shorter as score goes up)
+            const duration = Math.max(1500, 4000 - (state.score * 200));
+            
+            setTimeout(() => {
+                if(state.isOrdering) {
+                    speechBubble.classList.add('hidden');
+                }
+            }, duration);
+        }
+
+        function addItem(item) {
+            if (!state.isOrdering) return;
+            state.playerSelection.push(item);
+            renderSelection();
+        }
+
+        function clearSelection() {
+            state.playerSelection = [];
+            renderSelection();
+        }
+
+        function renderSelection() {
+            const container = document.getElementById('current-selection');
+            container.innerHTML = state.playerSelection.map(item => 
+                `<span class="bg-gray-200 px-2 py-1 rounded text-sm text-gray-700">${item}</span>`
+            ).join('');
+        }
+
+        function submitOrder() {
+            if (!state.isOrdering) return;
+            state.isOrdering = false;
+            document.getElementById('speech-bubble').classList.add('hidden');
+
+            // Check correctness (exact match, order doesn't matter)
+            const target = [...state.currentOrder].sort();
+            const actual = [...state.playerSelection].sort();
+            
+            const isCorrect = JSON.stringify(target) === JSON.stringify(actual);
+
+            const feedback = document.getElementById('feedback');
+            feedback.classList.remove('hidden', 'text-green-600', 'text-red-600');
+            
+            if (isCorrect) {
+                state.score++;
+                feedback.innerText = "答對了！阿姨好棒！✅";
+                feedback.classList.add('text-green-600');
+                setTimeout(nextRound, 1500);
+            } else {
+                state.lives--;
+                feedback.innerText = `錯了！❌ 客人要的是：${state.currentOrder.join('、')}`;
+                feedback.classList.add('text-red-600');
+                document.body.classList.add('shake');
+                setTimeout(() => document.body.classList.remove('shake'), 500);
+                setTimeout(nextRound, 2500);
+            }
+            updateUI();
+        }
+
+        function updateUI() {
+            document.getElementById('score').innerText = state.score;
+            document.getElementById('lives').innerText = '❤️'.repeat(state.lives);
+        }
+
+        function endGame() {
+            document.getElementById('controls').classList.add('hidden');
+            document.getElementById('avatar').innerText = "🏁";
+            
+            const feedback = document.getElementById('feedback');
+            feedback.classList.remove('hidden');
+            feedback.classList.add('text-orange-600');
+            
+            let comment = "";
+            if(state.score < 5) comment = "阿姨，你是不是還沒睡醒？";
+            else if(state.score < 10) comment = "還不錯喔，勉強及格！";
+            else comment = "太強了！真的是被早餐店耽誤的記憶大師！";
+
+            feedback.innerHTML = `遊戲結束！<br>總分：${state.score}<br><span class="text-sm text-gray-500">${comment}</span>`;
+            
+            const startBtn = document.getElementById('start-btn');
+            startBtn.innerText = "再玩一次";
+            startBtn.classList.remove('hidden');
+        }
+    </script>
+</body>
+</html>
