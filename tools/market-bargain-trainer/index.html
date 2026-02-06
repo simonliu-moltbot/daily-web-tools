@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>菜市場殺價王 | Market Bargain King</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Noto Sans TC', sans-serif; background-color: #f3f4f6; }
+        .game-card { background: white; border-radius: 1rem; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06); }
+        .speech-bubble {
+            position: relative;
+            background: #fff;
+            border-radius: .4em;
+            padding: 1rem;
+            border: 2px solid #e5e7eb;
+        }
+        .speech-bubble:after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border: 12px solid transparent;
+            border-top-color: #e5e7eb;
+            border-bottom: 0;
+            margin-left: -12px;
+            margin-bottom: -12px;
+        }
+        .shake { animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both; }
+        @keyframes shake {
+            10%, 90% { transform: translate3d(-1px, 0, 0); }
+            20%, 80% { transform: translate3d(2px, 0, 0); }
+            30%, 50%, 70% { transform: translate3d(-4px, 0, 0); }
+            40%, 60% { transform: translate3d(4px, 0, 0); }
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col items-center py-6 px-4">
+
+    <!-- Header -->
+    <div class="w-full max-w-md flex justify-between items-center mb-6">
+        <a href="../../index.html" class="text-gray-500 hover:text-gray-800 transition-colors flex items-center gap-1 font-medium text-sm">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
+            回首頁
+        </a>
+        <span class="text-xs text-gray-400">Daily Web Tool</span>
+    </div>
+
+    <!-- Title -->
+    <div class="text-center mb-6">
+        <h1 class="text-3xl font-bold text-gray-800 mb-2">🥬 菜市場殺價王</h1>
+        <p class="text-gray-600 text-sm">Market Bargain King</p>
+    </div>
+
+    <!-- Game Container -->
+    <div id="game-container" class="w-full max-w-md game-card p-6 relative overflow-hidden">
+        
+        <!-- Start Screen -->
+        <div id="screen-start" class="text-center py-8">
+            <div class="text-6xl mb-4">👵</div>
+            <h2 class="text-xl font-bold mb-4">挑戰菜市場阿姨！</h2>
+            <p class="text-gray-600 mb-6 text-sm leading-relaxed">
+                你在市場看到一件心儀的商品，但阿姨開價太高了。<br>
+                運用你的智慧、口才與厚臉皮，<br>
+                在阿姨失去耐心把你趕走之前，<br>
+                用最低的價格成交！
+            </p>
+            <button onclick="startGame()" class="w-full bg-red-500 hover:bg-red-600 text-white font-bold py-3 px-4 rounded-lg transition shadow-lg transform active:scale-95">
+                開始殺價！
+            </button>
+        </div>
+
+        <!-- Play Screen -->
+        <div id="screen-play" class="hidden flex flex-col h-full">
+            
+            <!-- Stats Bar -->
+            <div class="flex justify-between items-center mb-6 bg-gray-50 p-3 rounded-lg border border-gray-100">
+                <div class="text-center">
+                    <div class="text-xs text-gray-400">目前出價</div>
+                    <div class="text-xl font-bold text-green-600">$<span id="price-display">0</span></div>
+                </div>
+                <div class="text-center w-1/3">
+                    <div class="text-xs text-gray-400">阿姨耐心</div>
+                    <div class="w-full bg-gray-200 rounded-full h-2.5 mt-1">
+                        <div id="patience-bar" class="bg-blue-500 h-2.5 rounded-full transition-all duration-300" style="width: 100%"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Auntie Area -->
+            <div class="flex-1 flex flex-col items-center justify-center mb-6">
+                <div id="auntie-bubble" class="speech-bubble mb-4 text-center text-gray-800 font-medium w-full">
+                    帥哥，這件衣服算你便宜啦！
+                </div>
+                <div id="auntie-face" class="text-7xl transition-transform duration-300 transform hover:scale-110 cursor-pointer">👵</div>
+                <div id="item-name" class="mt-2 text-sm text-gray-500 bg-gray-100 px-3 py-1 rounded-full"></div>
+            </div>
+
+            <!-- Actions -->
+            <div class="grid grid-cols-2 gap-3">
+                <button onclick="action('praise')" class="bg-pink-100 hover:bg-pink-200 text-pink-700 font-bold py-3 px-2 rounded-lg text-sm transition">
+                    🥰 稱讚阿姨<br><span class="text-[10px] font-normal text-pink-500">耐心++ 價格-</span>
+                </button>
+                <button onclick="action('poor')" class="bg-yellow-100 hover:bg-yellow-200 text-yellow-700 font-bold py-3 px-2 rounded-lg text-sm transition">
+                    💸 哭窮裝學生<br><span class="text-[10px] font-normal text-yellow-600">耐心- 價格--</span>
+                </button>
+                <button onclick="action('flaw')" class="bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold py-3 px-2 rounded-lg text-sm transition">
+                    🔍 挑毛病<br><span class="text-[10px] font-normal text-gray-500">耐心--- 價格---</span>
+                </button>
+                <button onclick="action('walk')" class="bg-red-100 hover:bg-red-200 text-red-700 font-bold py-3 px-2 rounded-lg text-sm transition">
+                    🏃 假裝要走<br><span class="text-[10px] font-normal text-red-500">賭一把大的</span>
+                </button>
+                <button onclick="acceptDeal()" class="col-span-2 bg-green-500 hover:bg-green-600 text-white font-bold py-3 rounded-lg mt-2 shadow-md">
+                    🤝 就這個價格成交！
+                </button>
+            </div>
+        </div>
+
+        <!-- Result Screen -->
+        <div id="screen-result" class="hidden text-center py-6">
+            <div id="result-emoji" class="text-6xl mb-4">🎉</div>
+            <h2 id="result-title" class="text-2xl font-bold mb-2">成交！</h2>
+            <p id="result-desc" class="text-gray-600 mb-6 px-4"></p>
+            
+            <div class="bg-gray-50 rounded-lg p-4 mb-6 mx-4">
+                <div class="flex justify-between mb-2 border-b border-gray-200 pb-2">
+                    <span class="text-gray-500">最終價格</span>
+                    <span class="font-bold text-gray-800">$<span id="final-price"></span></span>
+                </div>
+                <div class="flex justify-between mb-2 border-b border-gray-200 pb-2">
+                    <span class="text-gray-500">原價</span>
+                    <span class="text-gray-800 line-through">$<span id="original-price"></span></span>
+                </div>
+                <div class="flex justify-between">
+                    <span class="text-gray-500">省下</span>
+                    <span class="font-bold text-green-600">$<span id="saved-amount"></span></span>
+                </div>
+            </div>
+
+            <button onclick="startGame()" class="w-full bg-indigo-500 hover:bg-indigo-600 text-white font-bold py-3 px-4 rounded-lg transition shadow-md">
+                再玩一次
+            </button>
+        </div>
+
+    </div>
+
+    <!-- Footer -->
+    <footer class="mt-8 text-center text-xs text-gray-400">
+        <p>Created by AI Agent on 2026-02-07</p>
+    </footer>
+
+    <script>
+        const ITEMS = [
+            { name: "當季高麗菜", price: 120, min: 40 },
+            { name: "手工真皮皮帶", price: 890, min: 250 },
+            { name: "潮牌盜版T恤", price: 490, min: 150 },
+            { name: "阿嬤種的絲瓜", price: 80, min: 20 },
+            { name: "深海大石斑", price: 1200, min: 600 }
+        ];
+
+        const DIALOGUES = {
+            start: ["帥哥/美女，這東西很讚捏，算你便宜啦！", "這可是最後一件了，算你優惠價！", "今天剛到的貨，很新鮮喔！"],
+            praise: ["嘴巴真甜，好啦少算你一點！", "哎唷，真會說話，阿姨開心！", "好啦好啦，看你這麼有眼光。"],
+            poor: ["現在年輕人也不容易...好啦。", "好啦好啦，別裝可憐了。", "真的沒錢喔？那再便宜一點點。"],
+            flaw: ["這哪是瑕疵！這是特色！(不爽)", "你很挑捏！一分錢一分貨啦！", "嫌貴不要買！(生氣)"],
+            walk: ["好啦好啦！回來！給你便宜啦！", "真的是...好啦賣你啦！", "算了算了，交個朋友！"],
+            angry: ["不賣了！你走！", "哪有人這樣殺價的！我不賣了！", "去去去，別擋我做生意！"],
+            lowball: ["少年仔，這樣我會虧錢啦！不行！", "這個價格我進貨都不夠！", "太低了啦，沒辦法！"]
+        };
+
+        let state = {
+            item: null,
+            currentPrice: 0,
+            patience: 100,
+            history: []
+        };
+
+        const screens = {
+            start: document.getElementById('screen-start'),
+            play: document.getElementById('screen-play'),
+            result: document.getElementById('screen-result')
+        };
+
+        const els = {
+            price: document.getElementById('price-display'),
+            patience: document.getElementById('patience-bar'),
+            bubble: document.getElementById('auntie-bubble'),
+            face: document.getElementById('auntie-face'),
+            itemName: document.getElementById('item-name')
+        };
+
+        function showScreen(name) {
+            Object.values(screens).forEach(s => s.classList.add('hidden'));
+            screens[name].classList.remove('hidden');
+        }
+
+        function startGame() {
+            const item = ITEMS[Math.floor(Math.random() * ITEMS.length)];
+            state = {
+                item: item,
+                currentPrice: item.price,
+                patience: 100,
+                history: []
+            };
+            
+            els.itemName.textContent = item.name;
+            updateUI();
+            setBubble(DIALOGUES.start);
+            showScreen('play');
+        }
+
+        function updateUI() {
+            els.price.textContent = Math.round(state.currentPrice);
+            els.patience.style.width = state.patience + '%';
+            
+            // Color of patience bar
+            if (state.patience < 30) els.patience.className = 'bg-red-500 h-2.5 rounded-full transition-all duration-300';
+            else if (state.patience < 60) els.patience.className = 'bg-yellow-500 h-2.5 rounded-full transition-all duration-300';
+            else els.patience.className = 'bg-blue-500 h-2.5 rounded-full transition-all duration-300';
+
+            // Face expression
+            if (state.patience < 30) els.face.textContent = '😡';
+            else if (state.patience < 70) els.face.textContent = '😒';
+            else els.face.textContent = '👵';
+        }
+
+        function setBubble(arr) {
+            els.bubble.textContent = arr[Math.floor(Math.random() * arr.length)];
+        }
+
+        function action(type) {
+            let priceDrop = 0;
+            let patienceDrop = 0;
+            const min = state.item.min;
+
+            // Logic
+            if (type === 'praise') {
+                priceDrop = state.currentPrice * 0.05;
+                patienceDrop = -5; // Heal patience slightly
+                setBubble(DIALOGUES.praise);
+            } else if (type === 'poor') {
+                priceDrop = state.currentPrice * 0.1;
+                patienceDrop = 15;
+                setBubble(DIALOGUES.poor);
+            } else if (type === 'flaw') {
+                priceDrop = state.currentPrice * 0.2;
+                patienceDrop = 30;
+                setBubble(DIALOGUES.flaw);
+                // Shake effect
+                els.face.classList.add('shake');
+                setTimeout(()=>els.face.classList.remove('shake'), 500);
+            } else if (type === 'walk') {
+                if (state.patience > 50) {
+                    priceDrop = state.currentPrice * 0.3;
+                    patienceDrop = 20;
+                    setBubble(DIALOGUES.walk);
+                } else {
+                    // Fail
+                    endGame(false, "阿姨真的讓你走了...");
+                    return;
+                }
+            }
+
+            // Apply changes
+            state.currentPrice = Math.max(min * 1.1, state.currentPrice - priceDrop);
+            state.patience = Math.min(100, Math.max(0, state.patience - patienceDrop));
+
+            updateUI();
+
+            // Check Game Over
+            if (state.patience <= 0) {
+                endGame(false, "阿姨生氣了：「不賣了！你去別家買！」");
+            }
+        }
+
+        function acceptDeal() {
+            endGame(true, "成交！");
+        }
+
+        function endGame(success, msg) {
+            showScreen('result');
+            const resTitle = document.getElementById('result-title');
+            const resDesc = document.getElementById('result-desc');
+            const resEmoji = document.getElementById('result-emoji');
+
+            if (success) {
+                // Calculate score
+                const discount = 1 - (state.currentPrice / state.item.price);
+                let rank = "";
+                if (discount < 0.2) rank = "殺價新手";
+                else if (discount < 0.4) rank = "精打細算";
+                else if (discount < 0.6) rank = "菜市場殺手";
+                else rank = "殺價之神";
+
+                resEmoji.textContent = "🎉";
+                resTitle.textContent = "成交！";
+                resTitle.className = "text-2xl font-bold mb-2 text-green-600";
+                resDesc.innerHTML = `阿姨：「好啦，算你會說話！」<br><span class="font-bold text-indigo-600 mt-2 block">評價：${rank}</span>`;
+                
+                document.getElementById('final-price').textContent = Math.round(state.currentPrice);
+                document.getElementById('original-price').textContent = state.item.price;
+                document.getElementById('saved-amount').textContent = Math.round(state.item.price - state.currentPrice);
+
+            } else {
+                resEmoji.textContent = "😭";
+                resTitle.textContent = "失敗！";
+                resTitle.className = "text-2xl font-bold mb-2 text-red-600";
+                resDesc.textContent = msg;
+                
+                document.getElementById('final-price').textContent = "---";
+                document.getElementById('original-price').textContent = state.item.price;
+                document.getElementById('saved-amount').textContent = "0";
+            }
+        }
+    </script>
+</body>
+</html>
