@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>連假雙鐵搶票神指 (Taiwan Ticket Snatch Trainer)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Noto Sans TC', sans-serif; }
+        .train-bg { background-color: #f3f4f6; background-image: radial-gradient(#e5e7eb 1px, transparent 1px); background-size: 20px 20px; }
+        .blink { animation: blink 1s infinite; }
+        @keyframes blink { 50% { opacity: 0; } }
+        .shake { animation: shake 0.5s; }
+        @keyframes shake {
+            0% { transform: translate(1px, 1px) rotate(0deg); }
+            10% { transform: translate(-1px, -2px) rotate(-1deg); }
+            20% { transform: translate(-3px, 0px) rotate(1deg); }
+            30% { transform: translate(3px, 2px) rotate(0deg); }
+            40% { transform: translate(1px, -1px) rotate(1deg); }
+            50% { transform: translate(-1px, 2px) rotate(-1deg); }
+            60% { transform: translate(-3px, 1px) rotate(0deg); }
+            70% { transform: translate(3px, 1px) rotate(-1deg); }
+            80% { transform: translate(-1px, -1px) rotate(1deg); }
+            90% { transform: translate(1px, 2px) rotate(0deg); }
+            100% { transform: translate(1px, -2px) rotate(-1deg); }
+        }
+    </style>
+</head>
+<body class="train-bg min-h-screen flex flex-col items-center p-4 text-gray-800">
+
+    <!-- Top Navigation -->
+    <div class="w-full max-w-md flex justify-between items-center mb-6">
+        <a href="../../index.html" class="text-blue-600 hover:text-blue-800 font-bold text-lg flex items-center gap-1 transition-colors">
+            <span>🏠</span> 回首頁
+        </a>
+        <div class="text-sm text-gray-500">v1.0.0</div>
+    </div>
+
+    <!-- Main Card -->
+    <div class="bg-white w-full max-w-md rounded-2xl shadow-xl overflow-hidden border-2 border-orange-500 relative">
+        <!-- Header -->
+        <div class="bg-orange-500 p-4 text-white text-center">
+            <h1 class="text-2xl font-bold tracking-wider">🚄 連假搶票神指</h1>
+            <p class="text-sm opacity-90 mt-1">別讓除夕回不了家！練好手速再上！</p>
+        </div>
+
+        <!-- Game Area -->
+        <div class="p-6 flex flex-col items-center gap-6">
+            
+            <!-- Status Panel -->
+            <div id="status-panel" class="w-full text-center">
+                <div class="text-sm text-gray-500 mb-1">距離開放訂票還有...</div>
+                <div id="countdown" class="text-5xl font-mono font-bold text-gray-800 tabular-nums tracking-tight">00:00:00</div>
+                <div id="ms-display" class="text-xl text-red-500 font-mono mt-2 h-8 font-bold">.000</div>
+            </div>
+
+            <!-- Action Area -->
+            <div class="w-full relative h-48 flex items-center justify-center bg-gray-50 rounded-xl border-2 border-dashed border-gray-300 transition-all" id="action-area">
+                
+                <!-- Start Button (Initial State) -->
+                <button id="btn-start" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-full shadow-lg transform transition hover:scale-105 active:scale-95 text-xl">
+                    🔥 開始特訓
+                </button>
+
+                <!-- Book Button (Hidden until 00:00) -->
+                <button id="btn-book" class="hidden bg-gray-400 cursor-not-allowed text-white font-bold py-4 px-10 rounded-lg shadow-md text-2xl w-3/4 transition-colors" disabled>
+                    立即訂票
+                </button>
+
+                <!-- Captcha Area (Hidden) -->
+                <div id="captcha-area" class="hidden absolute inset-0 bg-white/95 flex flex-col items-center justify-center p-4 rounded-xl z-10">
+                    <div class="text-lg font-bold mb-2 text-gray-700">快輸入驗證碼！</div>
+                    <div id="captcha-code" class="bg-gray-200 px-4 py-2 rounded text-2xl font-mono tracking-widest mb-3 select-none line-through decoration-wavy decoration-red-400">886</div>
+                    <div class="flex gap-2 w-full">
+                        <input type="tel" id="captcha-input" class="border-2 border-gray-300 rounded-lg px-3 py-2 text-center text-xl w-full focus:border-blue-500 focus:outline-none" placeholder="輸入上面數字" maxlength="4" autocomplete="off">
+                        <button id="btn-submit-captcha" class="bg-green-600 text-white px-4 py-2 rounded-lg font-bold hover:bg-green-700 whitespace-nowrap">送出</button>
+                    </div>
+                </div>
+
+                <!-- Result Overlay (Hidden) -->
+                <div id="result-overlay" class="hidden absolute inset-0 bg-white/95 flex flex-col items-center justify-center p-4 rounded-xl z-20 text-center">
+                    <div id="result-icon" class="text-6xl mb-2">🎉</div>
+                    <h3 id="result-title" class="text-2xl font-bold mb-1">搶票成功！</h3>
+                    <p id="result-desc" class="text-gray-600 mb-4">總耗時: 0.45秒</p>
+                    <button id="btn-retry" class="bg-gray-800 text-white px-6 py-2 rounded-full hover:bg-gray-900 transition">再試一次</button>
+                </div>
+            </div>
+
+            <!-- Stats -->
+            <div class="w-full grid grid-cols-2 gap-4 text-center text-sm">
+                <div class="bg-orange-50 p-2 rounded-lg">
+                    <div class="text-gray-500">最佳紀錄</div>
+                    <div id="best-score" class="font-bold text-orange-600 text-lg">--</div>
+                </div>
+                <div class="bg-blue-50 p-2 rounded-lg">
+                    <div class="text-gray-500">成功次數</div>
+                    <div id="success-count" class="font-bold text-blue-600 text-lg">0</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tips -->
+        <div class="bg-gray-100 p-4 text-xs text-gray-500 border-t border-gray-200">
+            <h4 class="font-bold mb-1">💡 搶票小撇步：</h4>
+            <ul class="list-disc list-inside space-y-1">
+                <li>真正的戰場在 00:00:00.000</li>
+                <li>此工具模擬網路延遲與伺服器繁忙</li>
+                <li>驗證碼通常是 4-5 位數字，看清楚再打！</li>
+            </ul>
+        </div>
+    </div>
+
+    <footer class="mt-8 text-center text-gray-400 text-xs">
+        <p>Created by AI Agent on 2026-02-08</p>
+        <p class="mt-1">此工具僅供娛樂與練習，與實際訂票系統無關</p>
+    </footer>
+
+    <script>
+        // DOM Elements
+        const els = {
+            btnStart: document.getElementById('btn-start'),
+            btnBook: document.getElementById('btn-book'),
+            btnSubmitCaptcha: document.getElementById('btn-submit-captcha'),
+            btnRetry: document.getElementById('btn-retry'),
+            captchaInput: document.getElementById('captcha-input'),
+            captchaArea: document.getElementById('captcha-area'),
+            captchaCode: document.getElementById('captcha-code'),
+            resultOverlay: document.getElementById('result-overlay'),
+            resultIcon: document.getElementById('result-icon'),
+            resultTitle: document.getElementById('result-title'),
+            resultDesc: document.getElementById('result-desc'),
+            countdown: document.getElementById('countdown'),
+            msDisplay: document.getElementById('ms-display'),
+            actionArea: document.getElementById('action-area'),
+            bestScore: document.getElementById('best-score'),
+            successCount: document.getElementById('success-count')
+        };
+
+        // State
+        let state = {
+            timerId: null,
+            targetTime: 0,
+            isBookingOpen: false,
+            reactionStart: 0,
+            bestTime: Infinity,
+            successes: 0,
+            currentCaptcha: ''
+        };
+
+        // Sounds (Simple oscillators if needed, but keeping it silent for web simplicity)
+        // Could add AudioContext later.
+
+        // Init
+        els.btnStart.addEventListener('click', startGame);
+        els.btnBook.addEventListener('click', onBookClick);
+        els.btnSubmitCaptcha.addEventListener('click', onSubmitCaptcha);
+        els.btnRetry.addEventListener('click', resetGame);
+        els.captchaInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') onSubmitCaptcha();
+        });
+
+        function generateCaptcha() {
+            return Math.floor(1000 + Math.random() * 9000).toString();
+        }
+
+        function resetGame() {
+            els.resultOverlay.classList.add('hidden');
+            els.captchaArea.classList.add('hidden');
+            els.btnBook.classList.add('hidden');
+            els.btnStart.classList.remove('hidden');
+            els.countdown.innerText = "00:00:00";
+            els.msDisplay.innerText = ".000";
+            els.countdown.classList.remove('text-red-600', 'blink');
+            els.actionArea.classList.remove('border-red-500', 'shake');
+            state.isBookingOpen = false;
+        }
+
+        function startGame() {
+            els.btnStart.classList.add('hidden');
+            els.btnBook.classList.remove('hidden');
+            els.btnBook.disabled = true;
+            els.btnBook.classList.remove('bg-green-600', 'hover:bg-green-700');
+            els.btnBook.classList.add('bg-gray-400', 'cursor-not-allowed');
+            els.btnBook.innerText = "等待開放...";
+
+            // Random delay between 3 to 6 seconds
+            const delay = 3000 + Math.random() * 3000;
+            state.targetTime = Date.now() + delay;
+            
+            // Start loop
+            updateTimer();
+        }
+
+        function updateTimer() {
+            const now = Date.now();
+            const diff = state.targetTime - now;
+
+            if (diff <= 0) {
+                // Time's up! Open booking
+                els.countdown.innerText = "00:00:00";
+                els.msDisplay.innerText = ".000";
+                openBooking();
+                return;
+            }
+
+            // Format time
+            const seconds = Math.floor(diff / 1000);
+            const ms = diff % 1000;
+            
+            els.countdown.innerText = `00:00:${seconds.toString().padStart(2, '0')}`;
+            els.msDisplay.innerText = `.${ms.toString().padStart(3, '0')}`;
+            
+            // Visual cue when close
+            if (diff < 1000) {
+                els.countdown.classList.add('text-red-600');
+            }
+
+            requestAnimationFrame(updateTimer);
+        }
+
+        function openBooking() {
+            state.isBookingOpen = true;
+            state.reactionStart = Date.now();
+            
+            els.countdown.classList.add('blink');
+            els.btnBook.disabled = false;
+            els.btnBook.classList.remove('bg-gray-400', 'cursor-not-allowed');
+            els.btnBook.classList.add('bg-green-600', 'hover:bg-green-700', 'transform', 'scale-110'); // Pop effect
+            els.btnBook.innerText = "立即訂票！";
+            
+            // Add vibration if supported
+            if (navigator.vibrate) navigator.vibrate(50);
+        }
+
+        function onBookClick() {
+            if (!state.isBookingOpen) {
+                // False start! Penalty?
+                return; // Disabled button handles this mostly
+            }
+            
+            // Show Captcha immediately
+            const reactionTime = Date.now() - state.reactionStart;
+            console.log("Reaction:", reactionTime);
+            
+            state.currentCaptcha = generateCaptcha();
+            els.captchaCode.innerText = state.currentCaptcha;
+            els.captchaInput.value = '';
+            els.captchaArea.classList.remove('hidden');
+            els.captchaInput.focus();
+        }
+
+        function onSubmitCaptcha() {
+            const input = els.captchaInput.value;
+            const now = Date.now();
+            const totalTime = (now - state.reactionStart) / 1000;
+
+            if (input === state.currentCaptcha) {
+                // Success
+                showResult(true, totalTime);
+            } else {
+                // Fail - Wrong Captcha
+                showResult(false, totalTime, "驗證碼錯誤！");
+                els.actionArea.classList.add('shake');
+                setTimeout(() => els.actionArea.classList.remove('shake'), 500);
+            }
+        }
+
+        function showResult(success, time, errorMsg) {
+            els.resultOverlay.classList.remove('hidden');
+            
+            if (success) {
+                let rank = "路人";
+                if (time < 1.5) rank = "高手";
+                if (time < 1.0) rank = "神手";
+                if (time < 0.8) rank = "外掛";
+
+                els.resultIcon.innerText = "🎉";
+                els.resultTitle.innerText = "搶票成功！";
+                els.resultTitle.className = "text-2xl font-bold mb-1 text-green-600";
+                els.resultDesc.innerHTML = `總耗時: <span class="font-bold text-xl">${time.toFixed(3)}s</span><br><span class="text-sm text-gray-500">等級: ${rank}</span>`;
+                
+                // Update stats
+                state.successes++;
+                els.successCount.innerText = state.successes;
+                if (time < state.bestTime) {
+                    state.bestTime = time;
+                    els.bestScore.innerText = time.toFixed(3) + "s";
+                }
+            } else {
+                els.resultIcon.innerText = "😭";
+                els.resultTitle.innerText = "搶票失敗";
+                els.resultTitle.className = "text-2xl font-bold mb-1 text-red-600";
+                els.resultDesc.innerText = errorMsg || "手速太慢，票被搶光了！";
+            }
+        }
+    </script>
+</body>
+</html>
