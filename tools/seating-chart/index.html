@@ -51,8 +51,8 @@
             
             body.print-list .venue-container { display: none !important; }
             body.print-list #list-view-container { display: block !important; width: 100% !important; height: auto !important; overflow: visible !important; }
-            body.print-list .list-grid { display: grid !important; grid-template-columns: 1fr 1fr 1fr; gap: 20px; }
-            body.print-list .list-card { break-inside: avoid; border: 1px solid #ddd; box-shadow: none; }
+            body.print-list .list-grid { display: flex !important; flex-wrap: wrap !important; gap: 20px !important; }
+            body.print-list .list-card { break-inside: avoid; border: 1px solid #ddd; box-shadow: none; width: 30% !important; min-width: 200px; }
 
             header, aside { display: none !important; }
         }
