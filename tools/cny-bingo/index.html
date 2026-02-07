@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>過年長輩問候語 Bingo | CNY Relative Cliché Bingo</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Noto Sans TC', sans-serif; background-color: #8b0000; color: #fff; }
+        .bingo-tile { aspect-ratio: 1 / 1; transition: all 0.3s; cursor: pointer; }
+        .bingo-tile.marked { background-color: #ffd700 !important; color: #8b0000 !important; transform: scale(0.95); font-weight: bold; }
+        .festive-border { border: 4px solid #ffd700; }
+        [x-cloak] { display: none !important; }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col items-center py-8 px-4" x-data="bingoApp()">
+
+    <!-- Header -->
+    <header class="text-center mb-8">
+        <h1 class="text-3xl font-bold text-yellow-400 mb-2">🧧 過年長輩問候 Bingo</h1>
+        <p class="text-yellow-200 text-sm">聚餐必備！聽到哪句點哪句，連成線就贏了！</p>
+    </header>
+
+    <!-- Bingo Grid -->
+    <div class="w-full max-w-md bg-red-900 p-4 rounded-xl festive-border shadow-2xl">
+        <div class="grid grid-cols-4 gap-2">
+            <template x-for="(item, index) in board" :key="index">
+                <div class="bingo-tile bg-red-800 border border-red-700 rounded-lg flex items-center justify-center p-2 text-center text-[10px] md:text-xs leading-tight shadow-inner"
+                     :class="{'marked': marked.includes(index)}"
+                     @click="toggleMark(index)">
+                    <span x-text="item"></span>
+                </div>
+            </template>
+        </div>
+    </div>
+
+    <!-- Win Message -->
+    <div x-show="isWinner" x-transition x-cloak class="mt-6 p-4 bg-yellow-400 text-red-900 font-bold rounded-lg animate-bounce text-center w-full max-w-md">
+        🎊 恭喜！你達成 BINGO 了！ 🎊<br>
+        看來你今年深受長輩「關愛」呢！
+    </div>
+
+    <!-- Controls -->
+    <div class="mt-8 flex flex-col gap-4 w-full max-w-md">
+        <button @click="resetBoard()" class="bg-yellow-500 hover:bg-yellow-400 text-red-900 font-bold py-3 rounded-full transition transform active:scale-95 shadow-lg">
+            換一張新的卡片
+        </button>
+        <button @click="share()" class="bg-red-700 hover:bg-red-600 text-white font-bold py-2 rounded-full border border-red-500 text-sm transition">
+            分享給正在受難的朋友
+        </button>
+    </div>
+
+    <!-- Footer -->
+    <footer class="mt-12 text-yellow-500/50 text-[10px] text-center">
+        僅供過年娛樂，請以家庭和諧為準 | Simon's AI Bot 祝您新年快樂
+    </footer>
+
+    <script>
+        function bingoApp() {
+            const phrases = [
+                "什麼時候結婚？", "薪水領多少？", "買房了嗎？", "怎麼不吃多點？",
+                "小時候我抱過你", "年終領幾個月？", "有沒有對象？", "工作穩不穩定？",
+                "怎麼還不生小孩？", "那個誰家小孩...", "要多跟長輩學習", "現在景氣不好喔",
+                "不要一直玩手機", "這個好吃多吃點", "變漂亮/帥了喔", "現在哪裡上班？",
+                "考不考慮考公務員？", "什麼時候回來的？", "明年什麼時候放假？", "現在大學好考嗎？",
+                "這是我的一點心意", "恭喜發財紅包拿來", "聽說你在做AI？", "幫我修個電腦...",
+                "年紀不小了喔", "要有儲蓄習慣", "身體要顧好", "什麼時候買車？"
+            ];
+
+            return {
+                board: [],
+                marked: [],
+                isWinner: false,
+
+                init() {
+                    this.resetBoard();
+                },
+
+                resetBoard() {
+                    // Shuffle and pick 16
+                    const shuffled = [...phrases].sort(() => 0.5 - Math.random());
+                    this.board = shuffled.slice(0, 16);
+                    this.marked = [];
+                    this.isWinner = false;
+                },
+
+                toggleMark(index) {
+                    if (this.marked.includes(index)) {
+                        this.marked = this.marked.filter(i => i !== index);
+                    } else {
+                        this.marked.push(index);
+                    }
+                    this.checkWin();
+                },
+
+                checkWin() {
+                    const size = 4;
+                    const winningLines = [
+                        // Rows
+                        [0, 1, 2, 3], [4, 5, 6, 7], [8, 9, 10, 11], [12, 13, 14, 15],
+                        // Cols
+                        [0, 4, 8, 12], [1, 5, 9, 13], [2, 6, 10, 14], [3, 7, 11, 15],
+                        // Diagonals
+                        [0, 5, 10, 15], [3, 6, 9, 12]
+                    ];
+
+                    this.isWinner = winningLines.some(line => 
+                        line.every(idx => this.marked.includes(index => index === idx || index.toString() === idx.toString()))
+                    );
+                    
+                    // Fixed logic for win check
+                    this.isWinner = winningLines.some(line => 
+                        line.every(idx => this.marked.includes(idx))
+                    );
+                },
+
+                share() {
+                    const text = "我正在玩過年長輩問候 Bingo，快救我！";
+                    if (navigator.share) {
+                        navigator.share({ title: '過年 Bingo', text: text, url: window.location.href });
+                    } else {
+                        alert("複製連結給朋友： " + window.location.href);
+                    }
+                }
+            }
+        }
+    </script>
+</body>
+</html>
