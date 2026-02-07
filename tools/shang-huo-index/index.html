@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>台灣人上火指數計算機 | Shang Huo Calculator</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Noto Sans TC', sans-serif; background-color: #fef2f2; } /* Red tint background */
+        .card-select { transition: all 0.2s; cursor: pointer; border: 2px solid transparent; }
+        .card-select:hover { transform: translateY(-2px); box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06); }
+        .card-select.selected { border-color: #ef4444; background-color: #fee2e2; }
+        .emoji-spin { animation: spin 1s linear infinite; }
+        @keyframes spin { 100% { transform: rotate(360deg); } }
+        /* Flame animation for result */
+        .flame { animation: flicker 1s infinite alternate; }
+        @keyframes flicker { 0% { opacity: 0.8; transform: scale(1); } 100% { opacity: 1; transform: scale(1.1); } }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col text-stone-800">
+
+    <!-- Navbar -->
+    <nav class="bg-white border-b border-red-100 sticky top-0 z-50">
+        <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <a href="../../index.html" class="flex items-center text-stone-600 hover:text-red-600 transition-colors font-medium">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z" clip-rule="evenodd" />
+                    </svg>
+                    回工具首頁
+                </a>
+                <span class="text-sm text-red-400 font-bold">Daily Taiwan Tools</span>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="flex-grow max-w-3xl mx-auto px-4 py-8 w-full">
+        
+        <div class="text-center mb-10">
+            <h1 class="text-3xl md:text-4xl font-bold text-red-800 mb-3">🔥 台灣人上火指數計算機</h1>
+            <p class="text-stone-600 text-lg">最近覺得口乾舌燥、心情煩躁嗎？<br>選出你這兩天做過的事情，AI 幫你診斷火氣有多大。</p>
+        </div>
+
+        <div id="quiz-section">
+            <div class="grid grid-cols-2 md:grid-cols-3 gap-4 mb-8" id="options-grid">
+                <!-- Options will be injected by JS -->
+            </div>
+
+            <div class="text-center">
+                <button id="calc-btn" class="bg-red-600 hover:bg-red-700 text-white font-bold py-4 px-8 rounded-full text-xl shadow-lg transform transition hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed">
+                    🔥 開始診斷火氣 🔥
+                </button>
+            </div>
+        </div>
+
+        <!-- Result Section (Hidden) -->
+        <div id="result-section" class="hidden animate-fade-in mt-8 bg-white rounded-2xl shadow-xl border-4 border-red-100 overflow-hidden">
+            <div class="p-8 text-center">
+                <div id="result-emoji" class="text-6xl mb-4 flame">🌡️</div>
+                <h2 class="text-2xl font-bold text-stone-800 mb-2">你的上火指數：<span id="result-score" class="text-4xl text-red-600 font-black">0</span> 分</h2>
+                <h3 id="result-title" class="text-xl font-bold text-red-500 mb-4">診斷結果...</h3>
+                
+                <div class="bg-red-50 rounded-xl p-6 mb-6 text-left">
+                    <p class="mb-2 font-bold text-red-800">🩺 症狀分析：</p>
+                    <p id="result-desc" class="text-stone-700 mb-4">...</p>
+                    
+                    <p class="mb-2 font-bold text-green-700">💊 降火良方：</p>
+                    <p id="result-fix" class="text-stone-700 font-medium">...</p>
+                </div>
+
+                <button onclick="resetQuiz()" class="text-stone-500 hover:text-stone-800 font-medium underline decoration-2 decoration-stone-300 underline-offset-4">
+                    🔄 重新測量
+                </button>
+            </div>
+            
+            <!-- Share Section -->
+            <div class="bg-stone-50 p-4 border-t border-stone-100 text-center">
+                <p class="text-sm text-stone-500 mb-2">覺得準嗎？分享給朋友看看誰火氣最大！</p>
+                <!-- Simplified share buttons could go here -->
+            </div>
+        </div>
+
+    </main>
+
+    <footer class="bg-white border-t border-stone-200 py-6 text-center text-sm text-stone-400 mt-auto">
+        <p>Created by AI Agent on 2026-02-07</p>
+        <p class="mt-1">僅供娛樂，身體不適請務必就醫。</p>
+    </footer>
+
+    <script>
+        const items = [
+            { id: 1, text: "吃炸雞/鹹酥雞", points: 3, emoji: "🍗" },
+            { id: 2, text: "吃麻辣鍋/薑母鴨", points: 4, emoji: "🌶️" },
+            { id: 3, text: "熬夜超過 2 點", points: 4, emoji: "🦉" },
+            { id: 4, text: "喝全糖手搖飲", points: 2, emoji: "🥤" },
+            { id: 5, text: "吃榴槤/荔枝/龍眼", points: 3, emoji: "🍈" },
+            { id: 6, text: "跟老闆/客戶吵架", points: 5, emoji: "🤬" },
+            { id: 7, text: "路上遇到三寶", points: 3, emoji: "🛵" },
+            { id: 8, text: "看政論節目/新聞", points: 2, emoji: "📺" },
+            { id: 9, text: "吃花生/堅果/瓜子", points: 2, emoji: "🥜" },
+            { id: 10, text: "忘記帶傘/淋雨", points: 2, emoji: "🌧️" },
+            { id: 11, text: "收到紅色炸彈", points: 3, emoji: "🧧" },
+            { id: 12, text: "搶不到演唱會票", points: 4, emoji: "🎫" },
+        ];
+
+        const results = [
+            { min: 0, max: 5, title: "🧊 心平氣和 (Zen Master)", desc: "你是修身養性的典範，體內陰陽調和，處於一個極度Peace的狀態。", fix: "繼續保持，偶爾可以喝杯溫開水養生。", emoji: "😌" },
+            { min: 6, max: 12, title: "🌡️ 微熱山丘 (Slightly Warm)", desc: "有點小火氣喔！可能最近太放縱口腹之慾，或是工作壓力稍大。", fix: "來杯青草茶、菊花茶，或是早點睡覺即可緩解。", emoji: "😓" },
+            { min: 13, max: 20, title: "🔥 火冒三丈 (Furious)", desc: "你的火氣已經大到可以煎蛋了！這幾天是不是諸事不順？嘴破、長痘痘風險極高。", fix: "立刻停止吃炸物！建議食用綠豆湯、苦瓜排骨湯，並強迫自己睡滿8小時。", emoji: "😡" },
+            { min: 21, max: 999, title: "🌋 原子彈爆發 (Nuclear Meltdown)", desc: "生人勿近！你現在就是一顆行走的未爆彈，隨時可能因為一句話而爆炸。", fix: "看醫生！或是直接請假飛去南極冷靜一下。現在、立刻、馬上！", emoji: "🤯" }
+        ];
+
+        let selectedItems = new Set();
+
+        function init() {
+            const grid = document.getElementById('options-grid');
+            grid.innerHTML = items.map(item => `
+                <div class="card-select bg-white p-4 rounded-xl shadow-sm flex flex-col items-center justify-center text-center h-32" onclick="toggleItem(this, ${item.id})">
+                    <div class="text-4xl mb-2">${item.emoji}</div>
+                    <div class="font-medium text-stone-700 text-sm md:text-base">${item.text}</div>
+                    <div class="text-xs text-red-300 mt-1 font-mono">+${item.points} 🔥</div>
+                </div>
+            `).join('');
+
+            document.getElementById('calc-btn').addEventListener('click', calculate);
+        }
+
+        function toggleItem(el, id) {
+            if (selectedItems.has(id)) {
+                selectedItems.delete(id);
+                el.classList.remove('selected');
+            } else {
+                selectedItems.add(id);
+                el.classList.add('selected');
+            }
+        }
+
+        function calculate() {
+            let totalPoints = 0;
+            selectedItems.forEach(id => {
+                const item = items.find(i => i.id === id);
+                if (item) totalPoints += item.points;
+            });
+
+            // Find result level
+            const result = results.find(r => totalPoints >= r.min && totalPoints <= r.max);
+
+            // Update UI
+            document.getElementById('quiz-section').classList.add('hidden');
+            const resultSection = document.getElementById('result-section');
+            resultSection.classList.remove('hidden');
+
+            document.getElementById('result-score').innerText = totalPoints;
+            document.getElementById('result-title').innerText = result.title;
+            document.getElementById('result-desc').innerText = result.desc;
+            document.getElementById('result-fix').innerText = result.fix;
+            document.getElementById('result-emoji').innerText = result.emoji;
+
+            // Scroll to result
+            resultSection.scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function resetQuiz() {
+            selectedItems.clear();
+            document.querySelectorAll('.card-select').forEach(el => el.classList.remove('selected'));
+            document.getElementById('quiz-section').classList.remove('hidden');
+            document.getElementById('result-section').classList.add('hidden');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        init();
+    </script>
+</body>
+</html>
