@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>薪水雞排指數計算機 🍗 | 台灣日常工具</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Noto Sans TC', sans-serif; background-color: #fffbeb; }
+        .jipai-bg { background-image: radial-gradient(#fcd34d 1px, transparent 1px); background-size: 20px 20px; }
+        .float-jipai { animation: float 3s ease-in-out infinite; }
+        @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+        .oil-drop { animation: drop 2s infinite; }
+        @keyframes drop { 0% { transform: translateY(0); opacity: 1; } 100% { transform: translateY(20px); opacity: 0; } }
+    </style>
+</head>
+<body class="jipai-bg min-h-screen flex flex-col items-center text-stone-800">
+
+    <!-- Header -->
+    <div class="w-full bg-amber-500 text-white p-4 shadow-lg sticky top-0 z-50">
+        <div class="max-w-2xl mx-auto flex justify-between items-center">
+            <a href="../../index.html" class="flex items-center gap-2 hover:bg-amber-600 px-3 py-1 rounded transition">
+                <span>🏠</span>
+                <span class="font-bold">回首頁</span>
+            </a>
+            <h1 class="text-lg font-bold tracking-wider">薪水雞排指數計算機 🍗</h1>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <main class="flex-grow w-full max-w-2xl p-4 md:p-8 space-y-6">
+        
+        <!-- Intro Card -->
+        <div class="bg-white rounded-2xl shadow-xl p-6 border-b-4 border-amber-500 text-center relative overflow-hidden">
+            <div class="absolute top-[-20px] left-[-20px] text-9xl opacity-10 select-none">🍗</div>
+            <div class="absolute bottom-[-20px] right-[-20px] text-9xl opacity-10 select-none">💸</div>
+            
+            <h2 class="text-2xl md:text-3xl font-black text-amber-600 mb-2 relative z-10">
+                你的時薪值幾片雞排？
+            </h2>
+            <p class="text-stone-500 font-medium relative z-10">
+                在這個物價飛漲的年代，<br>用最台的方式衡量你的購買力！
+            </p>
+        </div>
+
+        <!-- Calculator Form -->
+        <div class="bg-white rounded-2xl shadow-lg p-6 space-y-6">
+            
+            <!-- Salary Input -->
+            <div class="space-y-2">
+                <label class="block text-sm font-bold text-stone-600">💰 月薪 (TWD)</label>
+                <div class="relative">
+                    <span class="absolute left-4 top-3 text-stone-400">$</span>
+                    <input type="number" id="salary" value="35000" placeholder="例如：45000" 
+                        class="w-full pl-8 pr-4 py-3 bg-stone-50 border-2 border-stone-200 rounded-xl focus:outline-none focus:border-amber-500 focus:bg-white transition text-lg font-bold text-stone-800 shadow-inner">
+                </div>
+            </div>
+
+            <!-- Working Stats Grid -->
+            <div class="grid grid-cols-2 gap-4">
+                <div class="space-y-2">
+                    <label class="block text-sm font-bold text-stone-600">📅 每月工作天數</label>
+                    <input type="number" id="days" value="22" 
+                        class="w-full px-4 py-3 bg-stone-50 border-2 border-stone-200 rounded-xl focus:outline-none focus:border-amber-500 focus:bg-white transition font-bold text-stone-800 text-center">
+                </div>
+                <div class="space-y-2">
+                    <label class="block text-sm font-bold text-stone-600">⏰ 每日工時</label>
+                    <input type="number" id="hours" value="8" 
+                        class="w-full px-4 py-3 bg-stone-50 border-2 border-stone-200 rounded-xl focus:outline-none focus:border-amber-500 focus:bg-white transition font-bold text-stone-800 text-center">
+                </div>
+            </div>
+
+            <!-- Jipai Price Config -->
+            <div class="bg-amber-50 rounded-xl p-4 border border-amber-100">
+                <div class="flex justify-between items-end mb-2">
+                    <label class="block text-sm font-bold text-amber-800">🍗 雞排價格 (TWD)</label>
+                    <span class="text-xs text-amber-600 bg-amber-200 px-2 py-1 rounded-full">現在約 $90-$110</span>
+                </div>
+                
+                <input type="range" id="priceRange" min="30" max="150" value="100" step="5" class="w-full h-2 bg-amber-200 rounded-lg appearance-none cursor-pointer accent-amber-600 mb-4">
+                
+                <div class="flex justify-between items-center">
+                    <div class="relative w-24">
+                        <span class="absolute left-3 top-2 text-stone-400 text-sm">$</span>
+                        <input type="number" id="priceInput" value="100" class="w-full pl-6 pr-2 py-1.5 rounded-lg border border-amber-300 text-center font-bold text-amber-800 focus:outline-none focus:ring-2 focus:ring-amber-500">
+                    </div>
+                    
+                    <!-- Time Machine Buttons -->
+                    <div class="flex gap-2 text-xs">
+                        <button onclick="setPrice(35)" class="px-2 py-1 bg-white border border-stone-200 rounded hover:bg-stone-100 text-stone-500 transition" title="2000年左右">🦖 2000年 ($35)</button>
+                        <button onclick="setPrice(65)" class="px-2 py-1 bg-white border border-stone-200 rounded hover:bg-stone-100 text-stone-500 transition" title="2015年左右">🕰️ 2015年 ($65)</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Action Button -->
+            <button onclick="calculate()" class="w-full bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 text-white text-xl font-black py-4 rounded-xl shadow-lg transform active:scale-95 transition-all flex justify-center items-center gap-2">
+                <span>🔥 開始換算</span>
+                <span class="animate-bounce">🍗</span>
+            </button>
+
+        </div>
+
+        <!-- Result Section (Hidden initially) -->
+        <div id="result" class="hidden space-y-6 animate-fade-in-up">
+            
+            <!-- Key Metrics -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <!-- Hourly Wage -->
+                <div class="bg-white p-4 rounded-xl shadow border-l-4 border-blue-500">
+                    <p class="text-sm text-stone-500 font-bold mb-1">你的時薪 (Real Wage)</p>
+                    <p class="text-3xl font-black text-stone-800">$<span id="hourlyWage">0</span></p>
+                </div>
+                
+                <!-- Time to Earn -->
+                <div class="bg-white p-4 rounded-xl shadow border-l-4 border-red-500">
+                    <p class="text-sm text-stone-500 font-bold mb-1">賺一塊雞排要...</p>
+                    <p class="text-3xl font-black text-red-600"><span id="workMinutes">0</span> <span class="text-base font-medium text-stone-400">分鐘</span></p>
+                </div>
+            </div>
+
+            <!-- The Big Number -->
+            <div class="bg-stone-900 text-amber-400 p-8 rounded-2xl shadow-2xl text-center relative overflow-hidden">
+                <div class="relative z-10">
+                    <p class="text-stone-400 font-bold uppercase tracking-widest text-sm mb-2">J.P.H. (Jipai Per Hour)</p>
+                    <div class="text-6xl md:text-7xl font-black leading-none mb-4 font-mono">
+                        <span id="jph">0.00</span>
+                        <span class="text-2xl text-stone-500">片/hr</span>
+                    </div>
+                    <div id="verdict" class="inline-block px-4 py-1 bg-amber-500 text-stone-900 font-bold rounded-full text-sm md:text-base animate-pulse">
+                        評語載入中...
+                    </div>
+                </div>
+                
+                <!-- Background visual noise -->
+                <div class="absolute inset-0 opacity-10 bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0IiBoZWlnaHQ9IjQiPgo8cmVjdCB3aWR0aD0iNCIgaGVpZ2h0PSI0IiBmaWxsPSIjZmZmIi8+CjxyZWN0IHdpZHRoPSIxIiBoZWlnaHQ9IjEiIGZpbGw9IiMwMDAiLz4KPC9zdmc+')]"></div>
+            </div>
+
+            <!-- Visualization -->
+            <div class="bg-white p-6 rounded-xl shadow text-center">
+                <h3 class="text-stone-500 font-bold mb-4">一小時的工作成果：</h3>
+                <div id="visualStack" class="flex flex-wrap justify-center gap-2 min-h-[60px]">
+                    <!-- Icons injected here -->
+                </div>
+            </div>
+
+            <!-- Share / Warning -->
+            <p class="text-center text-xs text-stone-400 mt-4">
+                *計算公式：月薪 ÷ (天數 × 工時) ÷ 雞排單價<br>
+                *本工具純屬娛樂，如有心痛請儘速購買雞排壓驚
+            </p>
+        </div>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="w-full bg-stone-100 py-6 text-center text-stone-400 text-sm mt-8">
+        <p>Created by AI Agent on <span id="currentDate"></span></p>
+        <p class="mt-1 opacity-50">Powered by 💸 Inflation & 🍗 Oil</p>
+    </footer>
+
+    <script>
+        // Init Date
+        document.getElementById('currentDate').innerText = new Date().toISOString().split('T')[0];
+
+        // Sync Range and Input
+        const range = document.getElementById('priceRange');
+        const input = document.getElementById('priceInput');
+
+        range.addEventListener('input', (e) => input.value = e.target.value);
+        input.addEventListener('input', (e) => range.value = e.target.value);
+
+        function setPrice(p) {
+            range.value = p;
+            input.value = p;
+            // Add subtle highlight effect
+            input.classList.add('bg-yellow-100');
+            setTimeout(() => input.classList.remove('bg-yellow-100'), 300);
+        }
+
+        function calculate() {
+            // Get values
+            const salary = parseFloat(document.getElementById('salary').value);
+            const days = parseFloat(document.getElementById('days').value);
+            const hours = parseFloat(document.getElementById('hours').value);
+            const price = parseFloat(document.getElementById('priceInput').value);
+
+            if (!salary || !days || !hours || !price) {
+                alert("請填寫所有欄位！老闆不會因為你算不出來就加薪！");
+                return;
+            }
+
+            // Calc
+            const totalHours = days * hours;
+            const hourlyWage = salary / totalHours;
+            const jph = hourlyWage / price;
+            const minutesPerJipai = (price / hourlyWage) * 60;
+
+            // Render
+            document.getElementById('hourlyWage').innerText = Math.round(hourlyWage);
+            document.getElementById('jph').innerText = jph.toFixed(2);
+            document.getElementById('workMinutes').innerText = Math.round(minutesPerJipai);
+
+            // Verdict Logic
+            const verdictEl = document.getElementById('verdict');
+            let verdict = "";
+            let colorClass = "bg-gray-500";
+
+            if (jph < 1) {
+                verdict = "😭 雞排奴隸：連一塊都買不起...";
+                colorClass = "bg-stone-600 text-white";
+            } else if (jph < 1.5) {
+                verdict = "😐 勉強溫飽：工作一小時，換來一塊肉";
+                colorClass = "bg-blue-500 text-white";
+            } else if (jph < 2.5) {
+                verdict = "🙂 小康階級：可以加辣，不用切";
+                colorClass = "bg-green-500 text-white";
+            } else if (jph < 4) {
+                verdict = "😎 雞排自由：想吃就吃，不用看價錢";
+                colorClass = "bg-amber-500 text-stone-900";
+            } else {
+                verdict = "👑 炸油大亨：請全辦公室吃都不心疼！";
+                colorClass = "bg-yellow-400 text-stone-900";
+            }
+            
+            verdictEl.innerText = verdict;
+            verdictEl.className = `inline-block px-4 py-2 font-bold rounded-full text-sm md:text-base shadow-lg ${colorClass}`;
+
+            // Visual Stack
+            const visualStack = document.getElementById('visualStack');
+            visualStack.innerHTML = '';
+            
+            const whole = Math.floor(jph);
+            const fraction = jph - whole;
+
+            // Render whole chickens
+            for(let i=0; i<Math.min(whole, 50); i++) {
+                const el = document.createElement('div');
+                el.className = 'text-4xl float-jipai cursor-help transition hover:scale-125';
+                el.innerText = '🍗';
+                el.title = '一整塊香噴噴的雞排';
+                el.style.animationDelay = `${i * 0.1}s`;
+                visualStack.appendChild(el);
+            }
+
+            // Render fraction (bone)
+            if (fraction > 0) {
+                const el = document.createElement('div');
+                el.className = 'text-4xl opacity-50 grayscale';
+                el.innerText = '🦴';
+                el.title = `剩下的 ${Math.round(fraction*100)}%`;
+                visualStack.appendChild(el);
+            }
+            
+            if (whole > 50) {
+                const more = document.createElement('span');
+                more.innerText = `...還有 ${whole-50} 塊堆不下了`;
+                more.className = 'text-xs text-stone-400 self-center';
+                visualStack.appendChild(more);
+            }
+
+            // Show result
+            document.getElementById('result').classList.remove('hidden');
+            
+            // Scroll to result
+            setTimeout(() => {
+                document.getElementById('result').scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }, 100);
+        }
+    </script>
+</body>
+</html>
