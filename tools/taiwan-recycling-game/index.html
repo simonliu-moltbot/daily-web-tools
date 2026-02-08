@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>台灣回收大考驗 | Taiwan Recycling Master</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body { font-family: 'Noto Sans TC', sans-serif; touch-action: manipulation; }
+        .glass {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        .item-card {
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            animation: popIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        @keyframes popIn {
+            0% { transform: scale(0.5) opacity(0); }
+            100% { transform: scale(1) opacity(1); }
+        }
+        .shake { animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both; }
+        @keyframes shake {
+            10%, 90% { transform: translate3d(-2px, 0, 0); }
+            20%, 80% { transform: translate3d(4px, 0, 0); }
+            30%, 50%, 70% { transform: translate3d(-6px, 0, 0); }
+            40%, 60% { transform: translate3d(6px, 0, 0); }
+        }
+        /* Mobile-friendly specific adjustments */
+        .btn-press:active { transform: scale(0.95); }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-gray-900 via-blue-900 to-black min-h-screen text-white flex flex-col items-center overflow-hidden relative">
+
+    <!-- Background Decoration -->
+    <div class="absolute top-0 left-0 w-full h-full overflow-hidden z-0 pointer-events-none">
+        <div class="absolute top-10 left-10 w-64 h-64 bg-yellow-400 rounded-full mix-blend-multiply filter blur-3xl opacity-10 animate-blob"></div>
+        <div class="absolute top-10 right-10 w-64 h-64 bg-purple-400 rounded-full mix-blend-multiply filter blur-3xl opacity-10 animate-blob animation-delay-2000"></div>
+        <div class="absolute -bottom-8 left-20 w-64 h-64 bg-pink-400 rounded-full mix-blend-multiply filter blur-3xl opacity-10 animate-blob animation-delay-4000"></div>
+    </div>
+
+    <!-- UI Layer -->
+    <div id="app" class="z-10 w-full max-w-md h-screen flex flex-col p-4 relative">
+        
+        <!-- Header -->
+        <header class="flex justify-between items-center mb-4">
+            <a href="../../index.html" class="glass px-3 py-1 rounded-full text-xs hover:bg-white/20 transition">
+                <i class="fas fa-home mr-1"></i>回首頁
+            </a>
+            <div class="flex items-center space-x-2">
+                <span class="text-xs bg-red-500/80 px-2 py-1 rounded">剩餘時間: <span class="font-mono text-lg font-bold" id="timer">60</span>s</span>
+                <span class="text-xs bg-green-500/80 px-2 py-1 rounded">分數: <span class="font-mono text-lg font-bold" id="score">0</span></span>
+            </div>
+        </header>
+
+        <!-- Game Area -->
+        <main class="flex-grow flex flex-col justify-center items-center relative" id="game-container">
+            
+            <!-- Start Screen -->
+            <div id="start-screen" class="absolute inset-0 flex flex-col justify-center items-center bg-black/80 z-50 text-center p-6 backdrop-blur-md">
+                <div class="text-6xl mb-4">♻️</div>
+                <h1 class="text-3xl font-black mb-2 text-transparent bg-clip-text bg-gradient-to-r from-green-400 to-blue-500">台灣回收大考驗</h1>
+                <p class="text-gray-300 mb-8 text-sm leading-relaxed">
+                    這裡不是一般垃圾場！<br>如果不小心把廚餘丟進一般垃圾，<br>
+                    <span class="text-yellow-400 font-bold">倒垃圾阿姨會生氣瞪你！</span>
+                </p>
+                <button onclick="startGame()" class="bg-gradient-to-r from-green-500 to-emerald-600 px-8 py-4 rounded-xl font-bold text-xl shadow-lg hover:scale-105 transition btn-press border-b-4 border-green-800">
+                    <i class="fas fa-play mr-2"></i>開始挑戰
+                </button>
+                <div class="mt-8 text-xs text-gray-500">
+                    <p>規則：看到物品出現，快速點擊正確的垃圾桶分類。</p>
+                </div>
+            </div>
+
+            <!-- Game Over Screen -->
+            <div id="game-over-screen" class="hidden absolute inset-0 flex flex-col justify-center items-center bg-black/90 z-50 text-center p-6 backdrop-blur-md">
+                <div class="text-6xl mb-4" id="end-emoji">🏆</div>
+                <h2 class="text-3xl font-bold mb-2 text-white">時間到！</h2>
+                <div class="glass p-6 rounded-2xl w-full mb-6">
+                    <p class="text-gray-400 text-sm mb-1">最終分數</p>
+                    <div class="text-5xl font-black text-yellow-400 mb-2" id="final-score">0</div>
+                    <p class="text-xl font-bold text-white" id="rank-title">回收菜鳥</p>
+                    <p class="text-xs text-gray-400 mt-2" id="rank-desc">你可能常被阿姨罵喔...</p>
+                </div>
+                <button onclick="location.reload()" class="w-full bg-blue-600 hover:bg-blue-500 px-6 py-3 rounded-xl font-bold mb-3 btn-press">
+                    <i class="fas fa-redo mr-2"></i>再玩一次
+                </button>
+                <a href="../../index.html" class="w-full bg-gray-700 hover:bg-gray-600 px-6 py-3 rounded-xl font-bold text-gray-300 block btn-press">
+                    離開遊戲
+                </a>
+            </div>
+
+            <!-- Reaction Area (Auntie) -->
+            <div id="reaction-area" class="h-16 flex justify-center items-center mb-4 transition-all duration-200">
+                <div id="auntie-face" class="text-4xl transition-transform duration-200">👵</div>
+                <div id="feedback-text" class="ml-3 text-lg font-bold opacity-0 transition-opacity duration-200 text-white bg-black/50 px-3 py-1 rounded-lg border border-white/20">
+                    準備好了嗎？
+                </div>
+            </div>
+
+            <!-- Current Item Card -->
+            <div id="item-card" class="glass w-48 h-48 rounded-3xl flex flex-col justify-center items-center mb-8 shadow-2xl border-2 border-white/10 relative overflow-hidden">
+                <div class="absolute inset-0 bg-gradient-to-b from-white/5 to-transparent pointer-events-none"></div>
+                <div id="item-emoji" class="text-7xl mb-2 filter drop-shadow-lg">❓</div>
+                <div id="item-name" class="text-xl font-bold text-center px-2">準備開始</div>
+                <div id="item-hint" class="text-[10px] text-gray-400 mt-1 opacity-0 transition-opacity">小提示...</div>
+            </div>
+
+            <!-- Control Buttons (Bins) -->
+            <div class="w-full grid grid-cols-3 gap-3 mt-auto mb-4">
+                <!-- General Trash -->
+                <button onclick="checkAnswer('general')" class="btn-press group relative h-32 bg-gray-800 hover:bg-gray-700 rounded-2xl border-b-4 border-gray-950 flex flex-col items-center justify-center transition active:border-b-0 active:translate-y-1">
+                    <div class="absolute -top-3 bg-gray-600 text-[10px] px-2 py-0.5 rounded-full border border-gray-500">一般垃圾</div>
+                    <div class="text-3xl mb-1 group-hover:scale-110 transition">🗑️</div>
+                    <div class="text-sm font-bold text-gray-300">一般垃圾</div>
+                </button>
+
+                <!-- Recycle -->
+                <button onclick="checkAnswer('recycle')" class="btn-press group relative h-32 bg-yellow-600 hover:bg-yellow-500 rounded-2xl border-b-4 border-yellow-800 flex flex-col items-center justify-center transition active:border-b-0 active:translate-y-1">
+                    <div class="absolute -top-3 bg-yellow-500 text-[10px] px-2 py-0.5 rounded-full border border-yellow-400 text-yellow-900 font-bold">資源回收</div>
+                    <div class="text-3xl mb-1 group-hover:scale-110 transition">♻️</div>
+                    <div class="text-sm font-bold text-yellow-100">資源回收</div>
+                </button>
+
+                <!-- Food Waste -->
+                <button onclick="checkAnswer('food')" class="btn-press group relative h-32 bg-green-700 hover:bg-green-600 rounded-2xl border-b-4 border-green-900 flex flex-col items-center justify-center transition active:border-b-0 active:translate-y-1">
+                    <div class="absolute -top-3 bg-green-500 text-[10px] px-2 py-0.5 rounded-full border border-green-400 text-green-900 font-bold">養豬/堆肥</div>
+                    <div class="text-3xl mb-1 group-hover:scale-110 transition">🦴</div>
+                    <div class="text-sm font-bold text-green-100">廚餘</div>
+                </button>
+            </div>
+
+        </main>
+        
+        <footer class="text-center text-[10px] text-gray-500 py-2">
+            Created by AI Agent • Daily Taiwan Web Tools
+        </footer>
+
+    </div>
+
+    <script>
+        // Game Data
+        const ITEMS = [
+            { name: "用過的衛生紙", emoji: "🧻", type: "general", hint: "太髒了，不能回收！" },
+            { name: "電子發票(感熱紙)", emoji: "🧾", type: "general", hint: "這是感熱紙，上面有塗層，只能當垃圾！" },
+            { name: "香蕉皮", emoji: "🍌", type: "food", hint: "雖然不能吃，但可以做堆肥！" },
+            { name: "乾淨寶特瓶", emoji: "🧴", type: "recycle", hint: "記得壓扁省空間喔！" },
+            { name: "鋁箔包飲料", emoji: "🧃", type: "recycle", hint: "要把吸管拿掉喔！" },
+            { name: "免洗筷", emoji: "🥢", type: "general", hint: "竹筷通常不回收，因為太油或有化學處理。" },
+            { name: "雞骨頭(熟)", emoji: "food", hint: "台北市規定：軟骨/殘渣是養豬廚餘！" }, // Tricky one, changed to "food" based on common practice, though large bones are general. Let's make it clearer.
+            { name: "剩飯剩菜", emoji: "🍚", type: "food", hint: "這是養豬廚餘喔！" },
+            { name: "保麗龍", emoji: "🧊", type: "recycle", hint: "保麗龍是可以回收的喔！" },
+            { name: "尿布", emoji: "👶", type: "general", hint: "絕對是一般垃圾！" },
+            { name: "咖啡渣", emoji: "☕", type: "food", hint: "可以做堆肥！(堆肥廚餘)" },
+            { name: "塑膠吸管", emoji: "🥤", type: "general", hint: "吸管太小通常不回收，丟垃圾！" }, // Controversial but generally safe for game
+            { name: "玻璃啤酒瓶", emoji: "🍾", type: "recycle", hint: "玻璃要小心輕放喔！" },
+            { name: "破掉的陶瓷碗", emoji: "🥣", type: "general", hint: "陶瓷不是玻璃，不能回收！" },
+            { name: "乾淨紙箱", emoji: "📦", type: "recycle", hint: "拆開壓扁！" },
+            { name: "髒污塑膠袋", emoji: "🛍️", type: "general", hint: "有油污的塑膠袋不能回收！" },
+            { name: "光碟片", emoji: "💿", type: "recycle", hint: "這是可回收物品喔！" },
+            { name: "牙線棒", emoji: "🦷", type: "general", hint: "太小又有尖刺，丟垃圾！" }
+        ];
+
+        // Override specific tricky items for clarity
+        ITEMS[6] = { name: "大骨頭(硬殼)", emoji: "🍖", type: "general", hint: "硬骨頭豬不能吃，丟一般垃圾！" };
+
+        let score = 0;
+        let timeLeft = 60;
+        let timerInterval;
+        let currentItem = null;
+        let isGameActive = false;
+
+        // Sound Effects (Web Audio API or just visual feedback)
+        // Let's stick to visual feedback for simplicity
+
+        function startGame() {
+            document.getElementById('start-screen').classList.add('hidden');
+            document.getElementById('game-over-screen').classList.add('hidden');
+            score = 0;
+            timeLeft = 60;
+            updateScore();
+            updateTimer();
+            isGameActive = true;
+            
+            spawnItem();
+            
+            timerInterval = setInterval(() => {
+                timeLeft--;
+                updateTimer();
+                if (timeLeft <= 0) {
+                    endGame();
+                }
+            }, 1000);
+        }
+
+        function spawnItem() {
+            // Random item
+            currentItem = ITEMS[Math.floor(Math.random() * ITEMS.length)];
+            
+            // Animation reset
+            const card = document.getElementById('item-card');
+            card.classList.remove('item-card');
+            void card.offsetWidth; // trigger reflow
+            card.classList.add('item-card');
+
+            document.getElementById('item-emoji').innerText = currentItem.emoji;
+            document.getElementById('item-name').innerText = currentItem.name;
+            document.getElementById('item-hint').style.opacity = '0';
+        }
+
+        function checkAnswer(type) {
+            if (!isGameActive) return;
+
+            const feedback = document.getElementById('feedback-text');
+            const auntie = document.getElementById('auntie-face');
+            const card = document.getElementById('item-card');
+
+            if (type === currentItem.type) {
+                // Correct
+                score += 10;
+                feedback.innerText = "正確！乖孩子！";
+                feedback.className = "ml-3 text-lg font-bold text-white bg-green-600/80 px-3 py-1 rounded-lg border border-green-400";
+                auntie.innerText = "👵👍";
+                // Quick next item
+                setTimeout(spawnItem, 200);
+            } else {
+                // Wrong
+                score = Math.max(0, score - 5);
+                feedback.innerText = currentItem.hint; // Show educational hint
+                feedback.className = "ml-3 text-xs font-bold text-white bg-red-600/90 px-3 py-1 rounded-lg border border-red-400 shake";
+                auntie.innerText = "👵💢";
+                card.classList.add('shake');
+                setTimeout(() => card.classList.remove('shake'), 500);
+                // Delay next item so they can read
+                setTimeout(spawnItem, 1200);
+            }
+
+            feedback.style.opacity = '1';
+            updateScore();
+        }
+
+        function updateScore() {
+            document.getElementById('score').innerText = score;
+        }
+
+        function updateTimer() {
+            const el = document.getElementById('timer');
+            el.innerText = timeLeft;
+            if (timeLeft <= 10) {
+                el.classList.add('text-red-500');
+                el.parentElement.classList.replace('bg-green-500/80', 'bg-red-500/80');
+            }
+        }
+
+        function endGame() {
+            clearInterval(timerInterval);
+            isGameActive = false;
+            document.getElementById('game-over-screen').classList.remove('hidden');
+            document.getElementById('final-score').innerText = score;
+
+            let title = "";
+            let desc = "";
+            let emoji = "";
+
+            if (score >= 250) {
+                title = "♻️ 環保署長等級";
+                desc = "太強了！連阿姨都想聘請你當顧問！";
+                emoji = "👑";
+            } else if (score >= 150) {
+                title = "🌟 回收資優生";
+                desc = "觀念很正確喔！繼續保持！";
+                emoji = "🌟";
+            } else if (score >= 80) {
+                title = "😐 普通市民";
+                desc = "還可以啦，但有些細節要再注意一下。";
+                emoji = "😐";
+            } else {
+                title = "💩 垃圾製造機";
+                desc = "阿姨很生氣！你是不是都亂丟？";
+                emoji = "☠️";
+            }
+
+            document.getElementById('rank-title').innerText = title;
+            document.getElementById('rank-desc').innerText = desc;
+            document.getElementById('end-emoji').innerText = emoji;
+        }
+    </script>
+</body>
+</html>
