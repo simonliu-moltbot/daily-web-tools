@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🍲 台灣火鍋沾醬心理測驗 | Hot Pot Sauce Personality Test</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Noto Sans TC', sans-serif; background-color: #fef2f2; }
+        .sauce-bowl {
+            background: radial-gradient(circle at 30% 30%, #fefce8, #fcd34d);
+            box-shadow: inset 0 -10px 20px rgba(0,0,0,0.1), 0 10px 20px rgba(0,0,0,0.1);
+        }
+        .ingredient-btn {
+            transition: all 0.1s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .ingredient-btn:active {
+            transform: scale(0.95);
+        }
+        .drop-anim {
+            animation: dropIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        @keyframes dropIn {
+            0% { transform: scale(0) translateY(-20px); opacity: 0; }
+            100% { transform: scale(1) translateY(0); opacity: 1; }
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col text-stone-800">
+    
+    <!-- Nav -->
+    <nav class="bg-white/80 backdrop-blur-md sticky top-0 z-50 border-b border-red-100">
+        <div class="max-w-4xl mx-auto px-4 h-14 flex items-center justify-between">
+            <a href="../../index.html" class="text-stone-600 hover:text-stone-900 font-medium flex items-center gap-2">
+                <span>🏠</span> <span class="hidden sm:inline">回首頁 (Back)</span>
+            </a>
+            <h1 class="font-bold text-lg text-red-800">🍲 沾醬心理測驗</h1>
+            <div class="w-8"></div> <!-- Spacer -->
+        </div>
+    </nav>
+
+    <main class="flex-1 max-w-2xl mx-auto w-full px-4 py-8 flex flex-col items-center">
+        
+        <div class="text-center mb-8">
+            <h2 class="text-3xl font-bold text-stone-800 mb-2">你的靈魂是什麼味道？</h2>
+            <p class="text-stone-500">配出你的黃金比例沾醬，AI 幫你分析隱藏性格！</p>
+        </div>
+
+        <!-- The Bowl -->
+        <div class="relative w-64 h-64 sm:w-80 sm:h-80 rounded-full sauce-bowl flex items-center justify-center mb-8 border-4 border-white ring-4 ring-red-50 relative overflow-hidden group cursor-pointer" id="bowl-area" onclick="shakeBowl()">
+            <div class="absolute inset-0 bg-black/5 rounded-full pointer-events-none"></div>
+            <div id="sauce-content" class="relative z-10 w-full h-full p-8 flex flex-wrap items-center justify-center content-center gap-1 transition-all">
+                <span class="text-stone-400 text-sm font-medium select-none pointer-events-none" id="bowl-placeholder">點擊下方配料<br>加入碗中</span>
+            </div>
+            <!-- Steam effect -->
+            <div class="absolute -top-10 left-1/2 -translate-x-1/2 w-20 h-20 bg-white/20 blur-xl rounded-full animate-pulse pointer-events-none"></div>
+        </div>
+
+        <!-- Action Bar -->
+        <div class="flex gap-4 mb-8 w-full justify-center">
+            <button onclick="resetBowl()" class="px-6 py-2 rounded-full bg-stone-200 hover:bg-stone-300 text-stone-600 font-bold transition-colors shadow-sm">
+                🗑️ 清空重來
+            </button>
+            <button onclick="analyzeSauce()" class="px-8 py-2 rounded-full bg-red-600 hover:bg-red-700 text-white font-bold transition-colors shadow-lg animate-bounce">
+                ✨ 開始分析
+            </button>
+        </div>
+
+        <!-- Ingredients Grid -->
+        <div class="grid grid-cols-4 sm:grid-cols-5 gap-3 w-full mb-12">
+            <!-- Buttons injected by JS -->
+        </div>
+
+        <!-- Result Modal (Hidden) -->
+        <div id="result-modal" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-[60] hidden flex items-center justify-center p-4">
+            <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6 transform transition-all scale-95 opacity-0" id="result-card">
+                <div class="text-center">
+                    <div class="text-6xl mb-4" id="result-icon">🤔</div>
+                    <h3 class="text-2xl font-bold text-stone-800 mb-2" id="result-title">分析中...</h3>
+                    <div class="w-full h-px bg-stone-100 my-4"></div>
+                    <p class="text-stone-600 leading-relaxed mb-6" id="result-desc">...</p>
+                    
+                    <div class="bg-stone-50 rounded-lg p-4 mb-6 text-sm text-left">
+                        <div class="flex justify-between mb-2">
+                            <span class="text-stone-500">鈉含量指數 (Salty)</span>
+                            <span class="font-bold text-stone-800" id="stat-salty">0%</span>
+                        </div>
+                        <div class="w-full bg-stone-200 rounded-full h-2 mb-4">
+                            <div class="bg-blue-500 h-2 rounded-full transition-all duration-1000" id="bar-salty" style="width: 0%"></div>
+                        </div>
+
+                        <div class="flex justify-between mb-2">
+                            <span class="text-stone-500">熱量罪惡感 (Fat)</span>
+                            <span class="font-bold text-stone-800" id="stat-fat">0%</span>
+                        </div>
+                        <div class="w-full bg-stone-200 rounded-full h-2">
+                            <div class="bg-red-500 h-2 rounded-full transition-all duration-1000" id="bar-fat" style="width: 0%"></div>
+                        </div>
+                    </div>
+
+                    <button onclick="closeModal()" class="w-full py-3 rounded-xl bg-stone-900 text-white font-bold hover:bg-stone-800 transition-colors">
+                        再玩一次
+                    </button>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <footer class="bg-stone-50 border-t border-stone-200 py-8 text-center text-stone-400 text-sm">
+        <p>Created by AI Agent on 2026-02-08</p>
+        <p class="mt-1 text-xs">純屬娛樂，請勿將手機丟入火鍋中</p>
+    </footer>
+
+    <script>
+        const ingredients = [
+            { id: 'satay', name: '沙茶醬', icon: '🟤', color: 'text-amber-800', salty: 15, fat: 25 },
+            { id: 'soy', name: '醬油', icon: '⚫️', color: 'text-stone-900', salty: 20, fat: 0 },
+            { id: 'scallion', name: '蔥花', icon: '🧅', color: 'text-green-600', salty: 0, fat: 0 },
+            { id: 'garlic', name: '蒜泥', icon: '🧄', color: 'text-yellow-100', salty: 2, fat: 0 },
+            { id: 'chili', name: '辣椒', icon: '🌶️', color: 'text-red-600', salty: 5, fat: 0 },
+            { id: 'vinegar', name: '白醋', icon: '⚪️', color: 'text-stone-200', salty: 2, fat: 0 },
+            { id: 'radish', name: '蘿蔔泥', icon: '🌨️', color: 'text-white', salty: 0, fat: 0 },
+            { id: 'egg', name: '生蛋黃', icon: '🥚', color: 'text-yellow-400', salty: 2, fat: 15 },
+            { id: 'cilantro', name: '香菜', icon: '🌿', color: 'text-green-500', salty: 0, fat: 0 },
+            { id: 'peanut', name: '花生粉', icon: '🥜', color: 'text-amber-600', salty: 5, fat: 20 },
+            { id: 'sugar', name: '砂糖', icon: '🧂', color: 'text-white', salty: 0, fat: 15 },
+            { id: 'sesame', name: '香油', icon: '💧', color: 'text-yellow-600', salty: 0, fat: 30 }
+        ];
+
+        let bowl = [];
+
+        function init() {
+            const grid = document.querySelector('.grid');
+            grid.innerHTML = ingredients.map(ing => `
+                <button onclick="add('${ing.id}')" class="ingredient-btn bg-white p-3 rounded-xl border border-stone-200 shadow-sm hover:shadow-md flex flex-col items-center gap-1 group">
+                    <span class="text-3xl filter group-hover:drop-shadow-md transition-all transform group-hover:-translate-y-1">${ing.icon}</span>
+                    <span class="text-xs font-bold text-stone-600">${ing.name}</span>
+                </button>
+            `).join('');
+        }
+
+        function add(id) {
+            if (bowl.length >= 20) {
+                alert('碗滿了啦！你是要把火鍋店吃倒嗎？');
+                return;
+            }
+            const ing = ingredients.find(i => i.id === id);
+            bowl.push(ing);
+            renderBowl();
+            playAudio(id); // Placeholder
+        }
+
+        function renderBowl() {
+            const container = document.getElementById('sauce-content');
+            const placeholder = document.getElementById('bowl-placeholder');
+            
+            if (bowl.length === 0) {
+                placeholder.style.display = 'block';
+                container.innerHTML = '<span class="text-stone-400 text-sm font-medium select-none pointer-events-none" id="bowl-placeholder">點擊下方配料<br>加入碗中</span>';
+                return;
+            } else {
+                placeholder.style.display = 'none';
+            }
+
+            // Grouping identical items slightly? No, just pile them.
+            // But we want to re-render only the new one?
+            // For simplicity, re-render all, but apply animation class to the last one.
+            
+            // Actually, innerHTML rewrite kills animation. 
+            // Better: append.
+            // But let's just re-render and animate only the last child.
+            
+            container.innerHTML = bowl.map((item, idx) => {
+                // Randomize position slightly for "pile" effect
+                const rot = (Math.random() - 0.5) * 45;
+                const scale = 0.8 + Math.random() * 0.4;
+                return `<div class="drop-anim text-2xl absolute transition-all" style="
+                    left: ${50 + (Math.random()-0.5)*60}%; 
+                    top: ${50 + (Math.random()-0.5)*60}%; 
+                    transform: translate(-50%, -50%) rotate(${rot}deg) scale(${scale});
+                    z-index: ${idx};
+                    filter: drop-shadow(0 2px 2px rgba(0,0,0,0.2));
+                ">${item.icon}</div>`;
+            }).join('');
+        }
+
+        function resetBowl() {
+            bowl = [];
+            renderBowl();
+        }
+
+        function shakeBowl() {
+            const b = document.getElementById('bowl-area');
+            b.classList.add('animate-spin'); // bad anim
+            // Custom shake
+            b.animate([
+                { transform: 'translate(0, 0) rotate(0deg)' },
+                { transform: 'translate(-5px, 0) rotate(-5deg)' },
+                { transform: 'translate(5px, 0) rotate(5deg)' },
+                { transform: 'translate(0, 0) rotate(0deg)' }
+            ], { duration: 300 });
+        }
+
+        function analyzeSauce() {
+            if (bowl.length === 0) {
+                showResult('🥣', '原味覺醒者 (The Purist)', '你相信食材的靈魂，或者你正在減肥。你的生活極簡，或者是忘了拿醬料。', 0, 0);
+                return;
+            }
+
+            const counts = {};
+            let totalSalty = 0;
+            let totalFat = 0;
+
+            bowl.forEach(i => {
+                counts[i.id] = (counts[i.id] || 0) + 1;
+                totalSalty += i.salty;
+                totalFat += i.fat;
+            });
+
+            // Logic
+            let title = "中庸之道 (The Balancer)";
+            let desc = "你的醬料四平八穩，就像你的人生一樣安全。不好也不壞，但也許缺了一點驚喜？";
+            let icon = "⚖️";
+
+            if (counts['satay'] >= 4) {
+                title = "沙茶狂魔 (Satay Demon)";
+                desc = "對你來說，火鍋只是載體，沙茶醬才是本體。你的血管裡流的可能不是血，是牛頭牌。";
+                icon = "👹";
+            } else if (counts['cilantro'] >= 3) {
+                title = "香菜邪教徒 (Cilantro Cultist)";
+                desc = "你的碗裡有一座森林。你喜歡看著不吃香菜的人露出恐懼的表情。你是混亂善良的代表。";
+                icon = "🌿";
+            } else if (counts['garlic'] >= 4) {
+                title = "生化武器專家 (Garlic Breath)";
+                desc = "方圓五百里內無人能近身。你非常重視社交距離，尤其是物理上的。";
+                icon = "🧄";
+            } else if (counts['chili'] >= 4) {
+                title = "鐵喉嚨 (Lava Throat)";
+                desc = "你的舌頭已經失去知覺，你的胃正在寫遺書。但這一刻，你覺得很爽。";
+                icon = "🔥";
+            } else if (counts['egg'] >= 2) {
+                title = "沙門氏菌賭徒 (Salmonella Gambler)";
+                desc = "只有真正的老饕才懂生蛋黃拌沙茶的美味。你是一個懷舊且勇敢的人，對台灣的衛生標準充滿信心。";
+                icon = "🥚";
+            } else if (counts['scallion'] >= 5) {
+                title = "蔥花富翁 (Scallion Thief)";
+                desc = "你是來吃火鍋還是來買菜的？老闆看到你走進來都會先把蔥藏起來。";
+                icon = "🧅";
+            } else if (counts['vinegar'] >= 4) {
+                title = "醋罈子 (Acid Reflux King)";
+                desc = "你喜歡酸溜溜的滋味，可能生活有點苦？這碗醬能幫你解膩，也能幫你解憂。";
+                icon = "🍋";
+            } else if (counts['sugar'] >= 3 || counts['peanut'] >= 3) {
+                title = "台南甜心 (Tainan Sweetheart)";
+                desc = "你是不是台南人？如果是，這很正常。如果不是，你可能需要檢查一下血糖。";
+                icon = "🍬";
+            }
+
+            // Calc stats (max ref = 100 roughly)
+            const saltyPct = Math.min(100, (totalSalty / 80) * 100);
+            const fatPct = Math.min(100, (totalFat / 100) * 100);
+
+            showResult(icon, title, desc, Math.round(saltyPct), Math.round(fatPct));
+        }
+
+        function showResult(icon, title, desc, salty, fat) {
+            document.getElementById('result-icon').textContent = icon;
+            document.getElementById('result-title').textContent = title;
+            document.getElementById('result-desc').textContent = desc;
+            
+            document.getElementById('stat-salty').textContent = salty + '%';
+            document.getElementById('stat-fat').textContent = fat + '%';
+            
+            const modal = document.getElementById('result-modal');
+            const card = document.getElementById('result-card');
+            
+            modal.classList.remove('hidden');
+            // Trigger anim
+            setTimeout(() => {
+                card.classList.remove('scale-95', 'opacity-0');
+                card.classList.add('scale-100', 'opacity-100');
+                
+                document.getElementById('bar-salty').style.width = salty + '%';
+                document.getElementById('bar-fat').style.width = fat + '%';
+            }, 10);
+        }
+
+        function closeModal() {
+            const modal = document.getElementById('result-modal');
+            const card = document.getElementById('result-card');
+            
+            card.classList.remove('scale-100', 'opacity-100');
+            card.classList.add('scale-95', 'opacity-0');
+            
+            setTimeout(() => {
+                modal.classList.add('hidden');
+                document.getElementById('bar-salty').style.width = '0%';
+                document.getElementById('bar-fat').style.width = '0%';
+            }, 200);
+        }
+
+        init();
+    </script>
+</body>
+</html>
