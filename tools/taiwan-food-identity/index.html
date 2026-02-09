@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>台灣美食味蕾身分證 | Taiwan Food Identity Test</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Noto Sans TC', sans-serif;
+            background-color: #fef3c7; /* Amber-50 */
+            background-image: radial-gradient(#fbbf24 1px, transparent 1px);
+            background-size: 20px 20px;
+        }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+        .option-btn {
+            transition: all 0.2s;
+        }
+        .option-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+        .option-btn:active {
+            transform: translateY(0);
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-fade-in {
+            animation: fadeIn 0.5s ease-out forwards;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col text-stone-800">
+
+    <!-- Navbar -->
+    <nav class="bg-white/80 backdrop-blur-md border-b border-amber-200 sticky top-0 z-50">
+        <div class="max-w-3xl mx-auto px-4 h-14 flex items-center justify-between">
+            <a href="../../index.html" class="flex items-center gap-2 text-amber-700 hover:text-amber-900 transition-colors font-medium">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z" clip-rule="evenodd" />
+                </svg>
+                回首頁
+            </a>
+            <span class="font-bold text-amber-600">🍱 台灣美食味蕾身分證</span>
+        </div>
+    </nav>
+
+    <main class="flex-1 flex items-center justify-center p-4">
+        <div class="w-full max-w-lg">
+            
+            <!-- Start Screen -->
+            <div id="start-screen" class="glass-card rounded-2xl p-8 text-center animate-fade-in">
+                <div class="text-6xl mb-6">🇹🇼👅</div>
+                <h1 class="text-3xl font-bold text-stone-800 mb-4">你的舌頭是哪裡人？</h1>
+                <p class="text-stone-600 mb-8 leading-relaxed">
+                    你是「南部粽」還是「北部粽」派？<br>
+                    吃番茄要不要沾醬油？<br>
+                    回答 6 道題，AI 立刻分析你的<br>
+                    <span class="font-bold text-amber-600">台灣美食靈魂歸屬地</span>！
+                </p>
+                <button onclick="startQuiz()" class="w-full bg-amber-500 hover:bg-amber-600 text-white font-bold py-4 rounded-xl shadow-lg transform transition hover:scale-105 text-lg">
+                    開始測驗
+                </button>
+            </div>
+
+            <!-- Quiz Screen -->
+            <div id="quiz-screen" class="hidden">
+                <!-- Progress -->
+                <div class="mb-6 bg-white/50 rounded-full h-3 overflow-hidden">
+                    <div id="progress-bar" class="bg-amber-500 h-full transition-all duration-300" style="width: 0%"></div>
+                </div>
+
+                <!-- Question Card -->
+                <div id="question-card" class="glass-card rounded-2xl p-6 sm:p-8 animate-fade-in">
+                    <div class="flex items-center gap-3 mb-6">
+                        <span id="q-icon" class="text-4xl">🍙</span>
+                        <h2 id="q-text" class="text-xl font-bold text-stone-800">題目載入中...</h2>
+                    </div>
+                    <div id="options-container" class="space-y-3">
+                        <!-- Options will be injected here -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Result Screen -->
+            <div id="result-screen" class="hidden glass-card rounded-2xl p-8 text-center animate-fade-in">
+                <div class="mb-2 text-stone-500 font-medium tracking-widest uppercase">Analysis Complete</div>
+                <h2 class="text-2xl text-stone-700 mb-2">你的美食靈魂屬於</h2>
+                <div id="result-city" class="text-5xl font-black text-amber-600 mb-4 tracking-tight">載入中...</div>
+                <div id="result-desc" class="text-stone-600 bg-amber-50 p-4 rounded-lg mb-8 text-left leading-relaxed border border-amber-100">
+                    載入中...
+                </div>
+
+                <div class="grid grid-cols-2 gap-4">
+                    <button onclick="shareResult()" class="bg-stone-800 hover:bg-stone-900 text-white font-bold py-3 rounded-lg flex items-center justify-center gap-2 transition">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path d="M15 8a3 3 0 10-2.977-2.63l-4.94 2.47a3 3 0 100 4.319l4.94 2.47a3 3 0 10.895-1.789l-4.94-2.47a3.027 3.027 0 000-.74l4.94-2.47C13.456 7.68 14.19 8 15 8z" /></svg>
+                        分享結果
+                    </button>
+                    <button onclick="location.reload()" class="bg-white hover:bg-stone-50 text-stone-700 border border-stone-200 font-bold py-3 rounded-lg transition">
+                        再測一次
+                    </button>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <footer class="p-6 text-center text-stone-400 text-sm">
+        <p>Created by AI Agent on 2026-02-09</p>
+    </footer>
+
+    <script>
+        // Data
+        const questions = [
+            {
+                id: 1,
+                icon: "🍙",
+                text: "端午節到了，桌上那顆粽子應該是...",
+                options: [
+                    { text: "蒸的！粒粒分明才是粽子 (3D油飯)", scores: { taipei: 2, taichung: 1 } },
+                    { text: "煮的！軟糯黏牙才是王道", scores: { tainan: 2, kaohsiung: 2 } },
+                    { text: "不管是蒸是煮，只要有甜辣醬就好", scores: { taichung: 2 } }
+                ]
+            },
+            {
+                id: 2,
+                icon: "🍳",
+                text: "早餐店的荷包蛋，你堅持要加什麼？",
+                options: [
+                    { text: "純醬油 (清醬油)", scores: { taipei: 2 } },
+                    { text: "醬油膏 (稠稠的那種)", scores: { tainan: 1, kaohsiung: 2 } },
+                    { text: "番茄醬 (紅紅的)", scores: { taichung: 1 } },
+                    { text: "胡椒鹽或什麼都不加", scores: { taipei: 1 } }
+                ]
+            },
+            {
+                id: 3,
+                icon: "🥣",
+                text: "說到「羹湯」或「滷味」，你的甜度標準是？",
+                options: [
+                    { text: "鹹就是鹹，不要給我加糖！", scores: { taipei: 3 } },
+                    { text: "要有一點點回甘才好吃", scores: { kaohsiung: 1, taichung: 1 } },
+                    { text: "全糖！甜才是美味的靈魂", scores: { tainan: 3 } }
+                ]
+            },
+            {
+                id: 4,
+                icon: "🍅",
+                text: "看到一盤切好的大番茄，你會想沾...",
+                options: [
+                    { text: "梅子粉", scores: { taipei: 1, taichung: 1 } },
+                    { text: "薑汁醬油膏", scores: { kaohsiung: 3, tainan: 2 } },
+                    { text: "什麼怪東西？直接吃啦", scores: { taipei: 2 } }
+                ]
+            },
+            {
+                id: 5,
+                icon: "🌭",
+                text: "吃肉圓的時候，這顆肉圓是怎麼熟的？",
+                options: [
+                    { text: "先蒸後炸，皮要Q彈有嚼勁", scores: { taichung: 2, taipei: 1 } },
+                    { text: "純蒸的，皮軟軟嫩嫩最好吃", scores: { tainan: 2, kaohsiung: 2 } },
+                    { text: "炸到酥脆，像餅乾一樣", scores: { taichung: 1 } }
+                ]
+            },
+            {
+                id: 6,
+                icon: "🌶️",
+                text: "最後一題，吃炒麵如果沒味道，你會加...",
+                options: [
+                    { text: "東泉辣椒醬 (神醬)", scores: { taichung: 5 } },
+                    { text: "一般辣椒醬或豆瓣醬", scores: { kaohsiung: 1, taipei: 1 } },
+                    { text: "烏醋", scores: { taipei: 2 } },
+                    { text: "不用加，老闆本來就會炒甜甜的", scores: { tainan: 3 } }
+                ]
+            }
+        ];
+
+        const results = {
+            taipei: {
+                city: "台北 (Taipei)",
+                desc: "你是標準的「天龍味蕾」！你喜歡食物保有原味，討厭過度的調味（尤其是甜味）。對於「南部粽」那种黏糊糊的口感可能敬謝不敏。你追求的是精緻、清爽與層次感。吃東西比較講究環境與衛生，對於路邊攤的接受度看心情。"
+            },
+            taichung: {
+                city: "台中 (Taichung)",
+                desc: "你的血液裡流著「東泉辣椒醬」！對你來說，炒麵配豬血湯是經典早餐。你喜歡口味重一點、口感豐富的食物（例如炸肉圓）。對於食物的包容度很高，只要好吃，管他是什麼醬，加下去就對了！"
+            },
+            tainan: {
+                city: "台南 (Tainan)",
+                desc: "恭喜！你是全糖市的榮譽市民！你深知「甜」不是調味，而是一種對生活的態度。不管是羹湯、滷肉飯還是醬油膏，沒有一點甜味你就覺得少一味。你對食物有極高的堅持，會為了喝一碗牛肉湯早起排隊。"
+            },
+            kaohsiung: {
+                city: "高雄 (Kaohsiung)",
+                desc: "你是熱情的港都美食家！你喜歡豪邁、直爽的口味。薑汁番茄對你來說是人間美味，鍋燒意麵更是生命之水。你的口味偏向南部（偏甜、偏軟），但又帶有一點海派的鹹香。早餐吃海鮮粥也是很合理的！"
+            }
+        };
+
+        // State
+        let currentStep = 0;
+        let scores = { taipei: 0, taichung: 0, tainan: 0, kaohsiung: 0 };
+
+        // DOM Elements
+        const startScreen = document.getElementById('start-screen');
+        const quizScreen = document.getElementById('quiz-screen');
+        const resultScreen = document.getElementById('result-screen');
+        const progressBar = document.getElementById('progress-bar');
+        const qIcon = document.getElementById('q-icon');
+        const qText = document.getElementById('q-text');
+        const optionsContainer = document.getElementById('options-container');
+
+        // Functions
+        function startQuiz() {
+            startScreen.classList.add('hidden');
+            quizScreen.classList.remove('hidden');
+            renderQuestion();
+        }
+
+        function renderQuestion() {
+            const q = questions[currentStep];
+            
+            // Update Progress
+            const progress = ((currentStep) / questions.length) * 100;
+            progressBar.style.width = `${progress}%`;
+
+            // Update Content
+            qIcon.innerText = q.icon;
+            qText.innerText = q.text;
+            
+            // Clear and Add Options
+            optionsContainer.innerHTML = '';
+            
+            // Animate refresh
+            const card = document.getElementById('question-card');
+            card.classList.remove('animate-fade-in');
+            void card.offsetWidth; // trigger reflow
+            card.classList.add('animate-fade-in');
+
+            q.options.forEach((opt, idx) => {
+                const btn = document.createElement('button');
+                btn.className = "option-btn w-full text-left p-4 rounded-xl border border-amber-200 bg-white hover:bg-amber-50 hover:border-amber-300 font-medium text-stone-700";
+                btn.innerText = opt.text;
+                btn.onclick = () => handleAnswer(opt.scores);
+                optionsContainer.appendChild(btn);
+            });
+        }
+
+        function handleAnswer(points) {
+            // Add scores
+            for (const [city, value] of Object.entries(points)) {
+                if (scores[city] !== undefined) {
+                    scores[city] += value;
+                }
+            }
+
+            // Next or Finish
+            currentStep++;
+            if (currentStep < questions.length) {
+                renderQuestion();
+            } else {
+                showResult();
+            }
+        }
+
+        function showResult() {
+            quizScreen.classList.add('hidden');
+            resultScreen.classList.remove('hidden');
+
+            // Calculate winner
+            let winner = Object.keys(scores).reduce((a, b) => scores[a] > scores[b] ? a : b);
+            
+            // Render Result
+            const data = results[winner];
+            document.getElementById('result-city').innerText = data.city;
+            document.getElementById('result-desc').innerText = data.desc;
+        }
+
+        function shareResult() {
+            const city = document.getElementById('result-city').innerText;
+            const text = `測驗結果：我的台灣美食靈魂屬於【${city}】！\n快來測測你是哪裡人：\nhttps://simonliu-moltbot.github.io/daily-web-tools/tools/taiwan-food-identity/`;
+            
+            if (navigator.share) {
+                navigator.share({
+                    title: '台灣美食味蕾身分證',
+                    text: text,
+                    url: 'https://simonliu-moltbot.github.io/daily-web-tools/tools/taiwan-food-identity/'
+                });
+            } else {
+                navigator.clipboard.writeText(text).then(() => {
+                    alert('結果已複製到剪貼簿！');
+                });
+            }
+        }
+    </script>
+</body>
+</html>
