@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>乖乖保平安指南 | Guai Guai Lucky Charm Guide</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Noto Sans TC', 'sans-serif'],
+                    },
+                    colors: {
+                        'guai-green': '#009944',
+                        'guai-yellow': '#F1C40F',
+                        'guai-red': '#E74C3C',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { background-color: #f0fdf4; }
+        .guai-pack {
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            transform-style: preserve-3d;
+        }
+        .guai-pack:hover {
+            transform: scale(1.02) rotate(1deg);
+        }
+        .shimmer {
+            background: linear-gradient(110deg, rgba(255,255,255,0) 30%, rgba(255,255,255,0.3) 40%, rgba(255,255,255,0) 50%);
+            background-size: 200% 100%;
+            animation: shimmer 3s infinite linear;
+        }
+        @keyframes shimmer {
+            0% { background-position: 150% 0; }
+            100% { background-position: -50% 0; }
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col text-gray-800">
+
+    <!-- Navigation -->
+    <nav class="bg-white/80 backdrop-blur-md border-b border-green-100 sticky top-0 z-50">
+        <div class="max-w-3xl mx-auto px-4 sm:px-6 h-14 flex items-center justify-between">
+            <a href="../../index.html" class="flex items-center text-green-700 hover:text-green-900 font-medium transition-colors">
+                <span class="mr-2">🏠</span> 回首頁
+            </a>
+            <span class="text-xs text-gray-400">Daily Taiwan Tools</span>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="flex-grow container mx-auto px-4 py-8 max-w-2xl">
+        <header class="text-center mb-10">
+            <h1 class="text-3xl md:text-4xl font-bold text-green-800 mb-3">乖乖保平安指南</h1>
+            <p class="text-gray-600">在台灣，萬物皆有靈，機器更有靈。<br>選出你的守護對象，AI 告訴你該買哪一種乖乖！</p>
+        </header>
+
+        <!-- Selector -->
+        <div class="bg-white rounded-2xl shadow-lg p-6 mb-8 border border-green-50">
+            <label class="block text-sm font-medium text-gray-700 mb-3">你要守護什麼？</label>
+            <div class="grid grid-cols-2 md:grid-cols-3 gap-3" id="options-container">
+                <!-- Options injected by JS -->
+            </div>
+        </div>
+
+        <!-- Result Display -->
+        <div id="result-card" class="hidden">
+            <div id="pack-bg" class="guai-pack relative rounded-3xl p-8 text-white shadow-xl overflow-hidden mb-8 transform transition-all duration-500">
+                <div class="absolute inset-0 shimmer pointer-events-none"></div>
+                
+                <div class="relative z-10 flex flex-col items-center text-center">
+                    <div class="text-6xl mb-4 filter drop-shadow-lg" id="pack-icon">🥥</div>
+                    <h2 class="text-3xl font-bold mb-2 tracking-wider" id="pack-flavor">奶油椰子</h2>
+                    <div class="inline-block bg-white/20 backdrop-blur-sm rounded-full px-4 py-1 text-sm font-medium mb-6 border border-white/30">
+                        <span id="pack-color-name">綠色乖乖</span>
+                    </div>
+                    
+                    <div class="bg-white/95 text-gray-800 rounded-xl p-6 w-full shadow-lg backdrop-blur-sm">
+                        <h3 class="text-lg font-bold mb-2 flex items-center justify-center text-gray-900">
+                            <span class="mr-2">💡</span> 擺放法則
+                        </h3>
+                        <p id="pack-rule" class="mb-4 text-gray-600 leading-relaxed"></p>
+                        
+                        <div class="border-t border-gray-100 pt-4">
+                            <h3 class="text-sm font-bold text-red-500 mb-2 flex items-center justify-center uppercase tracking-wide">
+                                <span class="mr-1">⚠️</span> 絕對禁忌
+                            </h3>
+                            <p id="pack-taboo" class="text-sm text-gray-500"></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="text-center">
+                <button onclick="reset()" class="text-gray-400 hover:text-gray-600 text-sm underline decoration-gray-300 underline-offset-4 transition-colors">
+                    重新選擇
+                </button>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="text-center py-8 text-gray-400 text-xs">
+        <p>Created by AI Agent on <script>document.write(new Date().toISOString().split('T')[0])</script></p>
+        <p class="mt-1">僅供娛樂與文化推廣，機器故障請洽 IT 人員 (如有)。</p>
+    </footer>
+
+    <script>
+        const OPTIONS = [
+            { id: 'server', icon: '🖥️', label: '機房 / 伺服器', type: 'green', flavor: '奶油椰子', rule: '代表系統運作燈號「綠燈」，祈求機器乖乖聽話，不當機、不出包、不亮紅燈。', taboo: '絕對不能過期！絕對不能被老鼠咬！最重要的是：絕對不能偷吃！' },
+            { id: 'pc', icon: '💻', label: '個人電腦 / 筆電', type: 'green', flavor: '奶油椰子', rule: '放置於主機上方或螢幕旁，讓你的 Code 一次 Compile 就過，Excel 不會轉圈圈。', taboo: '不要買錯顏色！黃色代表錢 (但也代表過期)，紅色代表 Error！' },
+            { id: 'car', icon: '🚗', label: '愛車 / 機車', type: 'green', flavor: '奶油椰子', rule: '放在儀表板或後車廂，保佑行車平安，引擎順暢，不顧路。', taboo: '夏天車內高溫請勿久放，融化了會招惹螞蟻，反而不乖。' },
+            { id: 'stock_tw', icon: '📈', label: '台股投資', type: 'red', flavor: '巧克力', rule: '台灣股市「紅」代表漲！擺紅色乖乖，祝你的持股天天漲停板！', taboo: '千萬別放綠色乖乖！在台股，綠色代表臉都綠了 (跌停)！' },
+            { id: 'stock_us', icon: '💵', label: '美股投資', type: 'green', flavor: '奶油椰子', rule: '美股規則與台灣相反，「綠」代表漲！擺綠色乖乖讓你美金賺飽飽。', taboo: '不要搞混市場規則！放紅色乖乖在美股會讓你資產縮水！' },
+            { id: 'wealth', icon: '💰', label: '求財運', type: 'yellow', flavor: '五香', rule: '五香代表「五路財神」或「金黃色」的錢財。適合放在收銀機旁。', taboo: '不要放在電腦旁！IT 界傳說五香 (黃色) 也有「當機」或「過時」的不祥之兆。' },
+            { id: 'love', icon: '💞', label: '求姻緣 / 戀愛', type: 'red', flavor: '巧克力', rule: '甜甜蜜蜜的巧克力口味，象徵愛情熱烈如火，感情順利。', taboo: '如果是單戀，自己吃掉就好，不要擺出來嚇人。' },
+            { id: 'lab', icon: '🔬', label: '實驗室儀器', type: 'green', flavor: '奶油椰子', rule: '研究生神器！放在質譜儀、顯微鏡或任何昂貴設備旁，數據漂亮，畢業順利。', taboo: '學長說：誰敢吃掉實驗室的乖乖，誰就延畢！' },
+            { id: 'exam', icon: '💯', label: '考試 / 檢定', type: 'green', flavor: '奶油椰子', rule: '綠燈通行！代表考試一路順暢，分數「綠」意盎然 (合格)。', taboo: '考試前不要吃鴨蛋 (0分) 也不要吃肉丸 (完蛋)。' }
+        ];
+
+        const CONTAINER = document.getElementById('options-container');
+        const RESULT = document.getElementById('result-card');
+        const PACK_BG = document.getElementById('pack-bg');
+        
+        // Colors
+        const COLORS = {
+            green: 'bg-guai-green',
+            yellow: 'bg-guai-yellow',
+            red: 'bg-guai-red'
+        };
+
+        // Render Options
+        OPTIONS.forEach(opt => {
+            const btn = document.createElement('button');
+            btn.className = 'flex flex-col items-center justify-center p-4 rounded-xl border border-gray-200 bg-white hover:bg-green-50 hover:border-green-300 hover:shadow-md transition-all group h-24';
+            btn.innerHTML = `
+                <span class="text-2xl mb-2 group-hover:scale-110 transition-transform">${opt.icon}</span>
+                <span class="text-sm font-medium text-gray-700 group-hover:text-green-800">${opt.label}</span>
+            `;
+            btn.onclick = () => showResult(opt);
+            CONTAINER.appendChild(btn);
+        });
+
+        function showResult(opt) {
+            // Hide selector, Show result
+            // Populate data
+            
+            let icon = '🥥';
+            if (opt.type === 'red') icon = '🍫';
+            if (opt.type === 'yellow') icon = '🖐️';
+            document.getElementById('pack-icon').innerText = icon;
+
+            document.getElementById('pack-flavor').innerText = opt.flavor;
+            document.getElementById('pack-color-name').innerText = opt.type === 'green' ? '綠色乖乖 (奶油椰子)' : (opt.type === 'red' ? '紅色乖乖 (巧克力)' : '黃色乖乖 (五香)');
+            document.getElementById('pack-rule').innerText = opt.rule;
+            document.getElementById('pack-taboo').innerText = opt.taboo;
+
+            // Update Color Class
+            PACK_BG.className = `guai-pack relative rounded-3xl p-8 text-white shadow-xl overflow-hidden mb-8 transform transition-all duration-500 ${COLORS[opt.type]}`;
+
+            RESULT.classList.remove('hidden');
+            window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+        }
+
+        function reset() {
+            RESULT.classList.add('hidden');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+    </script>
+</body>
+</html>
