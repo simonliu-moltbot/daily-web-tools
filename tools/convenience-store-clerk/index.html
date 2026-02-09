@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>地獄超商模擬器 | Hell Convenience Store Simulator</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Noto Sans TC', sans-serif; }
+        .shake { animation: shake 0.5s; }
+        @keyframes shake {
+            0% { transform: translate(1px, 1px) rotate(0deg); }
+            10% { transform: translate(-1px, -2px) rotate(-1deg); }
+            20% { transform: translate(-3px, 0px) rotate(1deg); }
+            30% { transform: translate(3px, 2px) rotate(0deg); }
+            40% { transform: translate(1px, -1px) rotate(1deg); }
+            50% { transform: translate(-1px, 2px) rotate(-1deg); }
+            60% { transform: translate(-3px, 1px) rotate(0deg); }
+            70% { transform: translate(3px, 1px) rotate(-1deg); }
+            80% { transform: translate(-1px, -1px) rotate(1deg); }
+            90% { transform: translate(1px, 2px) rotate(0deg); }
+            100% { transform: translate(1px, -2px) rotate(-1deg); }
+        }
+        .pop-in { animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        @keyframes popIn {
+            0% { opacity: 0; transform: scale(0.5); }
+            100% { opacity: 1; transform: scale(1); }
+        }
+    </style>
+</head>
+<body class="bg-gray-100 min-h-screen flex flex-col items-center">
+
+    <!-- Navbar -->
+    <nav class="w-full bg-orange-600 text-white p-4 shadow-lg sticky top-0 z-50">
+        <div class="max-w-4xl mx-auto flex justify-between items-center">
+            <a href="../../index.html" class="flex items-center space-x-2 hover:opacity-80 transition">
+                <span>🏠</span>
+                <span class="font-bold">回首頁</span>
+            </a>
+            <h1 class="text-xl font-bold">🏪 地獄超商模擬器</h1>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="flex-grow w-full max-w-lg p-4 flex flex-col items-center justify-center space-y-6">
+        
+        <!-- Game Intro -->
+        <div id="intro-screen" class="bg-white p-8 rounded-2xl shadow-xl text-center w-full space-y-4">
+            <div class="text-6xl mb-4">🤯</div>
+            <h2 class="text-2xl font-bold text-gray-800">歡迎來到地獄超商</h2>
+            <p class="text-gray-600">
+                你是全台灣最強的超商店員。<br>
+                結帳、泡咖啡、找包裹、微波、擠霜淇淋...<br>
+                要在客人暴怒前完成任務！
+            </p>
+            <div class="bg-orange-100 p-4 rounded-lg text-left text-sm text-orange-800">
+                <strong>任務說明：</strong>
+                <ul class="list-disc ml-5 mt-2 space-y-1">
+                    <li>看到 <span class="font-bold">咖啡</span> ➝ 按 ☕ 泡咖啡</li>
+                    <li>看到 <span class="font-bold">包裹</span> ➝ 按 📦 找包裹</li>
+                    <li>看到 <span class="font-bold">便當</span> ➝ 按 🍱 微波</li>
+                    <li>看到 <span class="font-bold">一般商品</span> ➝ 按 📟 結帳</li>
+                    <li>看到 <span class="font-bold">奧客</span> ➝ 按 😤 道歉</li>
+                </ul>
+            </div>
+            <button onclick="startGame()" class="w-full py-4 bg-orange-600 text-white rounded-xl text-xl font-bold shadow-lg hover:bg-orange-700 transform active:scale-95 transition">
+                上班打卡 (Start)
+            </button>
+        </div>
+
+        <!-- Game Screen -->
+        <div id="game-screen" class="hidden w-full flex-col space-y-4">
+            
+            <!-- HUD -->
+            <div class="flex justify-between items-center bg-gray-800 text-white p-4 rounded-xl shadow-md">
+                <div class="text-center">
+                    <p class="text-xs text-gray-400">時薪 (Score)</p>
+                    <p class="text-2xl font-bold text-yellow-400">$<span id="score">183</span></p>
+                </div>
+                <div class="text-center">
+                    <p class="text-xs text-gray-400">剩餘時間</p>
+                    <p class="text-2xl font-bold" id="timer">30</p>
+                </div>
+                <div class="text-center">
+                    <p class="text-xs text-gray-400">Sanity (HP)</p>
+                    <div class="flex space-x-1 text-red-500 text-xl" id="lives">
+                        ❤️❤️❤️
+                    </div>
+                </div>
+            </div>
+
+            <!-- Customer/Task Area -->
+            <div class="bg-white p-8 rounded-2xl shadow-xl text-center min-h-[200px] flex flex-col items-center justify-center relative overflow-hidden">
+                <div id="feedback" class="absolute top-2 right-2 text-2xl font-bold opacity-0 transition-opacity"></div>
+                
+                <div id="task-emoji" class="text-8xl mb-4 pop-in">👋</div>
+                <h3 id="task-text" class="text-2xl font-bold text-gray-800">準備上班...</h3>
+                <div id="progress-bar-container" class="w-full h-2 bg-gray-200 mt-4 rounded-full overflow-hidden hidden">
+                    <div id="task-timer-bar" class="h-full bg-red-500 w-full"></div>
+                </div>
+            </div>
+
+            <!-- Controls -->
+            <div class="grid grid-cols-3 gap-3">
+                <button onclick="handleAction('scan')" class="bg-blue-100 hover:bg-blue-200 text-blue-800 p-4 rounded-xl flex flex-col items-center shadow-sm active:scale-95 transition border border-blue-200">
+                    <span class="text-3xl mb-1">📟</span>
+                    <span class="font-bold">結帳</span>
+                </button>
+                <button onclick="handleAction('coffee')" class="bg-amber-100 hover:bg-amber-200 text-amber-800 p-4 rounded-xl flex flex-col items-center shadow-sm active:scale-95 transition border border-amber-200">
+                    <span class="text-3xl mb-1">☕</span>
+                    <span class="font-bold">泡咖啡</span>
+                </button>
+                <button onclick="handleAction('parcel')" class="bg-green-100 hover:bg-green-200 text-green-800 p-4 rounded-xl flex flex-col items-center shadow-sm active:scale-95 transition border border-green-200">
+                    <span class="text-3xl mb-1">📦</span>
+                    <span class="font-bold">找包裹</span>
+                </button>
+                <button onclick="handleAction('microwave')" class="bg-orange-100 hover:bg-orange-200 text-orange-800 p-4 rounded-xl flex flex-col items-center shadow-sm active:scale-95 transition border border-orange-200">
+                    <span class="text-3xl mb-1">🍱</span>
+                    <span class="font-bold">微波</span>
+                </button>
+                <button onclick="handleAction('apologize')" class="bg-red-100 hover:bg-red-200 text-red-800 p-4 rounded-xl flex flex-col items-center shadow-sm active:scale-95 transition border border-red-200">
+                    <span class="text-3xl mb-1">😤</span>
+                    <span class="font-bold">道歉</span>
+                </button>
+                <button onclick="handleAction('icecream')" class="bg-purple-100 hover:bg-purple-200 text-purple-800 p-4 rounded-xl flex flex-col items-center shadow-sm active:scale-95 transition border border-purple-200">
+                    <span class="text-3xl mb-1">🍦</span>
+                    <span class="font-bold">擠霜淇淋</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Game Over Screen -->
+        <div id="game-over-screen" class="hidden bg-white p-8 rounded-2xl shadow-xl text-center w-full space-y-4">
+            <div class="text-6xl mb-4">💀</div>
+            <h2 class="text-3xl font-bold text-gray-800">你離職了</h2>
+            <p class="text-gray-600">你的最終時薪：</p>
+            <p class="text-5xl font-bold text-orange-600">$<span id="final-score">0</span></p>
+            <p id="comment" class="text-sm text-gray-500 italic mt-2">（評語載入中...）</p>
+            <button onclick="location.reload()" class="w-full py-4 bg-gray-800 text-white rounded-xl text-xl font-bold shadow-lg hover:bg-gray-700 transform active:scale-95 transition mt-4">
+                重新應徵 (Try Again)
+            </button>
+        </div>
+
+    </main>
+
+    <footer class="p-4 text-center text-gray-500 text-sm">
+        Created by AI Agent on 2026-02-09
+    </footer>
+
+    <script>
+        const tasks = [
+            { type: 'scan', text: '這瓶水多少錢？', emoji: '💧' },
+            { type: 'scan', text: '我要買這個口香糖', emoji: '🍬' },
+            { type: 'scan', text: '幫我刷載具', emoji: '📱' },
+            { type: 'coffee', text: '大冰美一杯', emoji: '🧊☕' },
+            { type: 'coffee', text: '熱拿鐵不加糖', emoji: '☕🥛' },
+            { type: 'coffee', text: '寄杯兌換', emoji: '🎫' },
+            { type: 'parcel', text: '我要領包裹，手機末三碼 080', emoji: '📦' },
+            { type: 'parcel', text: '店到店寄件', emoji: '📝' },
+            { type: 'microwave', text: '幫我微波便當', emoji: '🍱' },
+            { type: 'microwave', text: '飯糰要加熱', emoji: '🍙' },
+            { type: 'apologize', text: '為什麼沒有茶葉蛋！', emoji: '🥚💢' },
+            { type: 'apologize', text: '叫你們店長出來！', emoji: '🤬' },
+            { type: 'icecream', text: '我要一支霜淇淋', emoji: '🍦' },
+            { type: 'icecream', text: '胖胖冰一支', emoji: '💩' }
+        ];
+
+        let score = 183;
+        let timeLeft = 30;
+        let lives = 3;
+        let currentTask = null;
+        let gameInterval;
+        let taskTimer;
+        let taskTimeLimit = 3000; // ms
+
+        const elIntro = document.getElementById('intro-screen');
+        const elGame = document.getElementById('game-screen');
+        const elGameOver = document.getElementById('game-over-screen');
+        const elScore = document.getElementById('score');
+        const elTimer = document.getElementById('timer');
+        const elLives = document.getElementById('lives');
+        const elTaskText = document.getElementById('task-text');
+        const elTaskEmoji = document.getElementById('task-emoji');
+        const elFeedback = document.getElementById('feedback');
+
+        function startGame() {
+            elIntro.classList.add('hidden');
+            elGame.classList.remove('hidden');
+            elGame.classList.add('flex');
+            
+            score = 183;
+            timeLeft = 30;
+            lives = 3;
+            taskTimeLimit = 3000;
+            
+            updateUI();
+            
+            gameInterval = setInterval(() => {
+                timeLeft--;
+                updateUI();
+                if (timeLeft <= 0) gameOver();
+            }, 1000);
+
+            nextTask();
+        }
+
+        function nextTask() {
+            if (lives <= 0 || timeLeft <= 0) return;
+
+            // Speed up as score increases
+            if (score > 300) taskTimeLimit = 2500;
+            if (score > 500) taskTimeLimit = 2000;
+            if (score > 800) taskTimeLimit = 1500;
+
+            const randomIndex = Math.floor(Math.random() * tasks.length);
+            currentTask = tasks[randomIndex];
+
+            elTaskText.textContent = currentTask.text;
+            elTaskEmoji.textContent = currentTask.emoji;
+            
+            // Reset Animation
+            elTaskEmoji.classList.remove('pop-in');
+            void elTaskEmoji.offsetWidth; // trigger reflow
+            elTaskEmoji.classList.add('pop-in');
+
+            // Task Timer (Patience)
+            if (taskTimer) clearTimeout(taskTimer);
+            
+            // Visual bar logic could go here, for now just simple timeout
+            taskTimer = setTimeout(() => {
+                handleAction('timeout');
+            }, taskTimeLimit);
+        }
+
+        function handleAction(actionType) {
+            if (!currentTask) return;
+
+            clearTimeout(taskTimer);
+
+            if (actionType === currentTask.type) {
+                // Success
+                const bonus = Math.floor(Math.random() * 10) + 10;
+                score += bonus;
+                showFeedback('✅', 'text-green-500');
+            } else {
+                // Fail
+                lives--;
+                score -= 20; // Fine
+                showFeedback('❌', 'text-red-500');
+                document.body.classList.add('shake');
+                setTimeout(() => document.body.classList.remove('shake'), 500);
+            }
+
+            if (lives <= 0) {
+                gameOver();
+            } else {
+                updateUI();
+                nextTask();
+            }
+        }
+
+        function showFeedback(text, colorClass) {
+            elFeedback.textContent = text;
+            elFeedback.className = `absolute top-2 right-2 text-4xl font-bold transition-opacity duration-500 ${colorClass}`;
+            elFeedback.style.opacity = '1';
+            setTimeout(() => {
+                elFeedback.style.opacity = '0';
+            }, 300);
+        }
+
+        function updateUI() {
+            elScore.textContent = score;
+            elTimer.textContent = timeLeft;
+            elLives.textContent = '❤️'.repeat(lives);
+        }
+
+        function gameOver() {
+            clearInterval(gameInterval);
+            clearTimeout(taskTimer);
+            
+            elGame.classList.add('hidden');
+            elGameOver.classList.remove('hidden');
+            document.getElementById('final-score').textContent = score;
+            
+            const commentEl = document.getElementById('comment');
+            if (score < 200) commentEl.textContent = "連基本薪資都保不住...店長很生氣。";
+            else if (score < 500) commentEl.textContent = "表現普普，勉強沒被客訴。";
+            else if (score < 1000) commentEl.textContent = "你是超商界的明日之星！";
+            else commentEl.textContent = "根本是千手觀音轉世！請收下我的膝蓋。";
+        }
+    </script>
+</body>
+</html>
