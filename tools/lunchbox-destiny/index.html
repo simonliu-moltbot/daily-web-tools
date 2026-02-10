@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>台式便當命運轉盤 | Taiwanese Lunchbox Destiny</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Noto Sans TC', sans-serif;
+            background-color: #fef3c7; /* Amber-100 */
+        }
+        .slot-machine {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+        }
+        @media (min-width: 640px) {
+            .slot-machine {
+                grid-template-columns: repeat(4, 1fr);
+            }
+        }
+        .slot {
+            background: white;
+            border: 4px solid #78350f; /* Amber-900 */
+            border-radius: 1rem;
+            height: 10rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            box-shadow: inset 0 4px 6px rgba(0,0,0,0.1);
+            position: relative;
+            overflow: hidden;
+        }
+        .slot-content {
+            text-align: center;
+            transition: transform 0.1s;
+        }
+        .slot.spinning .slot-content {
+            animation: spin 0.2s infinite linear;
+        }
+        @keyframes spin {
+            0% { transform: translateY(-100%); opacity: 0; }
+            50% { opacity: 0.5; }
+            100% { transform: translateY(100%); opacity: 0; }
+        }
+        .stamp {
+            transform: rotate(-15deg);
+            opacity: 0;
+            transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            transform-origin: center;
+        }
+        .stamp.show {
+            opacity: 1;
+            transform: rotate(-15deg) scale(1);
+        }
+        .paper-texture {
+            background-image: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M11 18c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm48 25c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm-43-7c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm63 31c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM34 90c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm56-76c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM12 86c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm28-65c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm23-11c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-6 60c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm29 22c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zM32 63c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm57-13c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-9-21c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM60 91c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM35 41c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM12 60c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2z' fill='%23d97706' fill-opacity='0.1' fill-rule='evenodd'/%3E%3C/svg%3E");
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col paper-texture">
+    <!-- Header -->
+    <header class="bg-amber-800 text-amber-100 shadow-lg">
+        <div class="max-w-4xl mx-auto px-4 py-3 flex justify-between items-center">
+            <a href="../../index.html" class="flex items-center gap-2 hover:text-white transition-colors text-sm font-medium">
+                <span>🏠</span> 回首頁
+            </a>
+            <div class="text-xs opacity-75">Daily Web Tools</div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="flex-grow container mx-auto px-4 py-8 max-w-3xl flex flex-col items-center">
+        
+        <div class="text-center mb-8">
+            <h1 class="text-4xl md:text-5xl font-bold text-amber-900 mb-2 drop-shadow-sm">🍱 台式便當命運轉盤</h1>
+            <p class="text-amber-700 text-lg">中午吃什麼？交給命運來決定！小心三色豆...</p>
+        </div>
+
+        <!-- The Lunchbox -->
+        <div class="bg-amber-50 rounded-3xl p-6 shadow-2xl border-8 border-amber-900 w-full relative">
+            
+            <!-- Result Stamp -->
+            <div id="result-stamp" class="stamp absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-20 pointer-events-none">
+                <div class="border-8 border-red-600 text-red-600 rounded-full w-48 h-48 flex items-center justify-center bg-white/90 backdrop-blur-sm shadow-xl transform scale-0 transition-transform duration-300">
+                    <span class="text-4xl font-black transform -rotate-15" id="stamp-text"></span>
+                </div>
+            </div>
+
+            <div class="slot-machine mb-6">
+                <!-- Main Dish -->
+                <div class="slot relative group">
+                    <div class="absolute top-0 left-0 bg-red-600 text-white text-xs px-2 py-1 rounded-br-lg z-10 font-bold">主菜</div>
+                    <div class="slot-content" id="slot-main">
+                        <div class="text-6xl mb-2">❓</div>
+                        <div class="font-bold text-amber-900">???</div>
+                    </div>
+                </div>
+                <!-- Side 1 -->
+                <div class="slot relative">
+                    <div class="absolute top-0 left-0 bg-green-600 text-white text-xs px-2 py-1 rounded-br-lg z-10 font-bold">配菜 1</div>
+                    <div class="slot-content" id="slot-side1">
+                        <div class="text-6xl mb-2">❓</div>
+                        <div class="font-bold text-amber-900">???</div>
+                    </div>
+                </div>
+                <!-- Side 2 -->
+                <div class="slot relative">
+                    <div class="absolute top-0 left-0 bg-green-600 text-white text-xs px-2 py-1 rounded-br-lg z-10 font-bold">配菜 2</div>
+                    <div class="slot-content" id="slot-side2">
+                        <div class="text-6xl mb-2">❓</div>
+                        <div class="font-bold text-amber-900">???</div>
+                    </div>
+                </div>
+                <!-- Side 3 -->
+                <div class="slot relative">
+                    <div class="absolute top-0 left-0 bg-green-600 text-white text-xs px-2 py-1 rounded-br-lg z-10 font-bold">配菜 3</div>
+                    <div class="slot-content" id="slot-side3">
+                        <div class="text-6xl mb-2">❓</div>
+                        <div class="font-bold text-amber-900">???</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Analysis Section -->
+            <div id="analysis-panel" class="bg-white rounded-xl p-4 border-2 border-amber-200 hidden">
+                <h3 class="font-bold text-amber-900 mb-2 flex items-center gap-2">
+                    <span>📊</span> 便當分析報告
+                </h3>
+                <div class="space-y-2 text-sm text-stone-600">
+                    <p>CP值指數：<span id="score-val" class="font-bold text-lg">0</span> 分</p>
+                    <p id="commentary" class="italic text-amber-600 font-medium">...</p>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Controls -->
+        <div class="mt-8 flex flex-col items-center gap-4 w-full">
+            <button id="spin-btn" class="bg-red-600 hover:bg-red-700 text-white text-2xl font-bold py-4 px-12 rounded-full shadow-[0_6px_0_rgb(153,27,27)] active:shadow-none active:translate-y-[6px] transition-all transform hover:scale-105 flex items-center gap-3">
+                <span>🍱</span> 老闆，幫我配！
+            </button>
+            <p class="text-amber-800/60 text-sm mt-2">＊本系統絕無暗箱操作（除非出現三色豆）</p>
+        </div>
+
+    </main>
+
+    <footer class="bg-amber-900 text-amber-200/60 py-6 text-center text-sm mt-auto">
+        <p>Created by AI Agent on 2026-02-10</p>
+        <p class="text-xs mt-1">Images are for reference only. Actual misery may vary.</p>
+    </footer>
+
+    <script>
+        // Data
+        const MAIN_DISHES = [
+            { name: "炸雞腿", emoji: "🍗", score: 30, desc: "外酥內嫩，便當界的王者！" },
+            { name: "炸排骨", emoji: "🍖", score: 25, desc: "經典古早味，厚實多汁。" },
+            { name: "滷控肉", emoji: "🥓", score: 25, desc: "肥而不膩，白飯殺手。" },
+            { name: "炸魚排", emoji: "🐟", score: 20, desc: "酥脆可口，但小心有刺。" },
+            { name: "烤香腸", emoji: "🌭", score: 15, desc: "雖然份量少，但很下飯。" },
+            { name: "滷雞腿", emoji: "🍗", score: 25, desc: "醬香入味，軟嫩好吃。" },
+            { name: "鹹酥雞", emoji: "🐔", score: 20, desc: "雖然像宵夜，但誰在乎呢？" }
+        ];
+
+        const SIDE_DISHES = [
+            { name: "炒高麗菜", emoji: "🥬", score: 10, type: "good" },
+            { name: "番茄炒蛋", emoji: "🍳", score: 15, type: "good" },
+            { name: "麻婆豆腐", emoji: "🥘", score: 15, type: "good" },
+            { name: "滷蛋", emoji: "🥚", score: 10, type: "good" },
+            { name: "炒空心菜", emoji: "🥬", score: 10, type: "good" },
+            { name: "螞蟻上樹", emoji: "🍜", score: 10, type: "good" },
+            { name: "花椰菜", emoji: "🥦", score: 10, type: "good" },
+            { name: "小熱狗", emoji: "🌭", score: 5, type: "normal" },
+            { name: "豆干", emoji: "🟫", score: 5, type: "normal" },
+            { name: "海帶結", emoji: "🪱", score: 5, type: "normal" },
+            { name: "豆芽菜", emoji: "🌱", score: 0, type: "filler", desc: "便當店充數專用。" },
+            { name: "洋蔥炒蛋", emoji: "🧅", score: 10, type: "good" },
+            
+            // The Bad Ones
+            { name: "三色豆", emoji: "🥶", score: -50, type: "hell", desc: "便當界的佛地魔，萬惡之源！" },
+            { name: "螢光咖哩", emoji: "🟡", score: -20, type: "bad", desc: "這顏色真的能吃嗎..." },
+            { name: "辣筍乾", emoji: "🎋", score: -5, type: "bad", desc: "又油又鹹，配稀飯還行。" },
+            { name: "茄子", emoji: "🍆", score: -10, type: "polarizing", desc: "軟爛的口感，喜歡的人很喜歡..." },
+            { name: "苦瓜", emoji: "🥒", score: -10, type: "polarizing", desc: "吃得苦中苦，方為人上人。" },
+            { name: "電話線", emoji: "➰", score: 5, type: "meme", desc: "其實是海茸，但看起來像電話線。" }
+        ];
+
+        // Elements
+        const btn = document.getElementById('spin-btn');
+        const slots = [
+            document.getElementById('slot-main'),
+            document.getElementById('slot-side1'),
+            document.getElementById('slot-side2'),
+            document.getElementById('slot-side3')
+        ];
+        const stamp = document.getElementById('result-stamp');
+        const stampText = document.getElementById('stamp-text');
+        const analysisPanel = document.getElementById('analysis-panel');
+        const scoreVal = document.getElementById('score-val');
+        const commentary = document.getElementById('commentary');
+
+        let isSpinning = false;
+
+        function getRandomItem(arr) {
+            return arr[Math.floor(Math.random() * arr.length)];
+        }
+
+        // Ensure 3 unique sides
+        function getThreeSides() {
+            let shuffled = [...SIDE_DISHES].sort(() => 0.5 - Math.random());
+            return shuffled.slice(0, 3);
+        }
+
+        function updateSlot(el, item) {
+            el.innerHTML = `
+                <div class="text-6xl mb-2 filter drop-shadow-md transform transition-transform hover:scale-110">${item.emoji}</div>
+                <div class="font-bold text-amber-900 text-lg">${item.name}</div>
+            `;
+        }
+
+        function spin() {
+            if (isSpinning) return;
+            isSpinning = true;
+            btn.disabled = true;
+            btn.classList.add('opacity-50', 'cursor-not-allowed');
+            
+            // Reset UI
+            stamp.classList.remove('show');
+            stamp.querySelector('div').classList.remove('scale-100');
+            stamp.querySelector('div').classList.add('scale-0');
+            analysisPanel.classList.add('hidden');
+
+            // Start spinning animation
+            document.querySelectorAll('.slot').forEach(s => s.classList.add('spinning'));
+
+            // Decide results
+            const resultMain = getRandomItem(MAIN_DISHES);
+            const resultSides = getThreeSides();
+            const results = [resultMain, ...resultSides];
+
+            // Stop slots one by one
+            results.forEach((item, index) => {
+                setTimeout(() => {
+                    const slotEl = slots[index];
+                    slotEl.parentElement.classList.remove('spinning');
+                    updateSlot(slotEl, item);
+                    
+                    // Play sound effect (optional/simulated)
+                    
+                    if (index === 3) {
+                        finishSpin(resultMain, resultSides);
+                    }
+                }, 500 + (index * 600)); // Staggered stops
+            });
+        }
+
+        function finishSpin(main, sides) {
+            isSpinning = false;
+            btn.disabled = false;
+            btn.classList.remove('opacity-50', 'cursor-not-allowed');
+
+            // Calculate Score
+            let totalScore = main.score + sides.reduce((acc, curr) => acc + curr.score, 0);
+            let hasThreeColorBeans = sides.some(s => s.name === "三色豆");
+            let hasFluorescentCurry = sides.some(s => s.name === "螢光咖哩");
+            
+            // Determine Title & Commentary
+            let title = "";
+            let colorClass = "border-red-600 text-red-600";
+            let comment = "";
+
+            if (hasThreeColorBeans) {
+                title = "地獄便當";
+                colorClass = "border-stone-800 text-stone-800";
+                comment = "😱 天啊！是三色豆！老闆是不是討厭你？建議直接倒掉（誤）。";
+                totalScore = -999;
+            } else if (hasFluorescentCurry) {
+                title = "核廢料餐";
+                colorClass = "border-yellow-600 text-yellow-600";
+                comment = "⚠️ 這咖哩還會發光呢...吃了晚上不用開燈喔！";
+            } else if (totalScore >= 60) {
+                title = "豪華特餐";
+                colorClass = "border-red-600 text-red-600";
+                comment = "✨ 運氣爆棚！這根本是五星級便當吧！";
+            } else if (totalScore >= 40) {
+                title = "平民美食";
+                colorClass = "border-amber-600 text-amber-600";
+                comment = "👍 中規中矩，吃飽沒問題。";
+            } else if (totalScore >= 0) {
+                title = "勉強餬口";
+                colorClass = "border-blue-600 text-blue-600";
+                comment = "🤔 雖然普通，但至少能填飽肚子。";
+            } else {
+                title = "月底便當";
+                colorClass = "border-gray-500 text-gray-500";
+                comment = "💸 幫QQ...這是月底沒錢時的選擇嗎？";
+            }
+
+            // Show Stamp
+            stampText.innerText = title;
+            const stampInner = stamp.querySelector('div');
+            stampInner.className = `border-8 rounded-full w-48 h-48 flex items-center justify-center bg-white/90 backdrop-blur-sm shadow-xl transform transition-transform duration-300 ${colorClass}`;
+            stamp.classList.add('show');
+            requestAnimationFrame(() => {
+                stampInner.classList.remove('scale-0');
+                stampInner.classList.add('scale-100');
+            });
+
+            // Show Analysis
+            scoreVal.innerText = totalScore === -999 ? "負無限大" : totalScore;
+            
+            // Add specific dish comments
+            const specialComments = [];
+            if (main.name === "炸雞腿") specialComments.push("雞腿看起來很讚！");
+            sides.forEach(s => {
+                if (s.desc && s.name !== "三色豆" && s.name !== "螢光咖哩") {
+                    specialComments.push(s.desc);
+                }
+            });
+            
+            if (specialComments.length > 0 && !hasThreeColorBeans && !hasFluorescentCurry) {
+                comment += " " + specialComments[Math.floor(Math.random() * specialComments.length)];
+            }
+
+            commentary.innerText = comment;
+            analysisPanel.classList.remove('hidden');
+        }
+
+        btn.addEventListener('click', spin);
+    </script>
+</body>
+</html>
