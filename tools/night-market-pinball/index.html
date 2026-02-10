@@ -268,7 +268,9 @@
             
             score += SLOTS[slotIndex];
             document.getElementById('score-display').innerText = score;
+            
             activeBall = null;
+            isShooting = false; // 強制重置發射鎖定狀態
             
             if (balls === 0) endGame();
         }
