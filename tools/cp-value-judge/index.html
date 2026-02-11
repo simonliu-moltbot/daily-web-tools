@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>台式 CP 值審判官 ⚖️ | 台灣日常工具</title>
+    <meta name="description" content="想買東西又怕被笑盤子？輸入價格與使用頻率，讓台式審判官幫你算出真實 CP 值！避免繳智商稅必備工具。">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Noto Sans TC', sans-serif; background-color: #fdf6e3; }
+        .stamp {
+            border: 4px solid currentColor;
+            border-radius: 12px;
+            display: inline-block;
+            padding: 0.25rem 1rem;
+            text-transform: uppercase;
+            font-weight: 900;
+            transform: rotate(-10deg);
+            opacity: 0;
+            animation: stamp-in 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        }
+        @keyframes stamp-in {
+            0% { transform: scale(3) rotate(0deg); opacity: 0; }
+            100% { transform: scale(1) rotate(-10deg); opacity: 0.8; }
+        }
+        .wobble { animation: wobble 2s infinite; }
+        @keyframes wobble {
+            0%, 100% { transform: rotate(0deg); }
+            25% { transform: rotate(-5deg); }
+            75% { transform: rotate(5deg); }
+        }
+        /* Custom scrollbar */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #f1f1f1; }
+        ::-webkit-scrollbar-thumb { background: #d97706; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #b45309; }
+    </style>
+</head>
+<body class="bg-amber-50 text-stone-800 min-h-screen flex flex-col">
+
+    <div id="app" class="flex flex-col min-h-screen">
+        
+        <!-- Navbar -->
+        <nav class="bg-stone-900 text-amber-500 p-4 shadow-lg sticky top-0 z-50">
+            <div class="max-w-2xl mx-auto flex justify-between items-center">
+                <a href="../../index.html" class="flex items-center gap-2 hover:text-white transition group">
+                    <span class="text-2xl group-hover:-translate-x-1 transition">⬅️</span>
+                    <span class="font-bold tracking-wider">回工具列表</span>
+                </a>
+                <h1 class="font-black text-lg md:text-xl tracking-widest">⚖️ CP 值審判官</h1>
+            </div>
+        </nav>
+
+        <!-- Main Content -->
+        <main class="flex-grow w-full max-w-2xl mx-auto p-4 md:p-8 space-y-8">
+
+            <!-- Hero Section -->
+            <div class="text-center space-y-2 py-4">
+                <h2 class="text-3xl md:text-4xl font-black text-stone-800">
+                    買這個是<span class="text-amber-600">盤子</span>還是<span class="text-green-600">賺到</span>？
+                </h2>
+                <p class="text-stone-500 font-medium text-lg">
+                    輸入價格與使用頻率，讓審判官幫你算清楚！<br>
+                    <span class="text-xs text-stone-400">（還有阿嬤的碎碎念點評）</span>
+                </p>
+            </div>
+
+            <!-- Input Form Card -->
+            <div class="bg-white rounded-3xl shadow-xl p-6 md:p-8 space-y-6 border-2 border-stone-100 relative overflow-hidden">
+                <!-- Decorative background elements -->
+                <div class="absolute -top-10 -right-10 w-32 h-32 bg-amber-100 rounded-full opacity-50 blur-2xl"></div>
+                <div class="absolute -bottom-10 -left-10 w-32 h-32 bg-red-100 rounded-full opacity-50 blur-2xl"></div>
+
+                <!-- Product Name -->
+                <div class="space-y-2 relative z-10">
+                    <label class="block text-sm font-bold text-stone-500 uppercase tracking-wider">想買什麼酷東西？</label>
+                    <input type="text" v-model="form.name" placeholder="例如：iPhone 16 Pro Max 1TB" 
+                        class="w-full bg-stone-50 border-2 border-stone-200 rounded-xl px-4 py-3 text-lg font-bold focus:outline-none focus:border-amber-500 focus:bg-white transition shadow-inner placeholder-stone-300">
+                </div>
+
+                <!-- Price -->
+                <div class="space-y-2 relative z-10">
+                    <label class="block text-sm font-bold text-stone-500 uppercase tracking-wider">價格 (TWD)</label>
+                    <div class="relative">
+                        <span class="absolute left-4 top-1/2 -translate-y-1/2 text-stone-400 font-bold">$</span>
+                        <input type="number" v-model.number="form.price" placeholder="58900" 
+                            class="w-full bg-stone-50 border-2 border-stone-200 rounded-xl pl-10 pr-4 py-3 text-2xl font-black text-stone-800 focus:outline-none focus:border-amber-500 focus:bg-white transition shadow-inner">
+                    </div>
+                </div>
+
+                <!-- Usage Frequency Config -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 relative z-10">
+                    <!-- Expected Lifespan -->
+                    <div class="space-y-2">
+                        <label class="block text-sm font-bold text-stone-500 uppercase tracking-wider">預計用多久？</label>
+                        <div class="flex items-center gap-2">
+                            <input type="number" v-model.number="form.years" min="0.1" step="0.1" 
+                                class="w-24 bg-stone-50 border-2 border-stone-200 rounded-xl px-2 py-3 text-center font-bold text-lg focus:outline-none focus:border-amber-500 focus:bg-white transition">
+                            <span class="font-bold text-stone-600">年</span>
+                            <div class="flex-1 flex gap-1 justify-end">
+                                <button @click="form.years = 1" class="px-2 py-1 text-xs bg-stone-100 rounded hover:bg-stone-200 transition">1年</button>
+                                <button @click="form.years = 3" class="px-2 py-1 text-xs bg-stone-100 rounded hover:bg-stone-200 transition">3年</button>
+                                <button @click="form.years = 5" class="px-2 py-1 text-xs bg-stone-100 rounded hover:bg-stone-200 transition">5年</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Frequency -->
+                    <div class="space-y-2">
+                        <label class="block text-sm font-bold text-stone-500 uppercase tracking-wider">使用頻率？</label>
+                        <select v-model="form.frequency" 
+                            class="w-full bg-stone-50 border-2 border-stone-200 rounded-xl px-4 py-3 font-bold text-stone-800 focus:outline-none focus:border-amber-500 focus:bg-white transition appearance-none cursor-pointer">
+                            <option value="365">每天用 (365次/年)</option>
+                            <option value="250">工作日用 (250次/年)</option>
+                            <option value="104">週末用 (104次/年)</option>
+                            <option value="52">每週一次 (52次/年)</option>
+                            <option value="12">每月一次 (12次/年)</option>
+                            <option value="1">每年一次 (1次/年)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Calculate Button -->
+                <button @click="calculate" 
+                    class="w-full bg-stone-900 text-amber-500 hover:text-amber-400 font-black text-xl py-4 rounded-xl shadow-xl hover:shadow-2xl hover:scale-[1.02] active:scale-[0.98] transition-all relative overflow-hidden group">
+                    <span class="relative z-10 flex items-center justify-center gap-2">
+                        <span>🔨</span>
+                        <span>開庭審判</span>
+                    </span>
+                    <div class="absolute inset-0 bg-stone-800 translate-y-full group-hover:translate-y-0 transition-transform duration-300"></div>
+                </button>
+
+            </div>
+
+            <!-- Result Section -->
+            <div v-if="result" id="result" class="animate-fade-in space-y-6">
+                
+                <!-- Verdict Stamp Card -->
+                <div class="bg-white border-4 border-stone-900 rounded-sm p-8 shadow-[8px_8px_0px_0px_rgba(28,25,23,1)] relative text-center">
+                    
+                    <!-- The Stamp -->
+                    <div class="absolute top-4 right-4 md:top-8 md:right-8 transform rotate-12 z-20">
+                        <div v-if="result.score >= 90" class="stamp text-green-600 border-green-600 text-4xl md:text-5xl">傳家寶</div>
+                        <div v-else-if="result.score >= 70" class="stamp text-blue-600 border-blue-600 text-4xl md:text-5xl">買到賺到</div>
+                        <div v-else-if="result.score >= 40" class="stamp text-amber-600 border-amber-600 text-4xl md:text-5xl">勉強及格</div>
+                        <div v-else-if="result.score >= 20" class="stamp text-orange-600 border-orange-600 text-4xl md:text-5xl">有點盤</div>
+                        <div v-else class="stamp text-red-600 border-red-600 text-4xl md:text-5xl">超級盤子</div>
+                    </div>
+
+                    <h3 class="text-stone-400 font-bold uppercase tracking-widest text-sm mb-2">COST PER USE</h3>
+                    <div class="text-6xl md:text-7xl font-black text-stone-800 mb-1 leading-none">
+                        <span class="text-3xl align-top text-stone-400">$</span>{{ formatNumber(result.costPerUse) }}
+                    </div>
+                    <p class="text-stone-500 font-bold mb-6">每次使用的成本</p>
+
+                    <div class="bg-stone-100 rounded-xl p-4 text-left space-y-3 mb-6">
+                        <div class="flex justify-between items-center border-b border-stone-200 pb-2">
+                            <span class="text-stone-500 font-bold">每日持有成本</span>
+                            <span class="font-bold text-xl">${{ formatNumber(result.costPerDay) }} / 天</span>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-stone-500 font-bold">總使用次數</span>
+                            <span class="font-bold text-xl">{{ formatNumber(result.totalUses) }} 次</span>
+                        </div>
+                    </div>
+
+                    <!-- Comparison -->
+                    <div class="bg-amber-50 rounded-xl p-6 border border-amber-200">
+                        <p class="text-amber-800 font-bold mb-2">換算成實感：</p>
+                        <p class="text-xl md:text-2xl font-black text-stone-800 leading-relaxed">
+                            每次使用等於少喝 <span class="text-amber-600 text-3xl">{{ result.comparison.count }}</span> 杯 {{ result.comparison.item }}
+                            <span class="text-3xl align-middle">{{ result.comparison.emoji }}</span>
+                        </p>
+                    </div>
+
+                </div>
+
+                <!-- Auntie's Comment -->
+                <div class="flex gap-4 items-start">
+                    <div class="w-16 h-16 bg-pink-200 rounded-full flex-shrink-0 flex items-center justify-center text-3xl border-2 border-pink-300 overflow-hidden relative shadow-md">
+                        👩‍🦱
+                    </div>
+                    <div class="flex-1 bg-white p-5 rounded-2xl rounded-tl-none shadow-md border border-stone-100 relative">
+                        <div class="absolute top-4 -left-2 w-4 h-4 bg-white border-l border-b border-stone-100 transform rotate-45"></div>
+                        <p class="font-bold text-stone-600 mb-1 text-sm">隔壁阿姨說：</p>
+                        <p class="text-lg font-bold text-stone-800 leading-snug">
+                            "{{ result.comment }}"
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Share Button -->
+                <button @click="shareResult" class="w-full bg-stone-200 hover:bg-stone-300 text-stone-600 font-bold py-3 rounded-xl transition flex justify-center items-center gap-2">
+                    <span v-if="!copied">📋 複製結果去勸敗/勸退</span>
+                    <span v-else class="text-green-600">✅ 已複製！</span>
+                </button>
+
+            </div>
+
+        </main>
+
+        <!-- Footer -->
+        <footer class="bg-stone-900 text-stone-500 py-8 text-center mt-auto">
+            <p class="text-sm mb-2">Created with 😡 & 💸 by AI Agent</p>
+            <p class="text-xs opacity-50">本工具僅供參考，衝動購物請自行負責。</p>
+        </footer>
+
+    </div>
+
+    <script>
+        const { createApp, reactive, ref, computed } = Vue;
+
+        createApp({
+            setup() {
+                const form = reactive({
+                    name: '',
+                    price: null,
+                    years: 2,
+                    frequency: 365
+                });
+
+                const result = ref(null);
+                const copied = ref(false);
+
+                // Comparative Items
+                const anchors = [
+                    { price: 13, name: '茶葉蛋', emoji: '🥚' },
+                    { price: 25, name: '科學麵', emoji: '🍜' },
+                    { price: 35, name: '純茶', emoji: '🍵' },
+                    { price: 65, name: '珍奶', emoji: '🧋' },
+                    { price: 120, name: '雞腿便當', emoji: '🍱' },
+                    { price: 183, name: '基本時薪', emoji: '💰' }, // 2024 min wage
+                    { price: 350, name: '威秀電影票', emoji: '🎬' },
+                    { price: 800, name: '吃到飽', emoji: '🥩' },
+                    { price: 1500, name: '高鐵北高', emoji: '🚄' },
+                    { price: 25000, name: '台積電零股', emoji: '📈' }
+                ];
+
+                const formatNumber = (num) => {
+                    return num % 1 === 0 ? num.toLocaleString() : num.toFixed(1).toLocaleString();
+                };
+
+                const calculate = () => {
+                    if (!form.price || form.price <= 0) {
+                        alert("老闆，不用錢的東西 CP 值無限大啦！請輸入價格。");
+                        return;
+                    }
+
+                    const totalUses = form.years * form.frequency;
+                    const costPerUse = form.price / totalUses;
+                    const costPerDay = form.price / (form.years * 365);
+                    
+                    // Simple Score Heuristic for "Worthiness"
+                    // We need to scale based on absolute price too. 
+                    // High cost per use is ok for very rare, amazing things? No, CP is about efficiency.
+                    // Lower cost per use is always better.
+                    
+                    let score = 50; 
+                    
+                    // Base score logic
+                    if (costPerUse < 5) score = 100;
+                    else if (costPerUse < 15) score = 90;
+                    else if (costPerUse < 50) score = 80;
+                    else if (costPerUse < 100) score = 60;
+                    else if (costPerUse < 300) score = 40;
+                    else if (costPerUse < 1000) score = 20;
+                    else score = 0;
+
+                    // Generate Comparison
+                    // Find the closest anchor that is smaller than costPerUse
+                    let comparisonItem = anchors[0];
+                    let count = (costPerUse / anchors[0].price).toFixed(1);
+
+                    // Find best fit anchor
+                    let bestFit = null;
+                    for (let anchor of anchors) {
+                        if (costPerUse >= anchor.price * 0.5) {
+                            bestFit = anchor;
+                        }
+                    }
+                    if(bestFit) {
+                        comparisonItem = bestFit;
+                        count = (costPerUse / bestFit.price).toFixed(1);
+                    } else {
+                        // Very cheap
+                        comparisonItem = { price: 1, name: '塊錢', emoji: '🪙' };
+                        count = costPerUse.toFixed(1);
+                    }
+
+                    // Generate Auntie's Comment
+                    let comment = "";
+                    if (score >= 90) {
+                        comment = "夭壽喔這麼便宜！你是在做善事嗎？趕快買十個回家囤！";
+                    } else if (score >= 80) {
+                        comment = "還可以啦，算你有在精打細算，可以買啦！";
+                    } else if (score >= 60) {
+                        comment = "是有點貴啦，阿不過如果不買會睡不著，那就買吧...下個月省一點。";
+                    } else if (score >= 40) {
+                        comment = "嘖嘖嘖...這價格你是要吃土喔？想清楚捏，不要買了才在那邊哭。";
+                    } else {
+                        comment = "你是錢太多沒地方花喔？這種盤子價你也買得下去？阿姨我看不下去了！";
+                    }
+
+                    result.value = {
+                        costPerUse,
+                        costPerDay,
+                        totalUses,
+                        score,
+                        comparison: {
+                            item: comparisonItem.name,
+                            emoji: comparisonItem.emoji,
+                            count: count
+                        },
+                        comment
+                    };
+
+                    // Scroll to result
+                    setTimeout(() => {
+                        const el = document.getElementById('result');
+                        if(el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    }, 100);
+                };
+
+                const shareResult = () => {
+                    if (!result.value) return;
+                    const text = `【台式 CP 值審判官 ⚖️】\n我算過了，${form.name || '這個酷東西'}...\n每次使用成本：$${formatNumber(result.value.costPerUse)}\n等於少喝 ${result.value.comparison.count} 杯${result.value.comparison.item} ${result.value.comparison.emoji}\n阿姨說：${result.value.comment}\n快來算算你的：https://simonliuyuwei.github.io/daily-web-tools/tools/cp-value-judge/`;
+                    navigator.clipboard.writeText(text).then(() => {
+                        copied.value = true;
+                        setTimeout(() => copied.value = false, 2000);
+                    });
+                };
+
+                return {
+                    form,
+                    result,
+                    calculate,
+                    formatNumber,
+                    shareResult,
+                    copied
+                };
+            }
+        }).mount('#app');
+    </script>
+</body>
+</html>
