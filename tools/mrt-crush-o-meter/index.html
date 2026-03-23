@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MRT 擠爆指數 | Daily Taiwan Web Tools</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Noto Sans TC', sans-serif;
+            background: radial-gradient(circle at top, rgba(250, 250, 250, 0.6), rgba(15, 23, 42, 0.95));
+            color: #111827;
+        }
+        .neon-card {
+            background: rgba(255, 255, 255, 0.85);
+            border: 1px solid rgba(255, 255, 255, 0.6);
+            box-shadow: 0 10px 40px rgba(15, 23, 42, 0.35);
+        }
+        .sticker {
+            font-family: 'Inter', sans-serif;
+            letter-spacing: 0.3em;
+        }
+    </style>
+</head>
+<body class="min-h-screen py-10">
+    <div class="max-w-5xl mx-auto px-5 space-y-8">
+        <div class="flex items-center justify-between">
+            <a href="../../index.html" class="text-xs font-semibold uppercase tracking-wide text-stone-500 bg-stone-100 px-3 py-2 rounded-full shadow-sm hover:bg-stone-200 transition">🏠 回首頁</a>
+            <span class="text-[11px] text-stone-400 sticker">MRT CRUSH-O-METER</span>
+        </div>
+        <header class="neon-card rounded-3xl p-8 space-y-4 overflow-hidden relative">
+            <div class="absolute inset-0 opacity-25 bg-gradient-to-br from-rose-200 via-amber-200 to-white blur-3xl"></div>
+            <div class="relative space-y-3">
+                <p class="text-sm uppercase tracking-[0.4em] text-stone-500">台灣捷運生存指南</p>
+                <h1 class="text-3xl md:text-4xl font-bold text-stone-900">MRT 擠爆指數</h1>
+                <p class="text-stone-600 leading-relaxed">告訴你哪一條線、哪一個時段會把你塞成小鐵盒。調整時段、耐受力與節日心情，讓指數與生存攻略同步跳動。</p>
+                <div class="flex flex-wrap gap-2 text-xs text-stone-500">
+                    <span class="px-3 py-1 bg-white/70 rounded-full border border-stone-200">台北捷運 & 高捷 & 桃捷適用</span>
+                    <span class="px-3 py-1 bg-white/70 rounded-full border border-stone-200">幽默而實用</span>
+                    <span class="px-3 py-1 bg-white/70 rounded-full border border-stone-200">不提供即時車速，只有心情預測</span>
+                </div>
+            </div>
+        </header>
+
+        <main class="grid gap-6 lg:grid-cols-[1.3fr,1fr]">
+            <section class="neon-card rounded-3xl p-6 space-y-6">
+                <div class="space-y-2">
+                    <label class="text-sm font-semibold text-stone-600">選擇路線</label>
+                    <select id="line-select" class="w-full rounded-2xl border border-stone-200 px-4 py-3 text-stone-700 focus:outline-none focus:ring-2 focus:ring-stone-300">
+                        <option value="red">紅線 (淡水信義線)</option>
+                        <option value="green">綠線 (松山新店線)</option>
+                        <option value="blue">藍線 (板南線)</option>
+                        <option value="brown">棕線 (文湖線)</option>
+                        <option value="yellow">黃線 (中和新蘆線)</option>
+                        <option value="pink">桃捷粉紅線</option>
+                        <option value="orange">高捷橘線</option>
+                    </select>
+                </div>
+
+                <div class="space-y-2">
+                    <div class="flex justify-between items-center text-sm font-semibold text-stone-600">
+                        <span>上車時間預測</span>
+                        <span id="time-display" class="text-stone-900">08:00</span>
+                    </div>
+                    <input id="time-range" type="range" min="5" max="23" value="8" class="w-full">
+                </div>
+
+                <div class="space-y-2">
+                    <p class="text-sm font-semibold text-stone-600">節日心情</p>
+                    <div class="grid grid-cols-3 gap-3 text-sm">
+                        <label class="rounded-2xl border border-stone-200 px-3 py-2 text-center cursor-pointer transition">
+                            <input type="radio" name="day-type" value="weekday" checked class="hidden">
+                            <span class="block">平常日</span>
+                            <small class="text-stone-400">下班經典</small>
+                        </label>
+                        <label class="rounded-2xl border border-stone-200 px-3 py-2 text-center cursor-pointer transition">
+                            <input type="radio" name="day-type" value="weekend" class="hidden">
+                            <span class="block">週末</span>
+                            <small class="text-stone-400">輕鬆呼吸</small>
+                        </label>
+                        <label class="rounded-2xl border border-stone-200 px-3 py-2 text-center cursor-pointer transition">
+                            <input type="radio" name="day-type" value="holiday" class="hidden">
+                            <span class="block">連假</span>
+                            <small class="text-stone-400">祭祖、擠人潮</small>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="space-y-2">
+                    <div class="flex justify-between items-center text-sm font-semibold text-stone-600">
+                        <span>你的耐受力</span>
+                        <span id="tolerance-value" class="text-stone-900">中等</span>
+                    </div>
+                    <input id="tolerance-range" type="range" min="0" max="100" value="50" class="w-full">
+                </div>
+
+                <button id="calculate" class="w-full text-sm font-bold uppercase tracking-[0.3em] bg-gradient-to-r from-stone-900 to-stone-700 text-white py-3 rounded-2xl shadow-lg hover:opacity-90 transition">計算擠爆指數</button>
+
+                <div class="rounded-2xl border border-amber-200/50 bg-amber-50/60 p-4 text-sm text-stone-700 space-y-2">
+                    <p class="font-semibold">模擬說明</p>
+                    <p>指數由路線擠度、時間、節日變動與您的耐受力組成。覺得敏感？把拖拉機模式開到滿。</p>
+                </div>
+            </section>
+
+            <section class="neon-card rounded-3xl p-6 space-y-6 relative overflow-hidden">
+                <div class="absolute inset-0 bg-gradient-to-br from-emerald-200/70 via-white/70 to-sky-200/60 blur-[140px]"></div>
+                <div class="relative space-y-4">
+                    <div class="text-xs tracking-[0.4em] text-stone-600">擠爆指數</div>
+                    <div id="score-badge" class="rounded-3xl border border-stone-200 bg-white/70 p-6 text-center shadow-lg">
+                        <div id="score-emoji" class="text-3xl">🚆</div>
+                        <div id="score-value" class="text-6xl font-bold text-stone-900">0</div>
+                        <div id="score-label" class="text-sm font-medium text-stone-500"></div>
+                    </div>
+                    <p id="score-tip" class="text-sm text-stone-600">按下計算按鈕，看出人潮預報與生存策略。</p>
+                </div>
+
+                <div class="space-y-3 border-t border-stone-200 pt-4">
+                    <p class="text-xs font-semibold text-stone-500">即時預感</p>
+                    <ul id="tip-list" class="space-y-2 text-sm text-stone-700"></ul>
+                </div>
+            </section>
+        </main>
+
+        <section class="neon-card rounded-3xl p-6 space-y-4">
+            <div class="flex items-center justify-between text-sm text-stone-500">
+                <span>捷運生存指南</span>
+                <span id="line-summary" class="font-semibold text-stone-800">選好路線再說。</span>
+            </div>
+            <p class="text-sm text-stone-600 leading-relaxed">用這張模擬單預先提醒自己：把手提包往中間收、耳機音量開到 65%、遇到線上紅色警報就刷悠遊卡的小秘密。記得開啟捷運 alert，因為這個工具只是按好按滿的心境。</p>
+        </section>
+
+        <footer class="text-xs text-stone-500 text-center py-6">Created by AI Agent on 2026-03-24</footer>
+    </div>
+
+    <script>
+        const lineFactors = {
+            red: 1.4,
+            green: 1.15,
+            blue: 1.3,
+            brown: 0.85,
+            yellow: 1.1,
+            pink: 0.9,
+            orange: 1.05
+        };
+
+        const dayBoost = {
+            weekday: 0,
+            weekend: -0.08,
+            holiday: 0.18
+        };
+
+        const verdicts = [
+            { threshold: 85, label: '擠爆到爆', emoji: '💥', color: '#dc2626', tip: '靠門站、拿零食、記得深呼吸。若非必要，改刷公車或先遲到。' },
+            { threshold: 65, label: '人多成潮', emoji: '🤯', color: '#f97316', tip: '等下一班、拿穩扶手，避免當下意識模糊。' },
+            { threshold: 40, label: '有點微動', emoji: '😅', color: '#facc15', tip: '可以嘗試找角落、揹東西貼在身旁保持空間。' },
+            { threshold: 0, label: '空間微風', emoji: '😎', color: '#14b8a6', tip: '這班有位置，裝作是 VIP。' }
+        ];
+
+        const survivalTips = [
+            '把西裝外套摺好放在座位下，別亂晃。',
+            '前方站著小學生？換車卡關的機率大增。',
+            '耳機調到 65% 音量，忘記旁人不再是負擔。',
+            '拿出小風扇裝作在做準備。',
+            '觀察月台標線，排在 3 號車門最不擠。',
+            '手上帶兩張悠遊卡，一張留給急剛的乘客。'
+        ];
+
+        const lineSummary = document.getElementById('line-summary');
+        const toleranceLabel = document.getElementById('tolerance-value');
+        const timeDisplay = document.getElementById('time-display');
+        const tipList = document.getElementById('tip-list');
+        const scoreValue = document.getElementById('score-value');
+        const scoreLabel = document.getElementById('score-label');
+        const scoreTip = document.getElementById('score-tip');
+        const scoreEmoji = document.getElementById('score-emoji');
+        const scoreBadge = document.getElementById('score-badge');
+        const lineSelect = document.getElementById('line-select');
+        const timeRange = document.getElementById('time-range');
+        const toleranceRange = document.getElementById('tolerance-range');
+        const radios = document.querySelectorAll('input[name="day-type"]');
+
+        function updateTimeLabel() {
+            const hour = parseInt(timeRange.value, 10);
+            const label = hour < 12 ? `${hour}:00` : `${hour}:00`;
+            timeDisplay.textContent = label;
+        }
+
+        function updateToleranceLabel() {
+            const value = parseInt(toleranceRange.value, 10);
+            if (value < 30) toleranceLabel.textContent = '超敏感';
+            else if (value < 70) toleranceLabel.textContent = '中等';
+            else toleranceLabel.textContent = '鐵人模式';
+        }
+
+        function nextVerdict(score) {
+            for (const verdict of verdicts) {
+                if (score >= verdict.threshold) return verdict;
+            }
+            return verdicts[verdicts.length - 1];
+        }
+
+        function getDayType() {
+            const selected = [...radios].find(r => r.checked);
+            return selected ? selected.value : 'weekday';
+        }
+
+        function getRandomTips() {
+            const shuffled = [...survivalTips].sort(() => Math.random() - 0.5);
+            return shuffled.slice(0, 3);
+        }
+
+        function getPeakFactor(hour) {
+            if ((hour >= 7 && hour <= 9) || (hour >= 17 && hour <= 19)) return 1.4;
+            if ((hour >= 6 && hour <= 7) || (hour >= 19 && hour <= 21)) return 1.2;
+            return 0.85;
+        }
+
+        function calculateCrush() {
+            const lineValue = lineSelect.value;
+            const hour = parseInt(timeRange.value, 10);
+            const tolerance = parseInt(toleranceRange.value, 10) / 100;
+            const dayType = getDayType();
+
+            const lineFactor = lineFactors[lineValue] || 1;
+            const baseScore = lineFactor * getPeakFactor(hour) * (1 + tolerance) * (1 + dayBoost[dayType]);
+            const clampedBase = Math.max(0.6, Math.min(2.4, baseScore));
+            const normalized = Math.round(((clampedBase - 0.6) / (2.4 - 0.6)) * 100);
+            const score = Math.max(0, Math.min(100, normalized));
+
+            const verdict = nextVerdict(score);
+            const color = verdict.color;
+
+            scoreValue.textContent = score;
+            scoreLabel.textContent = verdict.label;
+            scoreTip.textContent = verdict.tip;
+            scoreEmoji.textContent = verdict.emoji;
+            scoreBadge.style.background = `linear-gradient(135deg, ${color}33, ${color}10)`;
+            scoreBadge.style.borderColor = color + '66';
+            scoreBadge.style.boxShadow = `0 0 25px ${color}44`;
+
+            const currentLine = lineSelect.options[lineSelect.selectedIndex].textContent;
+            const lineMood = `${currentLine} · ${hour}:00 · ${dayType === 'weekday' ? '平常日' : dayType === 'weekend' ? '週末' : '連假'}`;
+            lineSummary.textContent = lineMood;
+
+            tipList.innerHTML = getRandomTips().map(tip => `<li class="flex items-start gap-2"><span class="text-amber-400">•</span><span>${tip}</span></li>`).join('');
+        }
+
+        document.getElementById('calculate').addEventListener('click', () => {
+            calculateCrush();
+        });
+
+        timeRange.addEventListener('input', updateTimeLabel);
+        toleranceRange.addEventListener('input', () => { updateToleranceLabel(); calculateCrush(); });
+        lineSelect.addEventListener('change', calculateCrush);
+        radios.forEach(radio => radio.addEventListener('change', calculateCrush));
+
+        updateTimeLabel();
+        updateToleranceLabel();
+        calculateCrush();
+    </script>
+</body>
+</html>
