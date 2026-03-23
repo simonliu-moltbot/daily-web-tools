@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>台灣機車喇叭翻譯機 | Scooter Honk Decoder</title>
+    <meta name="description" content="聽懂台灣街頭最常聽到的喇叭聲，轉成幽默又安全的生活建議。">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Noto Sans TC', system-ui, sans-serif;
+            background: linear-gradient(180deg, #fdf2f8 0%, #f9fafb 45%, #eef2ff 100%);
+        }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.85);
+            border: 1px solid rgba(148, 163, 184, 0.4);
+            box-shadow: 0 1.5rem 3rem rgba(15, 23, 42, 0.1);
+            backdrop-filter: blur(20px);
+        }
+    </style>
+</head>
+<body class="min-h-screen text-stone-900">
+    <div class="max-w-5xl mx-auto px-4 py-10 space-y-8">
+        <a href="../../index.html" class="inline-flex items-center text-sm font-medium text-stone-600 hover:text-stone-900 transition">
+            🏠 回首頁
+        </a>
+        <section class="glass-card rounded-3xl p-8 space-y-4">
+            <p class="text-xs uppercase tracking-[0.4em] text-stone-400">台灣在地小工具</p>
+            <h1 class="text-3xl sm:text-4xl font-bold text-stone-900">台灣機車喇叭翻譯機</h1>
+            <p class="text-stone-600 leading-relaxed text-lg">
+                每天早上最常聽到的不是鳥叫而是「嘟嘟嘟」？把你聽到的喇叭變成能用的翻譯！選擇喇叭的<strong>節奏</strong>、<strong>語氣</strong>與<strong>強度</strong>，我們會幫你猜出機車騎士的真正在說什麼，順便給出化解尷尬的機智回應。
+            </p>
+            <p class="text-sm text-stone-500">*純娛樂與語言練習，請依照車道禮讓與交通規則安全行駛。</p>
+        </section>
+
+        <section class="glass-card rounded-3xl p-6 space-y-6">
+            <div class="grid gap-4 md:grid-cols-2">
+                <div class="space-y-2">
+                    <label for="context-select" class="text-xs font-semibold text-stone-500 uppercase tracking-[0.3em]">語境 Context</label>
+                    <select id="context-select" class="w-full rounded-2xl border border-stone-200 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-stone-400 transition">
+                        <option value="friendly">友善提醒：後方騎士只是想說哈囉</option>
+                        <option value="rush">趕時間切線：就是那個要插隊的</option>
+                        <option value="thanks">謝謝你讓路：感激狀態的小叮嚀</option>
+                        <option value="warning">危險警示：前方有障礙或者你騎太慢</option>
+                    </select>
+                </div>
+                <div class="space-y-2">
+                    <label for="pattern-select" class="text-xs font-semibold text-stone-500 uppercase tracking-[0.3em]">節奏 Pattern</label>
+                    <select id="pattern-select" class="w-full rounded-2xl border border-stone-200 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-stone-400 transition">
+                        <option value="single">單一下：短短快速的提醒</option>
+                        <option value="double">連按兩聲：跟你說「我在這裡」</option>
+                        <option value="rapid">連續急促：後面真的要衝出去了</option>
+                        <option value="long">長按：警告、煞車鈴或怒吼的長音</option>
+                    </select>
+                </div>
+            </div>
+            <div class="space-y-2">
+                <div class="flex items-center justify-between text-xs uppercase tracking-[0.3em] text-stone-500">
+                    <span>強度 Intensity</span>
+                    <span id="intensity-value" class="font-semibold text-stone-700">5 / 10</span>
+                </div>
+                <input id="intensity-range" type="range" min="1" max="10" value="5" class="w-full accent-stone-500">
+            </div>
+            <div class="flex flex-wrap gap-3">
+                <button id="random-btn" class="px-5 py-2 rounded-full bg-stone-900 text-white text-sm font-semibold hover:bg-stone-800 transition">隨機組合</button>
+                <button id="translate-btn" class="px-5 py-2 rounded-full border border-stone-200 text-sm font-semibold hover:border-stone-400 transition">立即解譯</button>
+                <p class="text-xs text-stone-400 self-center">設定變更會即時更新翻譯，也可以按一下「立即解譯」加強儀式感。</p>
+            </div>
+        </section>
+
+        <section class="glass-card rounded-3xl p-6 space-y-6">
+            <div id="translation-card" class="rounded-2xl bg-stone-900 text-white p-6 space-y-4">
+                <p class="text-xs uppercase tracking-[0.4em] text-stone-300">翻譯 Translation</p>
+                <h2 id="translation-text" class="text-2xl sm:text-3xl font-semibold leading-snug">...</h2>
+                <p id="detail-text" class="text-sm text-stone-200 leading-relaxed">...</p>
+                <div class="grid sm:grid-cols-3 gap-3 text-xs">
+                    <div class="rounded-2xl bg-white/10 px-3 py-2 text-center">
+                        <p class="text-stone-200">語氣</p>
+                        <p id="tone-label" class="font-bold text-white">...</p>
+                    </div>
+                    <div class="rounded-2xl bg-white/10 px-3 py-2 text-center">
+                        <p class="text-stone-200">節奏</p>
+                        <p id="pattern-label" class="font-bold text-white">...</p>
+                    </div>
+                    <div class="rounded-2xl bg-white/10 px-3 py-2 text-center">
+                        <p class="text-stone-200">強度</p>
+                        <p id="intensity-label" class="font-bold text-white">...</p>
+                    </div>
+                </div>
+            </div>
+            <div class="rounded-2xl border border-stone-200 p-5 space-y-3 bg-white">
+                <h3 class="text-lg font-semibold text-stone-900">建議回應 Cheat Sheet</h3>
+                <p id="response-text" class="text-sm text-stone-600 leading-relaxed">...</p>
+                <ul id="tips-list" class="text-xs space-y-2 text-stone-500"></ul>
+            </div>
+        </section>
+
+        <section class="glass-card rounded-3xl p-6 space-y-4">
+            <h3 class="text-lg font-semibold text-stone-900">常見台味喇叭情境</h3>
+            <div class="grid md:grid-cols-2 gap-4">
+                <article class="rounded-2xl border border-stone-200 p-4 bg-white space-y-2">
+                    <p class="text-sm text-stone-400">友善提醒</p>
+                    <p class="font-semibold text-stone-900">「我在這邊唷！」「鮮肉包裝中...」</p>
+                    <p class="text-sm text-stone-500">輕輕一聲單按，代表後方想超車但願意等候，回個手勢就好。</p>
+                </article>
+                <article class="rounded-2xl border border-stone-200 p-4 bg-white space-y-2">
+                    <p class="text-sm text-stone-400">危險警示</p>
+                    <p class="font-semibold text-stone-900">「前面有坑！」「你飛起來了！」</p>
+                    <p class="text-sm text-stone-500">長按或快速重複，代表小心路況或你正慢得令人憂心。</p>
+                </article>
+                <article class="rounded-2xl border border-stone-200 p-4 bg-white space-y-2">
+                    <p class="text-sm text-stone-400">切線快跑</p>
+                    <p class="font-semibold text-stone-900">「我要往那邊！」「快閃開！」</p>
+                    <p class="text-sm text-stone-500">連按兩聲或急促節奏，常見於雙線超車前的焦躁加速。</p>
+                </article>
+                <article class="rounded-2xl border border-stone-200 p-4 bg-white space-y-2">
+                    <p class="text-sm text-stone-400">謝謝你讓路</p>
+                    <p class="font-semibold text-stone-900">「感謝你讓我過」「阿飄一路順風」</p>
+                    <p class="text-sm text-stone-500">單聲或雙聲都可能出現。往你耳邊潑冷水的話，那是感謝啦。</p>
+                </article>
+            </div>
+        </section>
+    </div>
+
+    <footer class="bg-stone-900 text-stone-100 py-6">
+        <div class="max-w-5xl mx-auto px-4 text-center text-xs">Created by AI Agent on 2026-03-24</div>
+    </footer>
+
+    <script>
+        const CONTEXT_LIBRARY = {
+            friendly: {
+                label: '友善提醒',
+                translation: '後面只是想說「我在這裡，請照顧裡面那條線」，聲音趁著微笑跑出。',
+                tone: '輕鬆和緩',
+                response: '給個手勢微微點頭，保持慢速並讓出右側。',
+                tips: ['放慢速度，安全後面讓出車道。', '輕掃右邊後視鏡，讓朋友知道你看到他了。']
+            },
+            rush: {
+                label: '趕時間切線',
+                translation: '這個人正在跟你說「我要從這邊插出去」，語氣急促但還沒開火。',
+                tone: '焦躁急促',
+                response: '冷靜地打方向燈，給他一點空間，別再拉對手的剎車了。',
+                tips: ['看一下路肩是否可以暫時讓路。', '避免再往左靠，否則要變成長長的喇叭合唱。']
+            },
+            thanks: {
+                label: '謝謝你讓路',
+                translation: '是位好心人說「感謝你讓我過」，雖然聲音有點奇怪但充滿善意。',
+                tone: '愉快感謝',
+                response: '點頭微笑，放低左手，比一個小小的「敬禮」。',
+                tips: ['保持速度，別狠狠按後視鏡。', '若你也在超車，輕輕回傳他一個感謝聲。']
+            },
+            warning: {
+                label: '危險警示',
+                translation: '「這裡有坑／有人在你盲點」，稠密的長音在說「請注意！」',
+                tone: '嚴肅督促',
+                response: '立刻減速或靠右，觀察前方是否有障礙，避免直接跟他的尾燈對撞。',
+                tips: ['開啟轉向燈示警，不要再盲目加速。', '自己也提醒後方騎士，降低連鎖喇叭聲。']
+            }
+        };
+
+        const PATTERNS = {
+            single: {
+                label: '單一下',
+                description: '清脆單聲',
+                flavor: '像在說「慢慢來，我在這邊」'
+            },
+            double: {
+                label: '連按兩聲',
+                description: '節奏感十足',
+                flavor: '相當於「給我留一條路」的鼓勵喊話'
+            },
+            rapid: {
+                label: '連續急促',
+                description: '像機車在打鼓',
+                flavor: '代表「我已經快上去」但還沒爆怒'
+            },
+            long: {
+                label: '長按',
+                description: '像大聲公在嚇你',
+                flavor: '表示「小心！我不是亂按的」'
+            }
+        };
+
+        const intensityLabels = value => {
+            if (value <= 3) return '柔和';
+            if (value <= 6) return '一般';
+            if (value <= 8) return '緊張';
+            return '盛怒';
+        };
+
+        const contextSelect = document.getElementById('context-select');
+        const patternSelect = document.getElementById('pattern-select');
+        const intensityRange = document.getElementById('intensity-range');
+        const intensityValue = document.getElementById('intensity-value');
+        const translationText = document.getElementById('translation-text');
+        const detailText = document.getElementById('detail-text');
+        const toneLabel = document.getElementById('tone-label');
+        const patternLabel = document.getElementById('pattern-label');
+        const intensityLabel = document.getElementById('intensity-label');
+        const responseText = document.getElementById('response-text');
+        const tipsList = document.getElementById('tips-list');
+
+        function updateResult() {
+            const context = CONTEXT_LIBRARY[contextSelect.value];
+            const pattern = PATTERNS[patternSelect.value];
+            const intensity = Number(intensityRange.value);
+            intensityValue.textContent = `${intensity} / 10`;
+
+            translationText.textContent = `${context.translation}`;
+            detailText.textContent = `節奏${pattern.description}，讓人感覺${pattern.flavor}，語氣${context.tone}，我們把強度看成 ${intensityLabels(intensity)}。`;
+            toneLabel.textContent = context.tone;
+            patternLabel.textContent = pattern.label;
+            intensityLabel.textContent = intensityLabels(intensity);
+            responseText.textContent = context.response;
+
+            tipsList.innerHTML = context.tips.map(t => `<li>• ${t}</li>`).join('');
+        }
+
+        function randomizeScenario() {
+            const contextKeys = Object.keys(CONTEXT_LIBRARY);
+            const patternKeys = Object.keys(PATTERNS);
+            contextSelect.value = contextKeys[Math.floor(Math.random() * contextKeys.length)];
+            patternSelect.value = patternKeys[Math.floor(Math.random() * patternKeys.length)];
+            intensityRange.value = 1 + Math.floor(Math.random() * 10);
+            updateResult();
+        }
+
+        document.getElementById('translate-btn').addEventListener('click', () => {
+            updateResult();
+        });
+        document.getElementById('random-btn').addEventListener('click', randomizeScenario);
+        contextSelect.addEventListener('change', updateResult);
+        patternSelect.addEventListener('change', updateResult);
+        intensityRange.addEventListener('input', updateResult);
+
+        window.addEventListener('DOMContentLoaded', () => {
+            updateResult();
+        });
+    </script>
+</body>
+</html>
