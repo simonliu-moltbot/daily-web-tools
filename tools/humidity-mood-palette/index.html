@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>台灣濕度心情調色盤 | Daily Taiwan Web Tools</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Noto Sans TC', system-ui, sans-serif; }
+        .humidity-wave { background: linear-gradient(120deg, #38bdf8, #a855f7, #fb7185); }
+    </style>
+</head>
+<body class="bg-stone-950 text-stone-100">
+    <div class="min-h-screen px-4 py-10 bg-gradient-to-br from-stone-950 via-slate-900 to-stone-900">
+        <div class="max-w-5xl mx-auto bg-white/5 border border-white/10 rounded-3xl shadow-2xl backdrop-blur-3xl overflow-hidden">
+            <div class="p-6 flex flex-wrap items-center justify-between gap-3 border-b border-white/10">
+                <div>
+                    <p class="text-xs uppercase tracking-[0.3em] text-stone-400">Daily Taiwan Web Tools</p>
+                    <h1 class="text-3xl font-bold text-white">濕度心情調色盤</h1>
+                    <p class="text-sm text-stone-300 mt-1">把台灣的溼熱天氣轉成一張有趣的心情圖，準備好用噴射冷氣應對每一刻。</p>
+                </div>
+                <a href="../../index.html" class="px-4 py-2 rounded-full bg-white/90 text-stone-900 text-sm font-semibold border border-white/20 shadow-sm transition hover:scale-105">🏠 回首頁</a>
+            </div>
+            <div class="grid md:grid-cols-2 gap-6 p-6">
+                <section class="space-y-6">
+                    <div class="space-y-2">
+                        <div class="flex items-center justify-between text-xs uppercase tracking-[0.4em] text-stone-400">
+                            <span>溫度</span>
+                            <span id="temp-badge">28°C</span>
+                        </div>
+                        <input id="temp-input" type="range" min="18" max="38" value="28" class="w-full h-2 bg-white/30 accent-amber-300 rounded-full">
+                        <p class="text-xs text-stone-400">想像自己站在台北市區，騎車、等公車、還是走進夜市？調整溫度看看心情怎麼變化。</p>
+                    </div>
+                    <div class="space-y-2">
+                        <div class="flex items-center justify-between text-xs uppercase tracking-[0.4em] text-stone-400">
+                            <span>濕度</span>
+                            <span id="humidity-badge">70%</span>
+                        </div>
+                        <input id="humidity-input" type="range" min="20" max="100" value="70" class="w-full h-2 bg-white/30 accent-sky-400 rounded-full">
+                        <p class="text-xs text-stone-400">濕度越高，世界就越像蒸籠，快把毛巾塞進包包裡。</p>
+                    </div>
+                    <div class="space-y-3">
+                        <p class="text-xs uppercase tracking-[0.4em] text-stone-400">當天活動</p>
+                        <div id="activity-buttons" class="grid grid-cols-2 gap-3">
+                            <button type="button" class="activity-btn px-3 py-2 rounded-2xl border border-white/20 bg-white/10 text-left text-sm font-medium transition" data-activity="scooter">🛵 機車通勤</button>
+                            <button type="button" class="activity-btn px-3 py-2 rounded-2xl border border-white/20 bg-white/10 text-left text-sm font-medium transition" data-activity="office">🧊 冷氣辦公</button>
+                            <button type="button" class="activity-btn px-3 py-2 rounded-2xl border border-white/20 bg-white/10 text-left text-sm font-medium transition" data-activity="nightmarket">🌃 夜市亂逛</button>
+                            <button type="button" class="activity-btn px-3 py-2 rounded-2xl border border-white/20 bg-white/10 text-left text-sm font-medium transition" data-activity="hiking">🥾 山林健行</button>
+                        </div>
+                        <p id="activity-note" class="text-xs text-stone-400">選一個最貼近今天的行程，讓心情調色盤變得更精準。</p>
+                    </div>
+                </section>
+                <section class="space-y-5">
+                    <div class="rounded-3xl bg-stone-900/60 border border-white/10 p-5 shadow-lg">
+                        <div class="flex items-center justify-between">
+                            <p class="text-xs uppercase tracking-[0.5em] text-stone-400">心情指數</p>
+                            <span id="mood-value" class="text-sm font-semibold">88 / 100</span>
+                        </div>
+                        <div class="mt-3 h-3 w-full bg-white/10 rounded-full overflow-hidden">
+                            <div id="mood-meter" class="h-full rounded-full bg-gradient-to-r from-emerald-400 via-amber-300 to-rose-500" style="width: 80%;"></div>
+                        </div>
+                        <p id="mood-description" class="mt-4 text-sm text-stone-300 leading-relaxed">慵懶感剛好，今天可以挑戰不帶小電風扇的下班路。</p>
+                    </div>
+                    <div class="rounded-3xl bg-white/5 border border-white/10 p-5 shadow-lg space-y-3">
+                        <div class="flex items-center justify-between">
+                            <p class="text-xs uppercase tracking-[0.4em] text-stone-400">活動建議</p>
+                            <span id="activity-title" class="text-sm text-amber-300 font-semibold">🛵 機車通勤</span>
+                        </div>
+                        <p id="activity-blurb" class="text-sm text-stone-300">把防曬噴霧噴在耳朵與脖子，確保風衣對抗風乾。</p>
+                        <ul id="activity-tips" class="space-y-2 text-sm text-stone-400"></ul>
+                    </div>
+                    <div class="rounded-3xl border border-white/10 p-5 shadow-lg bg-gradient-to-br from-slate-900/80 via-slate-900/60 to-slate-900/90">
+                        <p class="text-xs uppercase tracking-[0.4em] text-stone-400">必備小物 / 湯包</p>
+                        <p id="snack-suggestion" class="mt-2 text-lg font-semibold text-white">鹽酥雞 X 喝一口檸檬冬瓜茶</p>
+                        <p id="snack-note" class="text-xs text-stone-400 mt-1">這個組合對抗黏黏潮濕，保證心情綠燈。</p>
+                    </div>
+                    <div class="rounded-3xl border border-dashed border-amber-400/50 p-5 bg-amber-500/10">
+                        <p class="text-xs uppercase tracking-[0.4em] text-amber-200">濕度畫布</p>
+                        <div class="relative h-20 rounded-2xl overflow-hidden humidity-wave"></div>
+                        <p class="text-xs text-amber-100 mt-3">今天的濕潤感：<span id="humidity-art"></span></p>
+                    </div>
+                </section>
+            </div>
+            <footer class="border-t border-white/10 px-6 py-4 text-xs text-stone-400 text-center">Created by AI Agent on 2026-03-25</footer>
+        </div>
+    </div>
+    <script>
+        const tempInput = document.getElementById('temp-input');
+        const humidityInput = document.getElementById('humidity-input');
+        const tempBadge = document.getElementById('temp-badge');
+        const humidityBadge = document.getElementById('humidity-badge');
+        const moodValue = document.getElementById('mood-value');
+        const moodMeter = document.getElementById('mood-meter');
+        const moodDescription = document.getElementById('mood-description');
+        const activityButtons = document.querySelectorAll('.activity-btn');
+        const activityTitle = document.getElementById('activity-title');
+        const activityBlurb = document.getElementById('activity-blurb');
+        const activityTips = document.getElementById('activity-tips');
+        const snackSuggestion = document.getElementById('snack-suggestion');
+        const snackNote = document.getElementById('snack-note');
+        const humidityArt = document.getElementById('humidity-art');
+        let currentActivity = 'scooter';
+
+        const activityProfiles = {
+            scooter: {
+                label: '🛵 機車通勤',
+                blurb: '重點是防曬與風衣，濕氣來自地面，雨衣不是唯一選項。',
+                steps: ['口罩裡塞一片涼感濕巾，再戴上安全帽布套', '紅燈排隊時把手套脫下通風，避免汗水滴進開關']
+            },
+            office: {
+                label: '🧊 冷氣辦公',
+                blurb: '空氣調節器是你的隊友，可別讓冷氣直接對著臉。',
+                steps: ['在桌上放一杯加冰水，讓R.O.I.看起來像冰雕', '準備一個小風扇模擬微風，不讓身體習慣冷熱快速變動']
+            },
+            nightmarket: {
+                label: '🌃 夜市亂逛',
+                blurb: '當路邊油煙再配上高濕，熱浪比廟口香火還旺。',
+                steps: ['買飲料時請老闆多加一片冰◆', '沿著巷子走走淺水道，讓風從小巷口吹進來']
+            },
+            hiking: {
+                label: '🥾 山林健行',
+                blurb: '山上霧氣濕潤，越往上走，汗越像瀑布。',
+                steps: ['選擇透氣鞋襪，濕氣自然走出來', '補水時間不要一次灌完，像在泡茶一樣分段喝']
+            }
+        };
+
+        const moodNarratives = [
+            { min: 80, title: '清爽微風', desc: '好像剛被吹過一次冷氣，走出門還能跟朋友聊八卦。' },
+            { min: 55, title: '濕潤伍人', desc: '有點黏，但還能靠小風扇、冰敷包撐下去。' },
+            { min: 35, title: '黏呼呼挑戰', desc: '需要風扇、冷敷跟一整瓶搖晃的冰萃茶，才能撐到下班。' },
+            { min: 0, title: '汗水濃湯', desc: '空氣像蒸籠一樣，別忘了那個隨身小毛巾。' }
+        ];
+
+        const snackIdeas = [
+            { until: 35, text: '咬一口檸檬汁炸雞 plus 冬瓜檸檬', note: '鹹甜酸的組合把黏膩晾乾。' },
+            { until: 55, text: '鹽酥雞＋冰梅汁', note: '半杯酸梅、一份香酥讓熱氣分心。' },
+            { until: 80, text: '刨冰＋茶飲', note: '多層次口感配上碎冰，就是濕度最佳解。' },
+            { until: 100, text: '豆漿＋油條', note: '稀飯也行，低調但有溫度。' }
+        ];
+
+        const humidityStories = [
+            '空氣像剛出蒸籠的刈包',
+            '走在街上像在熱炒攤裡多喝了三杯啤酒',
+            '小巷風一吹，頭髮變得像門神的鬍鬚',
+            '像下午的台北 7-11，門一開天下瞬間蒸發'
+        ];
+
+        function updateActivityUI() {
+            activityButtons.forEach(button => {
+                const isActive = button.dataset.activity === currentActivity;
+                button.classList.toggle('bg-amber-400/20', isActive);
+                button.classList.toggle('border-amber-200/60', isActive);
+                button.classList.toggle('text-white', isActive);
+            });
+        }
+
+        function pickMoodNarrative(score) {
+            return moodNarratives.find(n => score >= n.min);
+        }
+
+        function pickSnack(score) {
+            return snackIdeas.find(item => score <= item.until) || snackIdeas[snackIdeas.length - 1];
+        }
+
+        function pickHumidityStory() {
+            return humidityStories[Math.floor(Math.random() * humidityStories.length)];
+        }
+
+        function computeMoodScore(temp, humidity) {
+            const tempDiff = Math.abs(temp - 26);
+            const humidityDiff = Math.abs(humidity - 65);
+            const discomfort = tempDiff * 1.5 + humidityDiff;
+            const raw = Math.round(110 - discomfort);
+            return Math.max(10, Math.min(raw, 100));
+        }
+
+        function updateDisplay() {
+            const temp = Number(tempInput.value);
+            const humidity = Number(humidityInput.value);
+            tempBadge.textContent = `${temp}°C`;
+            humidityBadge.textContent = `${humidity}%`;
+
+            const score = computeMoodScore(temp, humidity);
+            const narrative = pickMoodNarrative(score);
+            moodValue.textContent = `${score} / 100`;
+            moodMeter.style.width = `${score}%`;
+            moodDescription.textContent = narrative.desc;
+
+            const profile = activityProfiles[currentActivity];
+            activityTitle.textContent = profile.label;
+            activityBlurb.textContent = profile.blurb;
+            activityTips.innerHTML = profile.steps.map(step => `<li class="list-disc pl-4">${step}</li>`).join('');
+
+            const snack = pickSnack(score);
+            snackSuggestion.textContent = snack.text;
+            snackNote.textContent = snack.note;
+
+            humidityArt.textContent = pickHumidityStory();
+        }
+
+        tempInput.addEventListener('input', updateDisplay);
+        humidityInput.addEventListener('input', updateDisplay);
+        activityButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                currentActivity = button.dataset.activity;
+                updateActivityUI();
+                updateDisplay();
+            });
+        });
+
+        // Initialize
+        updateActivityUI();
+        updateDisplay();
+    </script>
+</body>
+</html>
