@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>🛵 紅燈熄火省油神算 | 台灣機車怠速 vs 重啟</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'Noto Sans TC', system-ui, -apple-system, Segoe UI, Roboto, sans-serif; }
+    input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 18px; height: 18px; border-radius: 9999px; background: #0f172a; border: 2px solid #fff; box-shadow: 0 1px 3px rgba(0,0,0,.25); }
+    input[type="range"]::-webkit-slider-runnable-track { height: 8px; border-radius: 9999px; background: linear-gradient(90deg, #e2e8f0, #cbd5e1); }
+  </style>
+</head>
+<body class="min-h-screen bg-gradient-to-b from-slate-50 to-white text-slate-900">
+  <div class="max-w-5xl mx-auto px-4 py-6">
+    <div class="flex items-center justify-between gap-3">
+      <a href="../../index.html" class="inline-flex items-center gap-2 text-sm font-semibold text-slate-700 hover:text-slate-900">
+        <span class="text-base">🏠</span> 回首頁
+      </a>
+      <div class="text-xs text-slate-500">離線計算・不蒐集資料</div>
+    </div>
+
+    <header class="mt-6">
+      <h1 class="text-3xl sm:text-4xl font-bold tracking-tight">🛵 紅燈熄火省油神算</h1>
+      <p class="mt-3 text-slate-600 leading-relaxed">
+        台灣日常：紅燈排隊、右轉車硬擠、後面阿伯一直「叭」。
+        你想熄火省油，但又怕「重啟更耗油／更傷車」？用這個小工具用數字講話。
+      </p>
+
+      <div class="mt-5 grid grid-cols-1 lg:grid-cols-3 gap-3">
+        <div class="rounded-2xl border border-slate-200 bg-white p-4">
+          <div class="text-xs text-slate-500">快速情境</div>
+          <div class="mt-2 flex flex-wrap gap-2">
+            <button class="preset px-3 py-1.5 rounded-full border border-slate-200 text-sm hover:bg-slate-50" data-preset="commute">通勤族</button>
+            <button class="preset px-3 py-1.5 rounded-full border border-slate-200 text-sm hover:bg-slate-50" data-preset="delivery">外送跑單</button>
+            <button class="preset px-3 py-1.5 rounded-full border border-slate-200 text-sm hover:bg-slate-50" data-preset="chill">佛系出門</button>
+            <button class="preset px-3 py-1.5 rounded-full border border-slate-200 text-sm hover:bg-slate-50" data-preset="reset">重設</button>
+          </div>
+        </div>
+
+        <div class="rounded-2xl border border-slate-200 bg-white p-4 lg:col-span-2">
+          <div class="flex items-start justify-between gap-4">
+            <div>
+              <div class="text-xs text-slate-500">一句話建議</div>
+              <div id="oneLiner" class="mt-1 text-lg font-bold">調整參數後，我會幫你算出「熄火划不划算」。</div>
+              <div id="caveat" class="mt-1 text-xs text-slate-500"></div>
+            </div>
+            <div class="shrink-0 text-right">
+              <div class="text-xs text-slate-500">每月油錢差</div>
+              <div id="moneyMonthly" class="mt-1 text-2xl font-black tabular-nums">—</div>
+              <div id="riceMonthly" class="mt-1 text-xs text-slate-500">—</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <main class="mt-6 grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <section class="rounded-2xl border border-slate-200 bg-white p-5">
+        <h2 class="text-lg font-bold">1) 你的紅燈日常（行為）</h2>
+
+        <div class="mt-4 space-y-4">
+          <div>
+            <div class="flex items-center justify-between">
+              <label class="text-sm font-semibold" for="stopsPerDay">每天大概停幾次紅燈？</label>
+              <span class="text-sm text-slate-700 tabular-nums"><span id="stopsPerDayVal"></span> 次/天</span>
+            </div>
+            <input id="stopsPerDay" type="range" min="5" max="120" value="35" class="mt-2 w-full" />
+            <p class="mt-1 text-xs text-slate-500">大城市通勤常見 25–50 次；跑單可能更高。</p>
+          </div>
+
+          <div>
+            <div class="flex items-center justify-between">
+              <label class="text-sm font-semibold" for="avgWaitSec">每次平均等多久？</label>
+              <span class="text-sm text-slate-700 tabular-nums"><span id="avgWaitSecVal"></span> 秒</span>
+            </div>
+            <input id="avgWaitSec" type="range" min="5" max="180" value="55" class="mt-2 w-full" />
+          </div>
+
+          <div>
+            <div class="flex items-center justify-between">
+              <label class="text-sm font-semibold" for="cutoffSec">你會在「超過幾秒」才選擇熄火？</label>
+              <span class="text-sm text-slate-700 tabular-nums">> <span id="cutoffSecVal"></span> 秒</span>
+            </div>
+            <input id="cutoffSec" type="range" min="5" max="90" value="25" class="mt-2 w-full" />
+            <p class="mt-1 text-xs text-slate-500">太短就熄火：你會變成「啟停機器人」。太長：省油會變少。</p>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label class="text-sm font-semibold" for="daysPerMonth">每月騎車天數</label>
+              <input id="daysPerMonth" type="number" min="1" max="31" value="22" class="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-slate-200" />
+            </div>
+            <div>
+              <label class="text-sm font-semibold" for="bufferSec">起步前保留怠速（安全緩衝）</label>
+              <div class="mt-1 flex items-center gap-2">
+                <input id="bufferSec" type="number" min="0" max="10" value="3" class="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-slate-200" />
+                <span class="text-xs text-slate-500">秒</span>
+              </div>
+              <p class="mt-1 text-xs text-slate-500">例如綠燈前 3 秒先發動，避免慌張。</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="rounded-2xl border border-slate-200 bg-white p-5">
+        <h2 class="text-lg font-bold">2) 你的車／油（數字）</h2>
+
+        <div class="mt-4 space-y-4">
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label class="text-sm font-semibold" for="idleMlPerMin">怠速耗油（估值）</label>
+              <div class="mt-1 flex items-center gap-2">
+                <input id="idleMlPerMin" type="number" min="5" max="100" value="25" class="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-slate-200" />
+                <span class="text-xs text-slate-500">mL/分鐘</span>
+              </div>
+              <p class="mt-1 text-xs text-slate-500">不知道就用 20–35 mL/分鐘當作粗估。</p>
+            </div>
+            <div>
+              <label class="text-sm font-semibold" for="restartMl">每次重啟額外耗油（估值）</label>
+              <div class="mt-1 flex items-center gap-2">
+                <input id="restartMl" type="number" min="0" max="10" step="0.1" value="1.2" class="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-slate-200" />
+                <span class="text-xs text-slate-500">mL/次</span>
+              </div>
+              <p class="mt-1 text-xs text-slate-500">這是簡化模型：把「噴油、加速回怠速」折成一次固定值。</p>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label class="text-sm font-semibold" for="gasPrice">油價</label>
+              <div class="mt-1 flex items-center gap-2">
+                <input id="gasPrice" type="number" min="15" max="60" step="0.1" value="31.5" class="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-slate-200" />
+                <span class="text-xs text-slate-500">元/公升</span>
+              </div>
+            </div>
+            <div>
+              <label class="text-sm font-semibold" for="ricePrice">滷肉飯單價（梗用）</label>
+              <div class="mt-1 flex items-center gap-2">
+                <input id="ricePrice" type="number" min="25" max="120" value="45" class="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-slate-200" />
+                <span class="text-xs text-slate-500">元/碗</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="rounded-xl bg-slate-50 border border-slate-200 p-4">
+            <h3 class="text-sm font-bold">小提醒（很重要但不囉嗦）</h3>
+            <ul class="mt-2 text-sm text-slate-600 space-y-1 list-disc pl-5">
+              <li>本工具只算「油錢」，不評論電瓶、啟動馬達、引擎溫度等長期影響。</li>
+              <li>如果你是電車／油電／有原廠怠速啟停系統，參數意義會不同。</li>
+              <li>路口安全優先：別為了省 0.3 元搞到被後車「關心」。</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <section class="rounded-2xl border border-slate-200 bg-white p-5 lg:col-span-2">
+        <h2 class="text-lg font-bold">3) 結果（用數字把吵架終結）</h2>
+
+        <div class="mt-4 grid grid-cols-1 lg:grid-cols-3 gap-4">
+          <div class="rounded-xl border border-slate-200 p-4">
+            <div class="text-xs text-slate-500">預估會熄火的次數</div>
+            <div class="mt-1 text-2xl font-black tabular-nums" id="stopsOffMonthly">—</div>
+            <div class="mt-1 text-xs text-slate-500">次/月</div>
+          </div>
+          <div class="rounded-xl border border-slate-200 p-4">
+            <div class="text-xs text-slate-500">省下的怠速油耗</div>
+            <div class="mt-1 text-2xl font-black tabular-nums" id="savedFuelL">—</div>
+            <div class="mt-1 text-xs text-slate-500">公升/月</div>
+          </div>
+          <div class="rounded-xl border border-slate-200 p-4">
+            <div class="text-xs text-slate-500">重啟額外油耗</div>
+            <div class="mt-1 text-2xl font-black tabular-nums" id="restartFuelL">—</div>
+            <div class="mt-1 text-xs text-slate-500">公升/月</div>
+          </div>
+        </div>
+
+        <div class="mt-4 rounded-2xl bg-gradient-to-r from-slate-900 to-slate-700 text-white p-5">
+          <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+            <div>
+              <div class="text-xs text-white/70">每月淨差（熄火 - 不熄火）</div>
+              <div id="netMoney" class="mt-1 text-3xl font-black tabular-nums">—</div>
+              <div id="netFuel" class="mt-1 text-sm text-white/80 tabular-nums">—</div>
+            </div>
+            <div class="rounded-xl bg-white/10 border border-white/15 p-4 w-full sm:w-auto">
+              <div class="text-xs text-white/70">你的「熄火門檻」臨界點</div>
+              <div id="breakeven" class="mt-1 text-xl font-bold tabular-nums">—</div>
+              <div class="mt-1 text-xs text-white/70">（平均等候超過這個秒數，熄火才比較省）</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div class="rounded-xl border border-slate-200 p-4">
+            <div class="text-sm font-bold">阿伯怒瞪指數（娛樂用）</div>
+            <div class="mt-2 h-3 bg-slate-100 rounded-full overflow-hidden">
+              <div id="auntieBar" class="h-full bg-rose-500" style="width: 30%"></div>
+            </div>
+            <div id="auntieText" class="mt-2 text-sm text-slate-600">—</div>
+          </div>
+          <div class="rounded-xl border border-slate-200 p-4">
+            <div class="text-sm font-bold">一鍵分享（複製結果）</div>
+            <div class="mt-2 flex flex-col sm:flex-row gap-2">
+              <button id="copyBtn" class="px-4 py-2 rounded-lg bg-slate-900 text-white text-sm font-bold hover:bg-slate-800">複製摘要</button>
+              <button id="randomRoastBtn" class="px-4 py-2 rounded-lg border border-slate-200 text-sm font-bold hover:bg-slate-50">生成一段路口嘴砲</button>
+            </div>
+            <textarea id="shareText" class="mt-2 w-full h-24 rounded-lg border border-slate-200 px-3 py-2 text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-slate-200" placeholder="你的結果摘要會出現在這裡…" readonly></textarea>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="mt-10 pb-10 text-center text-xs text-slate-500">
+      Created by AI Agent on 2026-03-24
+    </footer>
+  </div>
+
+  <script>
+    const $ = (id) => document.getElementById(id);
+
+    const els = {
+      stopsPerDay: $('stopsPerDay'),
+      avgWaitSec: $('avgWaitSec'),
+      cutoffSec: $('cutoffSec'),
+      daysPerMonth: $('daysPerMonth'),
+      bufferSec: $('bufferSec'),
+      idleMlPerMin: $('idleMlPerMin'),
+      restartMl: $('restartMl'),
+      gasPrice: $('gasPrice'),
+      ricePrice: $('ricePrice'),
+
+      stopsPerDayVal: $('stopsPerDayVal'),
+      avgWaitSecVal: $('avgWaitSecVal'),
+      cutoffSecVal: $('cutoffSecVal'),
+
+      moneyMonthly: $('moneyMonthly'),
+      riceMonthly: $('riceMonthly'),
+      oneLiner: $('oneLiner'),
+      caveat: $('caveat'),
+
+      stopsOffMonthly: $('stopsOffMonthly'),
+      savedFuelL: $('savedFuelL'),
+      restartFuelL: $('restartFuelL'),
+      netMoney: $('netMoney'),
+      netFuel: $('netFuel'),
+      breakeven: $('breakeven'),
+
+      auntieBar: $('auntieBar'),
+      auntieText: $('auntieText'),
+
+      copyBtn: $('copyBtn'),
+      shareText: $('shareText'),
+      randomRoastBtn: $('randomRoastBtn'),
+    };
+
+    function clamp(n, a, b) { return Math.min(b, Math.max(a, n)); }
+    function fmt(n, d=0) {
+      const x = Number.isFinite(n) ? n : 0;
+      return x.toLocaleString('zh-TW', { maximumFractionDigits: d, minimumFractionDigits: d });
+    }
+
+    function compute() {
+      const stopsPerDay = Number(els.stopsPerDay.value);
+      const avgWaitSec = Number(els.avgWaitSec.value);
+      const cutoffSec = Number(els.cutoffSec.value);
+      const daysPerMonth = clamp(Number(els.daysPerMonth.value || 0), 1, 31);
+      const bufferSec = clamp(Number(els.bufferSec.value || 0), 0, 10);
+
+      const idleMlPerMin = clamp(Number(els.idleMlPerMin.value || 0), 0, 999);
+      const restartMl = clamp(Number(els.restartMl.value || 0), 0, 999);
+      const gasPrice = clamp(Number(els.gasPrice.value || 0), 0, 999);
+      const ricePrice = clamp(Number(els.ricePrice.value || 45), 1, 999);
+
+      // UI mirror
+      els.stopsPerDayVal.textContent = stopsPerDay;
+      els.avgWaitSecVal.textContent = avgWaitSec;
+      els.cutoffSecVal.textContent = cutoffSec;
+
+      // How many stops qualify for turning off? (very simplified)
+      const qualifies = avgWaitSec > cutoffSec ? 1 : 0;
+      const stopsOffPerDay = stopsPerDay * qualifies;
+      const stopsOffMonthly = stopsOffPerDay * daysPerMonth;
+
+      // Saved idle time per qualifying stop
+      const savedSecPerStop = Math.max(0, avgWaitSec - bufferSec);
+      const savedSecMonthly = stopsOffMonthly * savedSecPerStop;
+
+      const savedFuelMl = (savedSecMonthly / 60) * idleMlPerMin;
+      const restartFuelMl = stopsOffMonthly * restartMl;
+      const netFuelMl = savedFuelMl - restartFuelMl;
+
+      const netFuelL = netFuelMl / 1000;
+      const netMoney = netFuelL * gasPrice;
+
+      // Breakeven: need idleSavedMl > restartMl
+      // idleSavedMl per stop = max(0, (wait-buffer)/60 * idleMlPerMin)
+      // Solve for wait: (wait-buffer)/60*idleMlPerMin = restartMl => wait = buffer + 60*restartMl/idleMlPerMin
+      const breakevenSec = idleMlPerMin > 0 ? (bufferSec + 60 * restartMl / idleMlPerMin) : Infinity;
+
+      // Display blocks
+      els.stopsOffMonthly.textContent = fmt(stopsOffMonthly, 0);
+      els.savedFuelL.textContent = fmt(savedFuelMl/1000, 3);
+      els.restartFuelL.textContent = fmt(restartFuelMl/1000, 3);
+
+      const moneyStr = (netMoney >= 0 ? `省 ${fmt(netMoney, 0)} 元` : `多花 ${fmt(Math.abs(netMoney), 0)} 元`);
+      els.netMoney.textContent = moneyStr;
+      els.netFuel.textContent = `淨省油 ${netFuelL >= 0 ? fmt(netFuelL, 3) : '-' + fmt(Math.abs(netFuelL), 3)} L/月`;
+
+      els.moneyMonthly.textContent = netMoney === 0 ? '0 元' : (netMoney > 0 ? `+${fmt(netMoney, 0)} 元` : `-${fmt(Math.abs(netMoney), 0)} 元`);
+      const riceBowls = ricePrice > 0 ? (Math.abs(netMoney) / ricePrice) : 0;
+      els.riceMonthly.textContent = netMoney >= 0
+        ? `大約 ${fmt(riceBowls, 1)} 碗滷肉飯（以 ${fmt(ricePrice,0)} 元/碗）`
+        : `等於少吃 ${fmt(riceBowls, 1)} 碗滷肉飯（以 ${fmt(ricePrice,0)} 元/碗）`;
+
+      els.breakeven.textContent = (breakevenSec === Infinity)
+        ? '（怠速耗油=0？你是推車嗎）'
+        : `${fmt(breakevenSec, 1)} 秒`;
+
+      // One-liner advice
+      let one;
+      let caveat = '';
+      if (!qualifies) {
+        one = `以你現在的平均等候（${avgWaitSec}s）與門檻（>${cutoffSec}s），基本上「不會熄火」。你贏了：不用吵。`;
+        caveat = '提示：把「平均等候」調高或把「熄火門檻」調低，才會進入熄火情境。';
+      } else if (netMoney > 0) {
+        one = `建議：熄火偏划算。你每月大約可以省下 ${fmt(netMoney,0)} 元油錢。`;
+        caveat = `你的臨界點約 ${fmt(breakevenSec,1)} 秒；平均等候超過它就比較省。`;
+      } else if (netMoney < 0) {
+        one = `建議：先別熄火（至少別每次都熄）。以目前參數，重啟成本吃掉省油。`;
+        caveat = `想熄火也行：把門檻提高（只在更長紅燈才熄），或把「每次重啟耗油」估值調低。`;
+      } else {
+        one = `你的參數剛好打平：熄不熄都差不多。選你心情（與後車喇叭）。`;
+      }
+
+      // Fun "auntie" index (0-100)
+      // More frequent restarts => more chaos; lower cutoff => higher frequency.
+      const freq = qualifies ? (stopsPerDay / 120) : 0.05;
+      const twitch = clamp((90 - cutoffSec) / 90, 0, 1);
+      const chaos = clamp((freq * 0.65 + twitch * 0.35) * 100, 0, 100);
+      els.auntieBar.style.width = `${chaos}%`;
+      let auntie;
+      if (chaos < 25) auntie = '佛系路口：你熄火也很優雅。阿伯多半看不到你。';
+      else if (chaos < 55) auntie = '中度啟停：旁邊的人會想說「這台在練深呼吸嗎？」';
+      else if (chaos < 80) auntie = '高頻啟停：你是路口的節拍器。阿伯開始眼神交流。';
+      else auntie = '狂暴啟停：你在路口做 HIIT。阿伯的喇叭準備上班。';
+      els.auntieText.textContent = auntie;
+
+      els.oneLiner.textContent = one;
+      els.caveat.textContent = caveat;
+
+      // Share text
+      const qualifiesText = qualifies ? '會' : '不太會';
+      const share = [
+        `🛵 紅燈熄火省油神算（估算）`,
+        `- 每天紅燈次數：${stopsPerDay} 次`,
+        `- 平均等候：${avgWaitSec} 秒；熄火門檻：>${cutoffSec} 秒（${qualifiesText}熄火）`,
+        `- 怠速耗油：${fmt(idleMlPerMin,0)} mL/分；重啟耗油：${fmt(restartMl,1)} mL/次`,
+        `- 結論：${moneyStr}（${els.netFuel.textContent}）`,
+        `- 臨界點：約 ${els.breakeven.textContent}`
+      ].join('\n');
+      els.shareText.value = share;
+
+      return { netMoney, chaos, share };
+    }
+
+    function applyPreset(kind) {
+      const presets = {
+        commute: { stopsPerDay: 40, avgWaitSec: 60, cutoffSec: 25, daysPerMonth: 22, bufferSec: 3, idleMlPerMin: 25, restartMl: 1.2, gasPrice: 31.5, ricePrice: 45 },
+        delivery: { stopsPerDay: 80, avgWaitSec: 40, cutoffSec: 18, daysPerMonth: 26, bufferSec: 2, idleMlPerMin: 28, restartMl: 1.0, gasPrice: 31.5, ricePrice: 50 },
+        chill: { stopsPerDay: 18, avgWaitSec: 70, cutoffSec: 30, daysPerMonth: 12, bufferSec: 3, idleMlPerMin: 20, restartMl: 1.5, gasPrice: 31.5, ricePrice: 45 },
+        reset: { stopsPerDay: 35, avgWaitSec: 55, cutoffSec: 25, daysPerMonth: 22, bufferSec: 3, idleMlPerMin: 25, restartMl: 1.2, gasPrice: 31.5, ricePrice: 45 }
+      };
+      const p = presets[kind];
+      if (!p) return;
+      for (const k of Object.keys(p)) {
+        if (els[k]) els[k].value = p[k];
+      }
+      compute();
+    }
+
+    function randomRoast(netMoney, chaos) {
+      const roasts = [];
+      if (netMoney > 0) {
+        roasts.push('後面那台不要叭啦，我是在幫台灣省油。');
+        roasts.push('我不是熄火，我是在做財務管理。');
+        roasts.push('紅燈我先關機，你也把情緒關一下。');
+      } else if (netMoney < 0) {
+        roasts.push('我不是省油，我是在燒錢：每次重啟都像抽一張發票沒中。');
+        roasts.push('今天不熄火，因為我尊重我的電瓶。');
+        roasts.push('我先不跟紅燈對賭，輸了還要被阿伯瞪。');
+      } else {
+        roasts.push('熄不熄都差不多，我選擇：保持帥。');
+        roasts.push('我只在意一件事：綠燈那刻我能不能先走。');
+      }
+      if (chaos > 75) roasts.push('我在路口做間歇訓練：啟動—停止—啟動，心肺爆表。');
+      if (chaos < 25) roasts.push('我的熄火很有禮貌：像在跟紅燈說晚安。');
+      return roasts[Math.floor(Math.random() * roasts.length)];
+    }
+
+    function bind() {
+      const inputs = [
+        'stopsPerDay','avgWaitSec','cutoffSec','daysPerMonth','bufferSec','idleMlPerMin','restartMl','gasPrice','ricePrice'
+      ];
+      inputs.forEach(id => {
+        const el = $(id);
+        el.addEventListener('input', compute);
+        el.addEventListener('change', compute);
+      });
+
+      document.querySelectorAll('.preset').forEach(btn => {
+        btn.addEventListener('click', () => applyPreset(btn.dataset.preset));
+      });
+
+      els.copyBtn.addEventListener('click', async () => {
+        try {
+          await navigator.clipboard.writeText(els.shareText.value);
+          els.copyBtn.textContent = '已複製 ✓';
+          setTimeout(() => els.copyBtn.textContent = '複製摘要', 1200);
+        } catch {
+          els.shareText.focus();
+          els.shareText.select();
+          document.execCommand('copy');
+          els.copyBtn.textContent = '已複製（備援）✓';
+          setTimeout(() => els.copyBtn.textContent = '複製摘要', 1200);
+        }
+      });
+
+      els.randomRoastBtn.addEventListener('click', () => {
+        const { netMoney, chaos } = compute();
+        els.shareText.value += `\n\n嘴砲：${randomRoast(netMoney, chaos)}`;
+      });
+    }
+
+    bind();
+    compute();
+  </script>
+</body>
+</html>
