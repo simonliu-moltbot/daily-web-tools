@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>夜市排隊值不值？決策模擬器</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'Inter', 'Noto Sans TC', sans-serif; }
+    .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; }
+  </style>
+</head>
+<body class="min-h-screen bg-gradient-to-br from-stone-50 via-white to-amber-50 text-stone-800">
+  <div class="max-w-4xl mx-auto px-4 py-6">
+    <div class="flex items-center justify-between gap-3">
+      <a href="../../index.html" class="inline-flex items-center gap-2 text-xs font-bold bg-white/80 hover:bg-white border border-stone-200 rounded-full px-3 py-2 shadow-sm transition">
+        <span>🏠</span><span>回首頁</span>
+      </a>
+      <div class="text-xs text-stone-500">單檔離線小工具｜不需網路、不抓資料</div>
+    </div>
+
+    <header class="mt-6">
+      <h1 class="text-3xl sm:text-4xl font-light tracking-tight text-stone-900">夜市排隊值不值？</h1>
+      <p class="mt-3 text-stone-600 leading-relaxed">
+        你站在熱門攤位前，前面人海一條龍；旁邊朋友開始說「我快餓死」；遠方還傳來垃圾車音樂（錯棚）。
+        這個工具用<strong>可調參數 + 隨機事件</strong>，幫你算出：<span class="font-semibold">要排、改吃隔壁、還是直接撤退</span>。
+      </p>
+    </header>
+
+    <main class="mt-8 grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <!-- Controls -->
+      <section class="bg-white/80 backdrop-blur rounded-2xl border border-stone-200 shadow-sm p-5">
+        <h2 class="text-sm font-bold text-stone-900">輸入現場條件</h2>
+
+        <div class="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <label class="block">
+            <span class="text-xs text-stone-600">前方排隊人數</span>
+            <input id="people" type="number" min="0" value="18" class="mt-1 w-full rounded-xl border-stone-200 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-amber-200" />
+          </label>
+
+          <label class="block">
+            <span class="text-xs text-stone-600">每單平均秒數（含找錢/聊天）</span>
+            <input id="secPerOrder" type="number" min="5" value="35" class="mt-1 w-full rounded-xl border-stone-200 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-amber-200" />
+          </label>
+
+          <label class="block">
+            <span class="text-xs text-stone-600">你目前飢餓值</span>
+            <input id="hunger" type="range" min="0" max="100" value="65" class="mt-2 w-full" />
+            <div class="mt-1 flex justify-between text-[10px] text-stone-500"><span>剛吃完</span><span class="mono" id="hungerVal">65</span><span>快升天</span></div>
+          </label>
+
+          <label class="block">
+            <span class="text-xs text-stone-600">同行人耐心</span>
+            <input id="patience" type="range" min="0" max="100" value="55" class="mt-2 w-full" />
+            <div class="mt-1 flex justify-between text-[10px] text-stone-500"><span>一秒爆炸</span><span class="mono" id="patienceVal">55</span><span>佛系</span></div>
+          </label>
+
+          <label class="block sm:col-span-2">
+            <div class="flex items-center justify-between">
+              <span class="text-xs text-stone-600">「阿姨我先買十份」事件機率</span>
+              <span class="mono text-[10px] text-stone-500" id="auntieVal">22%</span>
+            </div>
+            <input id="auntieChance" type="range" min="0" max="60" value="22" class="mt-2 w-full" />
+            <p class="mt-2 text-[11px] text-stone-500 leading-relaxed">事件越高：越容易遇到買十份、找零掏出塑膠袋、或老闆突然去搬貨。</p>
+          </label>
+        </div>
+
+        <div class="mt-5 flex flex-col sm:flex-row gap-3">
+          <button id="btnSim" class="rounded-xl bg-stone-900 text-white px-4 py-2.5 text-sm font-bold hover:bg-stone-700 transition">
+            開始模擬
+          </button>
+          <button id="btnReset" class="rounded-xl bg-white border border-stone-200 px-4 py-2.5 text-sm font-bold text-stone-700 hover:bg-stone-50 transition">
+            重置參數
+          </button>
+          <button id="btnReroll" class="rounded-xl bg-amber-100 border border-amber-200 px-4 py-2.5 text-sm font-bold text-amber-900 hover:bg-amber-200 transition" disabled>
+            同條件再骰一次
+          </button>
+        </div>
+
+        <div class="mt-5">
+          <div class="flex items-center justify-between text-[11px] text-stone-500">
+            <span>排隊進度（模擬）</span>
+            <span class="mono" id="progressText">0%</span>
+          </div>
+          <div class="mt-2 h-3 rounded-full bg-stone-100 overflow-hidden border border-stone-200">
+            <div id="progressBar" class="h-full w-0 bg-gradient-to-r from-amber-300 to-amber-500"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Output -->
+      <section class="bg-white/80 backdrop-blur rounded-2xl border border-stone-200 shadow-sm p-5">
+        <h2 class="text-sm font-bold text-stone-900">結果與建議</h2>
+
+        <div class="mt-4 grid grid-cols-1 sm:grid-cols-3 gap-3">
+          <div class="rounded-2xl border border-stone-200 bg-white p-4">
+            <div class="text-[11px] text-stone-500">預估等待</div>
+            <div class="mt-1 text-2xl font-bold text-stone-900"><span id="waitMin">—</span><span class="text-sm font-semibold text-stone-500"> 分</span></div>
+            <div class="mt-1 text-[11px] text-stone-500">含事件加成</div>
+          </div>
+          <div class="rounded-2xl border border-stone-200 bg-white p-4">
+            <div class="text-[11px] text-stone-500">怒氣值</div>
+            <div class="mt-1 text-2xl font-bold" id="rage">—</div>
+            <div class="mt-1 text-[11px] text-stone-500">0 ~ 100</div>
+          </div>
+          <div class="rounded-2xl border border-stone-200 bg-white p-4">
+            <div class="text-[11px] text-stone-500">決策</div>
+            <div class="mt-1 text-lg font-extrabold" id="verdict">請先模擬</div>
+            <div class="mt-1 text-[11px] text-stone-500" id="verdictSub">—</div>
+          </div>
+        </div>
+
+        <div class="mt-5 rounded-2xl border border-stone-200 bg-white p-4">
+          <div class="flex items-center justify-between">
+            <h3 class="text-xs font-bold text-stone-700">事件紀錄（台味寫實）</h3>
+            <button id="btnCopy" class="text-[11px] font-bold text-stone-600 hover:text-stone-900 underline underline-offset-4 decoration-stone-200" disabled>複製結果</button>
+          </div>
+          <ul id="log" class="mt-3 space-y-2 text-sm"></ul>
+        </div>
+
+        <div class="mt-5 text-[11px] text-stone-500 leading-relaxed">
+          小提醒：這是<strong>娛樂性決策模擬</strong>。如果你真的超餓，請把手機收起來去買隔壁那家也好吃的。
+        </div>
+      </section>
+    </main>
+
+    <footer class="mt-10 pb-6 text-center text-xs text-stone-400">
+      Created by AI Agent on 2026-03-26
+    </footer>
+  </div>
+
+  <script>
+    const $ = (id) => document.getElementById(id);
+
+    const els = {
+      people: $('people'),
+      secPerOrder: $('secPerOrder'),
+      hunger: $('hunger'),
+      patience: $('patience'),
+      auntieChance: $('auntieChance'),
+      hungerVal: $('hungerVal'),
+      patienceVal: $('patienceVal'),
+      auntieVal: $('auntieVal'),
+      btnSim: $('btnSim'),
+      btnReset: $('btnReset'),
+      btnReroll: $('btnReroll'),
+      btnCopy: $('btnCopy'),
+      progressBar: $('progressBar'),
+      progressText: $('progressText'),
+      waitMin: $('waitMin'),
+      rage: $('rage'),
+      verdict: $('verdict'),
+      verdictSub: $('verdictSub'),
+      log: $('log'),
+    };
+
+    function clamp(n, a, b) { return Math.max(a, Math.min(b, n)); }
+    function rand() { return Math.random(); }
+    function pick(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
+
+    function fmtMin(min) {
+      if (!isFinite(min)) return '—';
+      if (min < 1) return '不到 1';
+      return String(Math.round(min));
+    }
+
+    function updateSliderLabels() {
+      els.hungerVal.textContent = els.hunger.value;
+      els.patienceVal.textContent = els.patience.value;
+      els.auntieVal.textContent = els.auntieChance.value + '%';
+    }
+
+    function resetUI() {
+      els.progressBar.style.width = '0%';
+      els.progressText.textContent = '0%';
+      els.waitMin.textContent = '—';
+      els.rage.textContent = '—';
+      els.rage.className = 'mt-1 text-2xl font-bold';
+      els.verdict.textContent = '請先模擬';
+      els.verdict.className = 'mt-1 text-lg font-extrabold text-stone-900';
+      els.verdictSub.textContent = '—';
+      els.log.innerHTML = '<li class="text-stone-500">尚未模擬。你可以先輸入現場條件，然後按「開始模擬」。</li>';
+      els.btnReroll.disabled = true;
+      els.btnCopy.disabled = true;
+    }
+
+    function rageColor(r) {
+      if (r >= 80) return 'text-rose-600';
+      if (r >= 60) return 'text-orange-600';
+      if (r >= 40) return 'text-amber-700';
+      return 'text-emerald-700';
+    }
+
+    function verdictFrom(rage, waitMin, hunger, patience) {
+      // Aggressive but fun heuristic
+      const score = rage + waitMin * 1.1 + (hunger * 0.35) - (patience * 0.35);
+      if (score >= 120) return { t: '撤退！換一攤', sub: '你現在排下去，等到吃到可能已經不愛了。', cls: 'text-rose-700' };
+      if (score >= 85) return { t: '改吃隔壁', sub: '保留尊嚴：走到旁邊那家也很香。', cls: 'text-orange-700' };
+      if (score >= 55) return { t: '可以排，但要想好', sub: '建議先打開手機：看朋友耐心剩幾格。', cls: 'text-amber-700' };
+      return { t: '排！值得！', sub: '你今天就是命中注定要吃到這家。', cls: 'text-emerald-700' };
+    }
+
+    function createLogItem(text, tone='neutral') {
+      const li = document.createElement('li');
+      const toneClass = {
+        neutral: 'text-stone-700',
+        good: 'text-emerald-700',
+        bad: 'text-rose-700',
+        warn: 'text-amber-700'
+      }[tone] || 'text-stone-700';
+      li.className = 'flex gap-2';
+      li.innerHTML = `<span class="mono text-[10px] text-stone-400 pt-[2px]">•</span><span class="${toneClass}">${text}</span>`;
+      return li;
+    }
+
+    function simulateOnce(params) {
+      const { people, secPerOrder, hunger, patience, auntieChance } = params;
+
+      // Base wait time
+      let seconds = people * secPerOrder;
+      let rage = 0;
+
+      const events = [];
+
+      // Random event engine: up to 6 checkpoints
+      const checkpoints = Math.min(6, Math.max(2, Math.ceil(people / 6)));
+      const perCheckpoint = people / checkpoints;
+
+      for (let i = 0; i < checkpoints; i++) {
+        const p = auntieChance / 100;
+        const mood = (hunger / 100) * 0.55 + (1 - patience / 100) * 0.45;
+        // Increase chance as mood worsens
+        const trigger = rand() < clamp(p + mood * 0.12, 0, 0.75);
+        if (!trigger) {
+          events.push({
+            tone: 'neutral',
+            text: pick([
+              '前面的人正常點餐。世界短暫和平。',
+              '你滑了三下手機，時間好像變快了一點點。',
+              '旁邊有人說「這家其實還好吧」你假裝沒聽到。'
+            ])
+          });
+          continue;
+        }
+
+        const kind = Math.floor(rand() * 6);
+        if (kind === 0) {
+          const extraOrders = 6 + Math.floor(rand() * 10); // 6~15
+          seconds += extraOrders * secPerOrder;
+          rage += 10 + extraOrders * 0.8;
+          events.push({ tone: 'bad', text: `阿姨霸氣出現：「老闆我先買 ${extraOrders} 份，分裝三袋要分開算。」` });
+        } else if (kind === 1) {
+          const extra = 45 + Math.floor(rand() * 60);
+          seconds += extra;
+          rage += 8;
+          events.push({ tone: 'warn', text: '老闆突然轉身去補貨（你看見冷凍庫像異次元）。' });
+        } else if (kind === 2) {
+          const extra = 25 + Math.floor(rand() * 35);
+          seconds += extra;
+          rage += 6;
+          events.push({ tone: 'warn', text: '前面的人開始「加辣不辣微辣小辣中辣」辯論賽。' });
+        } else if (kind === 3) {
+          const extra = 30 + Math.floor(rand() * 50);
+          seconds += extra;
+          rage += 7;
+          events.push({ tone: 'bad', text: '有人現場掏出一大把零錢，開始計算宇宙。' });
+        } else if (kind === 4) {
+          const saved = 20 + Math.floor(rand() * 35);
+          seconds -= saved;
+          rage -= 4;
+          events.push({ tone: 'good', text: '老闆手速突然爆發（像開了加速器）。你看見希望。' });
+        } else {
+          const extra = 15 + Math.floor(rand() * 25);
+          seconds += extra;
+          rage += 5;
+          events.push({ tone: 'bad', text: '旁邊有人插隊還裝熟：「欸我朋友在前面。」（你心裡有一萬句）。' });
+        }
+      }
+
+      // Rage model: wait + hunger - patience
+      const waitMin = Math.max(0, seconds / 60);
+      rage += waitMin * 1.35;
+      rage += (hunger / 100) * 35;
+      rage += (1 - patience / 100) * 28;
+      rage = clamp(Math.round(rage), 0, 100);
+
+      // Narrative baseline
+      const baseline = [];
+      baseline.push({ tone: 'neutral', text: `你目測前方 ${people} 人，每單約 ${secPerOrder}s。` });
+      baseline.push({ tone: 'neutral', text: `你的飢餓值 ${hunger}/100，同伴耐心 ${patience}/100。` });
+
+      return { seconds, waitMin, rage, events: baseline.concat(events) };
+    }
+
+    let lastResultText = '';
+    let currentTimer = null;
+
+    function animateProgress(durationMs) {
+      const start = performance.now();
+      if (currentTimer) cancelAnimationFrame(currentTimer);
+
+      const tick = (now) => {
+        const t = clamp((now - start) / durationMs, 0, 1);
+        const pct = Math.round(t * 100);
+        els.progressBar.style.width = pct + '%';
+        els.progressText.textContent = pct + '%';
+        if (t < 1) currentTimer = requestAnimationFrame(tick);
+      };
+      currentTimer = requestAnimationFrame(tick);
+    }
+
+    function runSimulation() {
+      const params = {
+        people: clamp(parseInt(els.people.value || '0', 10), 0, 999),
+        secPerOrder: clamp(parseInt(els.secPerOrder.value || '30', 10), 5, 600),
+        hunger: clamp(parseInt(els.hunger.value, 10), 0, 100),
+        patience: clamp(parseInt(els.patience.value, 10), 0, 100),
+        auntieChance: clamp(parseInt(els.auntieChance.value, 10), 0, 60),
+      };
+
+      const r = simulateOnce(params);
+
+      // UI updates
+      animateProgress(800);
+
+      els.waitMin.textContent = fmtMin(r.waitMin);
+      els.rage.textContent = String(r.rage);
+      els.rage.className = `mt-1 text-2xl font-bold ${rageColor(r.rage)}`;
+
+      const v = verdictFrom(r.rage, r.waitMin, params.hunger, params.patience);
+      els.verdict.textContent = v.t;
+      els.verdict.className = `mt-1 text-lg font-extrabold ${v.cls}`;
+      els.verdictSub.textContent = v.sub;
+
+      els.log.innerHTML = '';
+      r.events.forEach(ev => els.log.appendChild(createLogItem(ev.text, ev.tone)));
+
+      // Add closing tip
+      const tip = (r.rage >= 80)
+        ? { tone:'bad', text:'建議：先去買飲料/烤香腸安撫情緒，再決定要不要回來。' }
+        : (r.rage >= 55)
+          ? { tone:'warn', text:'建議：排隊時派一人去旁邊探路，預備 Plan B。' }
+          : { tone:'good', text:'建議：保持眼神堅定，不要被「其實還好」的聲音動搖。' };
+      els.log.appendChild(createLogItem(tip.text, tip.tone));
+
+      els.btnReroll.disabled = false;
+      els.btnCopy.disabled = false;
+
+      lastResultText = `夜市排隊值不值？\n- 前方人數: ${params.people}\n- 每單秒數: ${params.secPerOrder}s\n- 飢餓值: ${params.hunger}/100\n- 同行耐心: ${params.patience}/100\n- 阿姨事件: ${params.auntieChance}%\n\n結果：\n- 預估等待: ${fmtMin(r.waitMin)} 分\n- 怒氣值: ${r.rage}/100\n- 決策: ${v.t}（${v.sub}）\n\n（此為娛樂性模擬）`;
+    }
+
+    function resetParams() {
+      els.people.value = 18;
+      els.secPerOrder.value = 35;
+      els.hunger.value = 65;
+      els.patience.value = 55;
+      els.auntieChance.value = 22;
+      updateSliderLabels();
+      resetUI();
+    }
+
+    els.hunger.addEventListener('input', updateSliderLabels);
+    els.patience.addEventListener('input', updateSliderLabels);
+    els.auntieChance.addEventListener('input', updateSliderLabels);
+
+    els.btnSim.addEventListener('click', runSimulation);
+    els.btnReroll.addEventListener('click', runSimulation);
+    els.btnReset.addEventListener('click', resetParams);
+
+    els.btnCopy.addEventListener('click', async () => {
+      try {
+        await navigator.clipboard.writeText(lastResultText);
+        els.btnCopy.textContent = '已複製';
+        setTimeout(() => els.btnCopy.textContent = '複製結果', 900);
+      } catch (e) {
+        els.btnCopy.textContent = '複製失敗';
+        setTimeout(() => els.btnCopy.textContent = '複製結果', 900);
+      }
+    });
+
+    updateSliderLabels();
+    resetUI();
+  </script>
+</body>
+</html>
