@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>機車油錢 → 牛肉麵換算器 | Daily Taiwan Web Tools</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'Noto Sans TC', system-ui, -apple-system, Segoe UI, Roboto, sans-serif; }
+    .card { background: rgba(255,255,255,.85); backdrop-filter: blur(10px); }
+  </style>
+</head>
+<body class="min-h-screen bg-gradient-to-br from-amber-50 via-stone-50 to-sky-50 text-stone-800">
+  <div class="max-w-3xl mx-auto px-4 py-6">
+    <div class="flex items-center justify-between gap-3">
+      <a href="../../index.html" class="inline-flex items-center gap-2 text-sm font-bold text-stone-700 hover:text-stone-900">
+        <span class="text-lg">🏠</span><span>回首頁</span>
+      </a>
+      <button id="btn-reset" class="text-xs font-bold px-3 py-2 rounded-lg border border-stone-200 bg-white/70 hover:bg-white">
+        一鍵重置
+      </button>
+    </div>
+
+    <header class="mt-6">
+      <h1 class="text-3xl sm:text-4xl font-black tracking-tight">
+        🛵 機車油錢 → 牛肉麵換算器
+      </h1>
+      <p class="mt-3 text-stone-600 leading-relaxed">
+        你覺得自己「只是去巷口一下」？用數字把油錢翻譯成「每月少吃幾碗牛肉麵」，瞬間有感。
+      </p>
+    </header>
+
+    <main class="mt-6 grid gap-4">
+      <section class="card rounded-2xl border border-stone-200 shadow-sm p-5">
+        <h2 class="text-lg font-black">1) 先輸入你的日常</h2>
+
+        <div class="mt-4 grid sm:grid-cols-2 gap-4">
+          <div>
+            <label class="text-sm font-bold">每月騎乘里程 (km)</label>
+            <div class="mt-2 flex items-center gap-3">
+              <input id="kmPerMonth" type="range" min="0" max="1500" step="10" value="320" class="w-full" />
+              <input id="kmPerMonthNum" type="number" min="0" max="99999" step="10" value="320" class="w-28 px-3 py-2 rounded-lg border border-stone-200 bg-white" />
+            </div>
+            <p class="mt-1 text-xs text-stone-500">提示：通勤族 400~900km/月；「巷口一下」通常 200~400km/月。</p>
+          </div>
+
+          <div>
+            <label class="text-sm font-bold">平均油耗 (km/L)</label>
+            <div class="mt-2 flex items-center gap-3">
+              <input id="kmPerLiter" type="range" min="15" max="60" step="1" value="35" class="w-full" />
+              <input id="kmPerLiterNum" type="number" min="1" max="200" step="1" value="35" class="w-28 px-3 py-2 rounded-lg border border-stone-200 bg-white" />
+            </div>
+            <p class="mt-1 text-xs text-stone-500">大概：125c.c. 約 30~45；老車、重載、愛催油門會更低。</p>
+          </div>
+
+          <div>
+            <label class="text-sm font-bold">油價 (NT$/L)</label>
+            <div class="mt-2 grid grid-cols-3 gap-2">
+              <button data-fuel="92" class="fuelPreset px-3 py-2 rounded-lg border border-stone-200 bg-white hover:bg-stone-50 text-sm font-bold">92</button>
+              <button data-fuel="95" class="fuelPreset px-3 py-2 rounded-lg border border-stone-200 bg-white hover:bg-stone-50 text-sm font-bold">95</button>
+              <button data-fuel="98" class="fuelPreset px-3 py-2 rounded-lg border border-stone-200 bg-white hover:bg-stone-50 text-sm font-bold">98</button>
+            </div>
+            <div class="mt-2 flex items-center gap-3">
+              <input id="fuelPrice" type="range" min="20" max="45" step="0.1" value="30.5" class="w-full" />
+              <input id="fuelPriceNum" type="number" min="0" max="999" step="0.1" value="30.5" class="w-28 px-3 py-2 rounded-lg border border-stone-200 bg-white" />
+            </div>
+            <p class="mt-1 text-xs text-stone-500">小提醒：不同油品只是「價格」，不是保證更省油（看車、看腳）。</p>
+          </div>
+
+          <div>
+            <label class="text-sm font-bold">牛肉麵一碗多少？(NT$)</label>
+            <div class="mt-2 flex items-center gap-3">
+              <input id="noodlePrice" type="range" min="80" max="350" step="10" value="160" class="w-full" />
+              <input id="noodlePriceNum" type="number" min="1" max="9999" step="10" value="160" class="w-28 px-3 py-2 rounded-lg border border-stone-200 bg-white" />
+            </div>
+            <p class="mt-1 text-xs text-stone-500">你也可以把它當成「珍奶單價」或「雞排行情」：想換算什麼都行。</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="card rounded-2xl border border-stone-200 shadow-sm p-5">
+        <h2 class="text-lg font-black">2) 你的結果（很殘酷也很誠實）</h2>
+
+        <div class="mt-4 grid sm:grid-cols-3 gap-3">
+          <div class="rounded-xl border border-stone-200 bg-white p-4">
+            <div class="text-xs font-bold text-stone-500">每月油耗</div>
+            <div class="mt-1 text-2xl font-black"><span id="litersMonth">0</span> L</div>
+          </div>
+          <div class="rounded-xl border border-stone-200 bg-white p-4">
+            <div class="text-xs font-bold text-stone-500">每月油錢</div>
+            <div class="mt-1 text-2xl font-black">NT$ <span id="costMonth">0</span></div>
+          </div>
+          <div class="rounded-xl border border-stone-200 bg-white p-4">
+            <div class="text-xs font-bold text-stone-500">每月少吃牛肉麵</div>
+            <div class="mt-1 text-2xl font-black"><span id="bowlsMonth">0</span> 碗</div>
+          </div>
+        </div>
+
+        <div class="mt-3 grid sm:grid-cols-2 gap-3">
+          <div class="rounded-xl border border-stone-200 bg-white p-4">
+            <div class="text-xs font-bold text-stone-500">一年油錢（估）</div>
+            <div class="mt-1 text-xl font-black">NT$ <span id="costYear">0</span></div>
+            <div class="mt-1 text-xs text-stone-500">（不含保養、輪胎、罰單與你朋友的「欸借我載一下」）</div>
+          </div>
+          <div class="rounded-xl border border-stone-200 bg-white p-4">
+            <div class="text-xs font-bold text-stone-500">油品差價：92 vs 95</div>
+            <div class="mt-1 text-xl font-black">每月差 NT$ <span id="diff92_95">0</span></div>
+            <div class="mt-1 text-xs text-stone-500">假設油耗不變（純看價格差）。</div>
+          </div>
+        </div>
+
+        <div class="mt-4 rounded-2xl border border-amber-200 bg-amber-50 p-4">
+          <div class="text-sm font-black">🧠 台味評語</div>
+          <p id="comment" class="mt-2 text-stone-700 leading-relaxed"></p>
+          <div class="mt-3 flex flex-col sm:flex-row gap-2">
+            <button id="btn-copy" class="px-4 py-2 rounded-lg bg-stone-900 text-white text-sm font-bold hover:bg-stone-800">複製結果文案</button>
+            <button id="btn-reroll" class="px-4 py-2 rounded-lg border border-stone-200 bg-white text-sm font-bold hover:bg-stone-50">換一句嘴砲</button>
+          </div>
+          <p id="copyHint" class="mt-2 text-xs text-stone-500"></p>
+        </div>
+      </section>
+
+      <section class="card rounded-2xl border border-stone-200 shadow-sm p-5">
+        <h2 class="text-lg font-black">3) 小補充：怎麼讓油錢看起來不那麼痛？</h2>
+        <ul class="mt-3 list-disc pl-5 text-sm text-stone-700 space-y-2">
+          <li>胎壓顧好：不是省油神技，但通常是「最便宜的改善」。</li>
+          <li>少當油門 DJ：每一次猛催猛放，都是在跟錢包吵架。</li>
+          <li>路線別逞強：多 1 km 可能是多 1 個紅燈地獄。</li>
+          <li>最重要：把「巷口一下」改成「走路一下」— 你會少掉很多碗。</li>
+        </ul>
+      </section>
+    </main>
+
+    <footer class="mt-10 pb-10 text-center text-xs text-stone-400">
+      Created by AI Agent on 2026-03-25
+    </footer>
+  </div>
+
+  <script>
+    const $ = (id) => document.getElementById(id);
+
+    const state = {
+      kmPerMonth: 320,
+      kmPerLiter: 35,
+      fuelPrice: 30.5,
+      noodlePrice: 160,
+      commentIndex: 0,
+    };
+
+    const roastPool = [
+      ({ bowlsMonth }) => `你每月把 ${bowlsMonth} 碗牛肉麵燒進油箱裡。車子吃飽了，你呢？`,
+      ({ costMonth }) => `每月油錢 NT$${costMonth}：這不是油，是你對自由的月費（含塞車與找車位）。`,
+      ({ litersMonth }) => `一個月喝掉 ${litersMonth} 公升：你的車比你還常補充「熱量」。`,
+      ({ bowlsMonth }) => bowlsMonth >= 8
+        ? `你油箱裡養了一家牛肉麵店（${bowlsMonth} 碗/月）。建議：改名叫「行動麵攤」。`
+        : `還行啦（${bowlsMonth} 碗/月）。至少你不是每天在幫中油KPI加班。`,
+      ({ kmPerMonth }) => kmPerMonth <= 80
+        ? `你幾乎不騎車：恭喜，你的油錢已經是「散步級」。`
+        : `你每月 ${kmPerMonth} km：不是在騎車，就是在想等一下要不要騎車。`,
+    ];
+
+    function clampNum(x, min, max) {
+      if (Number.isNaN(x)) return min;
+      return Math.min(max, Math.max(min, x));
+    }
+
+    function fmt(n, digits = 0) {
+      return new Intl.NumberFormat('zh-TW', { maximumFractionDigits: digits, minimumFractionDigits: digits }).format(n);
+    }
+
+    function syncPair(rangeEl, numEl, key, { min = -Infinity, max = Infinity } = {}) {
+      const apply = (val) => {
+        const v = clampNum(Number(val), min, max);
+        state[key] = v;
+        rangeEl.value = v;
+        numEl.value = v;
+        render();
+      };
+      rangeEl.addEventListener('input', (e) => apply(e.target.value));
+      numEl.addEventListener('input', (e) => apply(e.target.value));
+      apply(state[key]);
+    }
+
+    function calc() {
+      const km = Math.max(0, state.kmPerMonth);
+      const kpl = Math.max(0.0001, state.kmPerLiter);
+      const price = Math.max(0, state.fuelPrice);
+      const noodle = Math.max(0.0001, state.noodlePrice);
+
+      const litersMonth = km / kpl;
+      const costMonth = litersMonth * price;
+      const bowlsMonth = costMonth / noodle;
+
+      // 92 vs 95 price diff only (assume +1.2 NTD typical; but user might set custom price)
+      const diffPrice = 1.2;
+      const diff92_95 = litersMonth * diffPrice;
+
+      return { km, kpl, price, noodle, litersMonth, costMonth, bowlsMonth, diff92_95 };
+    }
+
+    function render() {
+      const r = calc();
+      $('litersMonth').textContent = fmt(r.litersMonth, 1);
+      $('costMonth').textContent = fmt(Math.round(r.costMonth));
+      $('bowlsMonth').textContent = fmt(r.bowlsMonth, 1);
+      $('costYear').textContent = fmt(Math.round(r.costMonth * 12));
+      $('diff92_95').textContent = fmt(Math.round(r.diff92_95));
+
+      const pick = roastPool[state.commentIndex % roastPool.length];
+      const comment = pick({
+        kmPerMonth: Math.round(r.km),
+        litersMonth: fmt(r.litersMonth, 1),
+        costMonth: fmt(Math.round(r.costMonth)),
+        bowlsMonth: fmt(r.bowlsMonth, 1),
+      });
+      $('comment').textContent = comment;
+
+      const hint = r.km === 0
+        ? '先把里程拉高一點（不然我只能誇你超省）。'
+        : '你可以調整油耗或油價，看看「少吃幾碗」會不會比較舒服。';
+      $('copyHint').textContent = hint;
+    }
+
+    function buildShareText() {
+      const r = calc();
+      const lines = [
+        '🛵 機車油錢 → 牛肉麵換算',
+        `每月里程：${fmt(Math.round(r.km))} km`,
+        `油耗：${fmt(r.kpl, 1)} km/L`,
+        `油價：NT$${fmt(r.price, 1)}/L`,
+        `每月油錢：NT$${fmt(Math.round(r.costMonth))}`,
+        `≈ ${fmt(r.bowlsMonth, 1)} 碗牛肉麵（單價 NT$${fmt(Math.round(r.noodle))}）`,
+        '',
+        $('comment').textContent,
+      ];
+      return lines.join('\n');
+    }
+
+    function setFuelPreset(kind) {
+      // Not real-time official prices; just friendly defaults.
+      // Users can fine-tune with slider.
+      const presets = { 92: 29.9, 95: 31.4, 98: 33.4 };
+      if (!presets[kind]) return;
+      state.fuelPrice = presets[kind];
+      $('fuelPrice').value = state.fuelPrice;
+      $('fuelPriceNum').value = state.fuelPrice;
+      render();
+    }
+
+    function reset() {
+      state.kmPerMonth = 320;
+      state.kmPerLiter = 35;
+      state.fuelPrice = 30.5;
+      state.noodlePrice = 160;
+      state.commentIndex = 0;
+
+      $('kmPerMonth').value = state.kmPerMonth;
+      $('kmPerMonthNum').value = state.kmPerMonth;
+      $('kmPerLiter').value = state.kmPerLiter;
+      $('kmPerLiterNum').value = state.kmPerLiter;
+      $('fuelPrice').value = state.fuelPrice;
+      $('fuelPriceNum').value = state.fuelPrice;
+      $('noodlePrice').value = state.noodlePrice;
+      $('noodlePriceNum').value = state.noodlePrice;
+      render();
+    }
+
+    // wire
+    syncPair($('kmPerMonth'), $('kmPerMonthNum'), 'kmPerMonth', { min: 0, max: 99999 });
+    syncPair($('kmPerLiter'), $('kmPerLiterNum'), 'kmPerLiter', { min: 1, max: 200 });
+    syncPair($('fuelPrice'), $('fuelPriceNum'), 'fuelPrice', { min: 0, max: 999 });
+    syncPair($('noodlePrice'), $('noodlePriceNum'), 'noodlePrice', { min: 1, max: 9999 });
+
+    document.querySelectorAll('.fuelPreset').forEach(btn => {
+      btn.addEventListener('click', () => setFuelPreset(btn.dataset.fuel));
+    });
+
+    $('btn-reroll').addEventListener('click', () => {
+      state.commentIndex = (state.commentIndex + 1) % roastPool.length;
+      render();
+    });
+
+    $('btn-copy').addEventListener('click', async () => {
+      const text = buildShareText();
+      try {
+        await navigator.clipboard.writeText(text);
+        $('copyHint').textContent = '已複製！貼到群組讓大家一起心痛。';
+      } catch {
+        // fallback
+        const ta = document.createElement('textarea');
+        ta.value = text;
+        ta.className = 'fixed -left-[9999px] top-0';
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand('copy');
+        ta.remove();
+        $('copyHint').textContent = '已複製（fallback）！';
+      }
+    });
+
+    $('btn-reset').addEventListener('click', reset);
+
+    render();
+  </script>
+</body>
+</html>
