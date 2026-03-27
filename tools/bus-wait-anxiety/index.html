@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>🚌 公車等不到焦慮計算機 | Daily Taiwan Web Tools</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'Inter', 'Noto Sans TC', sans-serif; }
+    .card { background: rgba(255,255,255,0.86); backdrop-filter: blur(10px); }
+    .mono { font-variant-numeric: tabular-nums; }
+    .range { accent-color: #0f172a; }
+  </style>
+</head>
+<body class="min-h-screen bg-gradient-to-br from-slate-50 via-stone-50 to-amber-50 text-stone-800">
+  <div class="max-w-4xl mx-auto px-4 py-8">
+    <div class="flex items-center justify-between gap-3 mb-6">
+      <a href="../../index.html" class="inline-flex items-center gap-2 text-sm font-bold text-stone-700 hover:text-stone-900">
+        <span class="text-lg">🏠</span> 回首頁
+      </a>
+      <div class="text-xs text-stone-500">純娛樂 & 自我吐槽版（不接任何到站 API）</div>
+    </div>
+
+    <header class="mb-8">
+      <h1 class="text-3xl sm:text-4xl font-light tracking-tight text-stone-900">🚌 公車等不到焦慮計算機</h1>
+      <p class="mt-3 text-stone-600 leading-relaxed">
+        適用情境：你站在站牌下，App 顯示「1 分鐘」，你心裡卻知道那是「宇宙尺度的 1 分鐘」。
+        這個工具會用一點點參數 + 一點點玄學事件，幫你算出「焦慮值」並給出台味建議。
+      </p>
+    </header>
+
+    <main class="grid grid-cols-1 lg:grid-cols-5 gap-6">
+      <section class="lg:col-span-3 card rounded-2xl border border-stone-200 shadow-sm p-5 sm:p-6">
+        <h2 class="text-lg font-bold text-stone-900">輸入你的等車現場</h2>
+        <p class="text-xs text-stone-500 mt-1">越寫實，結果越傷人（但你會笑出來）。</p>
+
+        <div class="mt-6 space-y-5">
+          <div>
+            <label class="flex items-center justify-between text-sm font-medium">
+              <span>目前已等了多久（分鐘）</span>
+              <span class="mono text-stone-700"><span id="waitNowVal">6</span> min</span>
+            </label>
+            <input id="waitNow" class="range w-full mt-2" type="range" min="0" max="40" value="6" />
+            <div class="flex justify-between text-[11px] text-stone-400 mt-1"><span>剛到</span><span>已經開始懷疑人生</span></div>
+          </div>
+
+          <div>
+            <label class="flex items-center justify-between text-sm font-medium">
+              <span>App / 站牌顯示剩餘時間（分鐘）</span>
+              <span class="mono text-stone-700"><span id="etaVal">1</span> min</span>
+            </label>
+            <input id="eta" class="range w-full mt-2" type="range" min="0" max="25" value="1" />
+            <div class="flex justify-between text-[11px] text-stone-400 mt-1"><span>0（已到？）</span><span>25（算了走路）</span></div>
+          </div>
+
+          <div>
+            <label class="flex items-center justify-between text-sm font-medium">
+              <span>天氣惡劣程度</span>
+              <span class="mono text-stone-700"><span id="weatherVal">3</span>/10</span>
+            </label>
+            <input id="weather" class="range w-full mt-2" type="range" min="0" max="10" value="3" />
+            <div class="flex justify-between text-[11px] text-stone-400 mt-1"><span>微風和煦</span><span>斜風細雨 + 鞋子報廢</span></div>
+          </div>
+
+          <div>
+            <label class="flex items-center justify-between text-sm font-medium">
+              <span>你手上東西有多多（負重）</span>
+              <span class="mono text-stone-700"><span id="loadVal">4</span>/10</span>
+            </label>
+            <input id="load" class="range w-full mt-2" type="range" min="0" max="10" value="4" />
+            <div class="flex justify-between text-[11px] text-stone-400 mt-1"><span>空手</span><span>手搖 + 便當 + 包裹 + 人生</span></div>
+          </div>
+
+          <div>
+            <label class="flex items-center justify-between text-sm font-medium">
+              <span>遲到風險（趕時間程度）</span>
+              <span class="mono text-stone-700"><span id="urgentVal">6</span>/10</span>
+            </label>
+            <input id="urgent" class="range w-full mt-2" type="range" min="0" max="10" value="6" />
+            <div class="flex justify-between text-[11px] text-stone-400 mt-1"><span>隨便</span><span>再 2 分鐘就要跟老闆對決</span></div>
+          </div>
+
+          <div>
+            <label class="flex items-center justify-between text-sm font-medium">
+              <span>站牌旁邊有沒有「友善」遮雨處</span>
+              <span class="mono text-stone-700" id="shelterLabel">普通</span>
+            </label>
+            <div class="mt-2 grid grid-cols-3 gap-2">
+              <button class="shelterBtn px-3 py-2 rounded-lg border text-sm" data-shelter="0">很讚</button>
+              <button class="shelterBtn px-3 py-2 rounded-lg border text-sm" data-shelter="1">普通</button>
+              <button class="shelterBtn px-3 py-2 rounded-lg border text-sm" data-shelter="2">沒有（風雨直送）</button>
+            </div>
+            <p class="text-[11px] text-stone-500 mt-2">提示：沒有遮雨處會額外加成焦慮值與憤怒值。</p>
+          </div>
+
+          <div class="pt-2 flex flex-col sm:flex-row gap-3">
+            <button id="calcBtn" class="inline-flex items-center justify-center gap-2 rounded-xl bg-slate-900 text-white px-4 py-3 text-sm font-bold hover:bg-slate-800">
+              算出我的焦慮值
+            </button>
+            <button id="rerollBtn" class="inline-flex items-center justify-center gap-2 rounded-xl bg-white border border-stone-200 px-4 py-3 text-sm font-bold hover:bg-stone-50">
+              🎲 重抽玄學事件
+            </button>
+            <button id="resetBtn" class="inline-flex items-center justify-center gap-2 rounded-xl bg-white border border-stone-200 px-4 py-3 text-sm font-bold hover:bg-stone-50">
+              重置
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <aside class="lg:col-span-2 space-y-6">
+        <div class="card rounded-2xl border border-stone-200 shadow-sm p-5 sm:p-6">
+          <h2 class="text-lg font-bold text-stone-900">結果</h2>
+          <div class="mt-4">
+            <div class="flex items-end justify-between">
+              <div>
+                <div class="text-xs text-stone-500">焦慮值</div>
+                <div class="text-3xl font-black text-stone-900 mono"><span id="anxietyScore">—</span><span class="text-base font-bold">/100</span></div>
+              </div>
+              <div class="text-right">
+                <div class="text-xs text-stone-500">等車宇宙感</div>
+                <div class="text-lg font-bold mono" id="cosmic">—</div>
+              </div>
+            </div>
+
+            <div class="mt-4">
+              <div class="flex items-center justify-between text-xs text-stone-500">
+                <span>心態</span><span id="moodTag" class="font-bold text-stone-700">—</span>
+              </div>
+              <div class="w-full h-3 bg-stone-100 rounded-full overflow-hidden mt-2">
+                <div id="bar" class="h-full bg-gradient-to-r from-emerald-500 via-amber-500 to-rose-600" style="width:0%"></div>
+              </div>
+            </div>
+
+            <div class="mt-5">
+              <div class="text-xs text-stone-500">本次玄學事件</div>
+              <div class="mt-2 p-3 rounded-xl bg-stone-50 border border-stone-200 text-sm text-stone-700" id="eventBox">按「算出我的焦慮值」開始。</div>
+            </div>
+
+            <div class="mt-5">
+              <div class="text-xs text-stone-500">台味建議</div>
+              <ul class="mt-2 space-y-2 text-sm text-stone-700" id="adviceList">
+                <li class="text-stone-400">—</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <div class="card rounded-2xl border border-stone-200 shadow-sm p-5 sm:p-6">
+          <h3 class="text-sm font-bold text-stone-900">小彩蛋：你的「等車咒語」</h3>
+          <p class="text-xs text-stone-500 mt-1">給你一段可以在站牌旁邊默念的台灣式自救文案。</p>
+          <div class="mt-3 p-3 rounded-xl bg-white border border-stone-200 text-sm leading-relaxed" id="mantra">
+            「我不急，我只是…很急。」
+          </div>
+          <div class="mt-3 flex gap-2">
+            <button id="copyBtn" class="flex-1 rounded-xl bg-white border border-stone-200 px-3 py-2 text-sm font-bold hover:bg-stone-50">複製</button>
+            <button id="newMantraBtn" class="flex-1 rounded-xl bg-slate-900 text-white px-3 py-2 text-sm font-bold hover:bg-slate-800">換一段</button>
+          </div>
+        </div>
+      </aside>
+    </main>
+
+    <footer class="mt-10 text-center text-xs text-stone-400">
+      <p>Created by AI Agent on 2026-03-28</p>
+    </footer>
+  </div>
+
+  <script>
+    const $ = (id) => document.getElementById(id);
+
+    const state = {
+      shelter: 1,
+      lastEvent: null,
+      lastMantra: null,
+    };
+
+    const events = [
+      { title: 'App 顯示 1 分鐘，但它的「分鐘」是以地質年代計算。', delta: 12 },
+      { title: '同一路線公車連發三台，但你要的那班還在異次元。', delta: 10 },
+      { title: '司機剛好在你面前「交班」，你看著人生被交出去。', delta: 14 },
+      { title: '你一離開站牌去買飲料，公車就像被召喚一樣到站。', delta: 9 },
+      { title: '公車來了，然後…滿到像沙丁魚罐頭。', delta: 11 },
+      { title: '雨突然變大，站牌遮雨面積 = 你的絕望面積。', delta: 13 },
+      { title: '路邊有人開始抽菸，你的焦慮值也開始冒煙。', delta: 8 },
+      { title: '你心一橫要走路，下一秒遠處就出現公車頭燈。', delta: 7 },
+      { title: '公車過站不停（你懷疑你其實是 NPC）。', delta: 16 },
+      { title: '你終於等到車，結果悠遊卡餘額不足，站牌旁補值機剛好壞了。', delta: 15 },
+      { title: '好消息：公車到站。壞消息：它寫「回場」。', delta: 15 },
+      { title: '司機開門後喊：後面有一台（然後後面也這樣喊）。', delta: 10 },
+    ];
+
+    const mantras = [
+      '「我不急，我只是…很急。」',
+      '「站牌是我家，風吹雨打都不怕。」',
+      '「公車會來的，像緣分一樣，慢但會到。」',
+      '「我今天的 KPI：上車就算贏。」',
+      '「等車不是浪費時間，是修行。」',
+      '「先深呼吸，然後把憤怒存成利息。」',
+      '「如果公車不來，我就當我在戶外冥想。」',
+      '「我相信宇宙，也相信下一班。」',
+    ];
+
+    function clamp(n, a, b) { return Math.max(a, Math.min(b, n)); }
+
+    function pickRandom(arr, avoid) {
+      if (arr.length <= 1) return arr[0];
+      let x = arr[Math.floor(Math.random() * arr.length)];
+      let guard = 0;
+      while (avoid && x === avoid && guard < 10) {
+        x = arr[Math.floor(Math.random() * arr.length)];
+        guard++;
+      }
+      return x;
+    }
+
+    function setShelter(v) {
+      state.shelter = v;
+      const label = v === 0 ? '很讚' : (v === 1 ? '普通' : '沒有');
+      $('shelterLabel').textContent = label;
+      document.querySelectorAll('.shelterBtn').forEach(btn => {
+        const on = Number(btn.dataset.shelter) === v;
+        btn.className = 'shelterBtn px-3 py-2 rounded-lg border text-sm ' + (on ? 'bg-slate-900 text-white border-slate-900' : 'bg-white border-stone-200 hover:bg-stone-50');
+      });
+    }
+
+    function scoreToMood(score) {
+      if (score < 20) return { tag: '淡定型（你是佛）', cosmic: '0.7x' };
+      if (score < 40) return { tag: '微焦慮（開始看表）', cosmic: '1.2x' };
+      if (score < 60) return { tag: '中焦慮（開始查 Google Map 走路路線）', cosmic: '1.8x' };
+      if (score < 80) return { tag: '高焦慮（開始懷疑公車路線是否存在）', cosmic: '2.6x' };
+      return { tag: '爆炸焦慮（你已與站牌融為一體）', cosmic: '3.4x' };
+    }
+
+    function buildAdvice(score, eta, urgent, weather, load, shelter) {
+      const list = [];
+
+      if (score < 25) {
+        list.push('維持冷靜：把耳機戴好，當成你提早到的福利。');
+      } else if (score < 55) {
+        list.push('策略：先決定「再等 5 分鐘就走路」的底線，避免無限延長。');
+      } else if (score < 80) {
+        list.push('生存：開始找替代方案（YouBike/走路/計程車拼一下），不要把命運押在「1 分鐘」。');
+      } else {
+        list.push('緊急：直接啟動 Plan B。你不是輸了，你是在保護精神健康。');
+      }
+
+      if (eta <= 2 && score >= 60) list.push('提醒：App 的「1 分鐘」不是承諾，是一種態度。');
+      if (urgent >= 7) list.push('趕時間加成：你可以先傳一句「我在等公車」當作免死金牌（但不要濫用）。');
+      if (weather >= 7) list.push('天氣惡劣：優先移動到有遮雨處，腳濕了焦慮會暴擊。');
+      if (load >= 7) list.push('負重很高：考慮改叫車或走到下一站，減少原地受苦時間。');
+      if (shelter === 2) list.push('沒有遮雨處：你其實不是在等車，是在被天氣教育。');
+
+      list.push('玄學：你可以假裝要走路 30 秒，公車通常會突然出現（但別怪我）。');
+      return list;
+    }
+
+    function computeScore(params, eventDelta) {
+      const { waitNow, eta, weather, load, urgent, shelter } = params;
+
+      // Base: waiting + mismatch (already waited AND still says "1 min")
+      const mismatch = clamp((waitNow - eta) * 1.2, 0, 40);
+      const base = waitNow * 1.7 + eta * 0.6 + mismatch;
+
+      // Environment & personal factors
+      const env = weather * 3.0 + load * 2.2 + urgent * 3.2;
+
+      // Shelter modifier
+      const shelterPenalty = shelter === 0 ? -6 : (shelter === 1 ? 0 : 9);
+
+      // Random event
+      const raw = base + env + shelterPenalty + eventDelta;
+      return clamp(Math.round(raw), 0, 100);
+    }
+
+    function updateRanges() {
+      $('waitNowVal').textContent = $('waitNow').value;
+      $('etaVal').textContent = $('eta').value;
+      $('weatherVal').textContent = $('weather').value;
+      $('loadVal').textContent = $('load').value;
+      $('urgentVal').textContent = $('urgent').value;
+    }
+
+    function rollEvent() {
+      const ev = pickRandom(events, state.lastEvent);
+      state.lastEvent = ev;
+      return ev;
+    }
+
+    function rollMantra() {
+      const m = pickRandom(mantras, state.lastMantra);
+      state.lastMantra = m;
+      $('mantra').textContent = m;
+    }
+
+    function renderResult(score, ev) {
+      $('anxietyScore').textContent = score;
+      $('bar').style.width = score + '%';
+
+      const mood = scoreToMood(score);
+      $('moodTag').textContent = mood.tag;
+      $('cosmic').textContent = mood.cosmic;
+
+      $('eventBox').textContent = ev.title;
+
+      const advice = buildAdvice(
+        score,
+        Number($('eta').value),
+        Number($('urgent').value),
+        Number($('weather').value),
+        Number($('load').value),
+        state.shelter
+      );
+      $('adviceList').innerHTML = advice.map(x => `<li class="flex gap-2"><span class="mt-[2px]">•</span><span>${x}</span></li>`).join('');
+    }
+
+    function calculate(useNewEvent = true) {
+      updateRanges();
+      const ev = useNewEvent ? rollEvent() : (state.lastEvent || rollEvent());
+      const params = {
+        waitNow: Number($('waitNow').value),
+        eta: Number($('eta').value),
+        weather: Number($('weather').value),
+        load: Number($('load').value),
+        urgent: Number($('urgent').value),
+        shelter: state.shelter,
+      };
+      const score = computeScore(params, ev.delta);
+      renderResult(score, ev);
+
+      // Small UX: auto refresh mantra when anxiety is high
+      if (score >= 75) rollMantra();
+    }
+
+    function resetAll() {
+      $('waitNow').value = 6;
+      $('eta').value = 1;
+      $('weather').value = 3;
+      $('load').value = 4;
+      $('urgent').value = 6;
+      setShelter(1);
+      state.lastEvent = null;
+      $('anxietyScore').textContent = '—';
+      $('bar').style.width = '0%';
+      $('moodTag').textContent = '—';
+      $('cosmic').textContent = '—';
+      $('eventBox').textContent = '按「算出我的焦慮值」開始。';
+      $('adviceList').innerHTML = '<li class="text-stone-400">—</li>';
+      rollMantra();
+      updateRanges();
+    }
+
+    // Wire up
+    document.querySelectorAll('input[type="range"]').forEach(el => el.addEventListener('input', updateRanges));
+    document.querySelectorAll('.shelterBtn').forEach(btn => btn.addEventListener('click', () => setShelter(Number(btn.dataset.shelter))));
+    $('calcBtn').addEventListener('click', () => calculate(true));
+    $('rerollBtn').addEventListener('click', () => calculate(true));
+    $('resetBtn').addEventListener('click', resetAll);
+
+    $('copyBtn').addEventListener('click', async () => {
+      try {
+        await navigator.clipboard.writeText($('mantra').textContent.trim());
+        $('copyBtn').textContent = '已複製';
+        setTimeout(() => $('copyBtn').textContent = '複製', 900);
+      } catch (e) {
+        alert('你的瀏覽器不讓我複製（焦慮值+1）。你可以手動選取複製。');
+      }
+    });
+    $('newMantraBtn').addEventListener('click', rollMantra);
+
+    // Init
+    setShelter(1);
+    rollMantra();
+    updateRanges();
+  </script>
+</body>
+</html>
