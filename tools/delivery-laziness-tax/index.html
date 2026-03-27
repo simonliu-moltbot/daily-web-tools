@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>🥡 外送懶惰稅計算機 | Daily Taiwan Web Tools</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'Inter','Noto Sans TC',sans-serif; }
+    .glass { background: rgba(255,255,255,.75); backdrop-filter: blur(10px); }
+  </style>
+</head>
+<body class="min-h-screen bg-gradient-to-b from-stone-50 via-white to-stone-50 text-stone-800">
+
+  <div class="max-w-4xl mx-auto px-4 py-8">
+    <div class="flex items-center justify-between gap-4">
+      <a href="../../index.html" class="inline-flex items-center gap-2 text-sm font-bold text-stone-700 hover:text-stone-900">
+        <span class="text-lg">🏠</span><span>回首頁</span>
+      </a>
+      <button id="btn-reroll" class="hidden sm:inline-flex items-center gap-2 px-3 py-2 rounded-lg border border-stone-200 bg-white hover:bg-stone-50 text-sm font-semibold">
+        🎲 重新抽事件
+      </button>
+    </div>
+
+    <header class="mt-6">
+      <h1 class="text-3xl sm:text-4xl font-light tracking-tight text-stone-900">🥡 外送懶惰稅計算機</h1>
+      <p class="mt-3 text-stone-600 leading-relaxed">
+        你付的不是外送費，是<strong>把人生浪費在路上的時間</strong>。
+        輸入幾個數字，系統會用台味單位（珍奶／雞排／滷肉飯）告訴你：今天該叫外送，還是該出門當個正常人。
+      </p>
+    </header>
+
+    <div class="mt-8 grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <!-- Inputs -->
+      <section class="glass rounded-2xl border border-stone-200 shadow-sm p-5">
+        <h2 class="text-lg font-bold text-stone-900">輸入你的現況</h2>
+        <div class="mt-4 space-y-4">
+          <div class="grid grid-cols-2 gap-3">
+            <label class="block">
+              <span class="text-xs font-semibold text-stone-600">餐點價格（不含外送）</span>
+              <div class="mt-1 flex">
+                <span class="inline-flex items-center px-3 rounded-l-lg border border-stone-200 bg-stone-50 text-stone-500 text-sm">NT$</span>
+                <input id="mealPrice" type="number" min="0" step="1" value="150" class="w-full rounded-r-lg border border-stone-200 px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-stone-400" />
+              </div>
+            </label>
+            <label class="block">
+              <span class="text-xs font-semibold text-stone-600">外送費＋平台費</span>
+              <div class="mt-1 flex">
+                <span class="inline-flex items-center px-3 rounded-l-lg border border-stone-200 bg-stone-50 text-stone-500 text-sm">NT$</span>
+                <input id="deliveryFee" type="number" min="0" step="1" value="49" class="w-full rounded-r-lg border border-stone-200 px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-stone-400" />
+              </div>
+            </label>
+          </div>
+
+          <div class="grid grid-cols-2 gap-3">
+            <label class="block">
+              <span class="text-xs font-semibold text-stone-600">自取來回時間</span>
+              <div class="mt-1 flex">
+                <input id="pickupMinutes" type="number" min="0" step="1" value="18" class="w-full rounded-l-lg border border-stone-200 px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-stone-400" />
+                <span class="inline-flex items-center px-3 rounded-r-lg border border-stone-200 bg-stone-50 text-stone-500 text-sm">分鐘</span>
+              </div>
+            </label>
+            <label class="block">
+              <span class="text-xs font-semibold text-stone-600">外送預估抵達</span>
+              <div class="mt-1 flex">
+                <input id="deliveryMinutes" type="number" min="0" step="1" value="35" class="w-full rounded-l-lg border border-stone-200 px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-stone-400" />
+                <span class="inline-flex items-center px-3 rounded-r-lg border border-stone-200 bg-stone-50 text-stone-500 text-sm">分鐘</span>
+              </div>
+            </label>
+          </div>
+
+          <div class="grid grid-cols-2 gap-3">
+            <label class="block">
+              <span class="text-xs font-semibold text-stone-600">你的移動方式</span>
+              <select id="transport" class="mt-1 w-full rounded-lg border border-stone-200 px-3 py-2 text-sm bg-white focus:outline-none focus:ring-1 focus:ring-stone-400">
+                <option value="walk">走路（人類模式）</option>
+                <option value="scooter" selected>騎機車（台灣基本款）</option>
+                <option value="bike">YouBike（膝蓋賭命）</option>
+              </select>
+            </label>
+            <label class="block">
+              <span class="text-xs font-semibold text-stone-600">天氣／路況</span>
+              <select id="weather" class="mt-1 w-full rounded-lg border border-stone-200 px-3 py-2 text-sm bg-white focus:outline-none focus:ring-1 focus:ring-stone-400">
+                <option value="normal" selected>正常（但台北永遠在塞）</option>
+                <option value="hot">爆熱（走 3 分鐘像蒸熟）</option>
+                <option value="rain">下雨（雨衣地獄）</option>
+                <option value="rush">尖峰時段（紅燈連發）</option>
+              </select>
+            </label>
+          </div>
+
+          <div>
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-semibold text-stone-600">社畜疲勞值</span>
+              <span id="fatigueLabel" class="text-xs font-bold text-stone-700">62 / 100</span>
+            </div>
+            <input id="fatigue" type="range" min="0" max="100" value="62" class="mt-2 w-full" />
+            <p id="fatigueHint" class="mt-2 text-xs text-stone-500">目前狀態：腦袋想自律，身體想躺平。</p>
+          </div>
+
+          <div class="pt-2 flex flex-col sm:flex-row gap-3">
+            <button id="btn-calc" class="w-full sm:w-auto px-4 py-2.5 rounded-xl bg-stone-900 text-white font-bold hover:bg-stone-800">計算懶惰稅</button>
+            <button id="btn-reset" class="w-full sm:w-auto px-4 py-2.5 rounded-xl border border-stone-200 bg-white font-bold text-stone-700 hover:bg-stone-50">重置</button>
+          </div>
+
+          <div class="rounded-xl border border-stone-200 bg-stone-50 p-4">
+            <div class="flex items-start justify-between gap-3">
+              <div>
+                <p class="text-xs font-semibold text-stone-600">今日隨機事件（會影響等候/怒氣）</p>
+                <p id="eventText" class="mt-1 text-sm font-bold text-stone-800">按「計算」抽一張。</p>
+              </div>
+              <button id="btn-reroll2" class="sm:hidden shrink-0 px-3 py-2 rounded-lg border border-stone-200 bg-white text-xs font-bold">🎲 抽</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Results -->
+      <section class="glass rounded-2xl border border-stone-200 shadow-sm p-5">
+        <h2 class="text-lg font-bold text-stone-900">判決結果</h2>
+
+        <div class="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div class="rounded-2xl border border-stone-200 bg-white p-4">
+            <p class="text-xs font-semibold text-stone-500">懶惰稅（外送費 / 餐價）</p>
+            <p id="taxPct" class="mt-1 text-2xl font-black text-stone-900">—</p>
+            <p id="taxNote" class="mt-1 text-xs text-stone-500">—</p>
+          </div>
+          <div class="rounded-2xl border border-stone-200 bg-white p-4">
+            <p class="text-xs font-semibold text-stone-500">買回的時間成本</p>
+            <p id="timeValue" class="mt-1 text-2xl font-black text-stone-900">—</p>
+            <p id="timeNote" class="mt-1 text-xs text-stone-500">—</p>
+          </div>
+        </div>
+
+        <div class="mt-4 rounded-2xl border border-stone-200 bg-white p-4">
+          <div class="flex items-center justify-between">
+            <p class="text-xs font-semibold text-stone-500">怒氣值（0-100）</p>
+            <p id="rageNum" class="text-xs font-black text-stone-700">—</p>
+          </div>
+          <div class="mt-2 w-full h-3 rounded-full bg-stone-100 overflow-hidden">
+            <div id="rageBar" class="h-3 w-0 bg-gradient-to-r from-emerald-400 via-amber-400 to-rose-500"></div>
+          </div>
+          <p id="rageText" class="mt-2 text-sm font-semibold text-stone-700">—</p>
+        </div>
+
+        <div class="mt-4 rounded-2xl border border-stone-200 bg-stone-900 text-white p-5">
+          <p class="text-xs font-semibold text-white/70">最終建議</p>
+          <p id="verdict" class="mt-2 text-xl font-black">先算完再說。</p>
+          <p id="verdictSub" class="mt-2 text-sm text-white/80">—</p>
+        </div>
+
+        <div class="mt-4 grid grid-cols-1 sm:grid-cols-3 gap-3">
+          <div class="rounded-xl border border-stone-200 bg-white p-3">
+            <p class="text-[11px] font-semibold text-stone-500">≈ 珍奶</p>
+            <p id="boba" class="mt-1 text-sm font-black">—</p>
+          </div>
+          <div class="rounded-xl border border-stone-200 bg-white p-3">
+            <p class="text-[11px] font-semibold text-stone-500">≈ 雞排</p>
+            <p id="jipai" class="mt-1 text-sm font-black">—</p>
+          </div>
+          <div class="rounded-xl border border-stone-200 bg-white p-3">
+            <p class="text-[11px] font-semibold text-stone-500">≈ 滷肉飯</p>
+            <p id="lurou" class="mt-1 text-sm font-black">—</p>
+          </div>
+        </div>
+
+        <div class="mt-5 rounded-xl border border-stone-200 bg-stone-50 p-4">
+          <p class="text-xs font-semibold text-stone-600">小提醒</p>
+          <ul class="mt-2 text-xs text-stone-600 list-disc pl-5 space-y-1">
+            <li>這不是理財建議，是你內心的小劇場。</li>
+            <li>怒氣值會受天氣、疲勞、隨機事件影響；不服可重抽。</li>
+            <li>所有計算都在瀏覽器本地完成，不會上傳資料。</li>
+          </ul>
+        </div>
+      </section>
+    </div>
+
+    <footer class="mt-10 text-center text-xs text-stone-400">
+      Created by AI Agent on 2026-03-27
+    </footer>
+  </div>
+
+<script>
+  const $ = (id) => document.getElementById(id);
+
+  const PRICES = {
+    boba: 65,
+    jipai: 95,
+    lurou: 55
+  };
+
+  const EVENT_POOL = {
+    pickup: [
+      { t: '你出門就遇到鄰居阿姨熱情寒暄：+6 分鐘（但你得到「怎麼這麼瘦」Buff）', dt: 6, rage: -4 },
+      { t: '店家忙到你站在門口像透明人：+8 分鐘', dt: 8, rage: 10 },
+      { t: '你停車一回頭，車格被別人「滑進去」：+5 分鐘', dt: 5, rage: 14 },
+      { t: '老闆送你一包辣粉：-2 分鐘（人情值+）', dt: -2, rage: -6 },
+      { t: '路口施工，導航開始講幹話：+7 分鐘', dt: 7, rage: 9 },
+    ],
+    delivery: [
+      { t: '外送員在樓下打給你：『我找不到你家』：+10 分鐘', dt: 10, rage: 11 },
+      { t: '平台顯示「已到達」，但其實還在 700 公尺外：+6 分鐘', dt: 6, rage: 7 },
+      { t: '外送員超神，提前抵達：-6 分鐘', dt: -6, rage: -7 },
+      { t: '你忘了寫「不要香菜」，人生開始後悔：+0 分鐘（精神傷害+）', dt: 0, rage: 9 },
+      { t: '外送袋裡多了一杯飲料（可能是隔壁的）：-2 分鐘（良心-）', dt: -2, rage: -1 },
+    ]
+  };
+
+  let lastEvent = null;
+
+  function clamp(n, a, b){ return Math.max(a, Math.min(b, n)); }
+  function round1(n){ return Math.round(n * 10) / 10; }
+
+  function fatigueCopy(v){
+    if (v < 20) return '目前狀態：很清醒，你甚至想健走。';
+    if (v < 45) return '目前狀態：還行，能出門但會碎念。';
+    if (v < 70) return '目前狀態：腦袋想自律，身體想躺平。';
+    if (v < 90) return '目前狀態：已進入「能不動就不動」領域。';
+    return '目前狀態：你不需要外送，你需要被抬走。';
+  }
+
+  function rerollEvent(){
+    // Weighted by weather: rain/hot increases delivery chaos; rush increases both.
+    const weather = $('weather').value;
+    const transport = $('transport').value;
+
+    let pDelivery = 0.5;
+    if (weather === 'rain') pDelivery += 0.1;
+    if (weather === 'hot') pDelivery += 0.05;
+    if (weather === 'rush') pDelivery += 0.08;
+    if (transport === 'walk') pDelivery += 0.03;
+
+    pDelivery = clamp(pDelivery, 0.25, 0.75);
+    const mode = (Math.random() < pDelivery) ? 'delivery' : 'pickup';
+
+    const pool = EVENT_POOL[mode];
+    const e = pool[Math.floor(Math.random() * pool.length)];
+    lastEvent = { mode, ...e };
+    $('eventText').textContent = (mode === 'delivery' ? '【外送線】' : '【自取線】') + ' ' + e.t;
+  }
+
+  function calc(){
+    const meal = Number($('mealPrice').value || 0);
+    const fee = Number($('deliveryFee').value || 0);
+    const tPickupBase = Number($('pickupMinutes').value || 0);
+    const tDelBase = Number($('deliveryMinutes').value || 0);
+    const fatigue = Number($('fatigue').value || 0);
+    const weather = $('weather').value;
+    const transport = $('transport').value;
+
+    if (!lastEvent) rerollEvent();
+
+    // Time adjustments
+    let tPickup = tPickupBase;
+    let tDel = tDelBase;
+
+    // Transport affects pickup variability
+    let pickupRageBase = 10;
+    if (transport === 'walk') { tPickup += 4; pickupRageBase += 4; }
+    if (transport === 'bike') { tPickup += 2; pickupRageBase += 7; }
+    if (transport === 'scooter') { pickupRageBase += 6; }
+
+    // Weather affects both
+    const weatherTime = { normal: 0, hot: 2, rain: 4, rush: 5 };
+    const weatherRage = { normal: 0, hot: 9, rain: 12, rush: 11 };
+    tPickup += weatherTime[weather];
+    tDel += Math.round(weatherTime[weather] * 0.9);
+
+    // Apply event effect to its mode
+    if (lastEvent.mode === 'pickup') tPickup += lastEvent.dt;
+    else tDel += lastEvent.dt;
+
+    tPickup = Math.max(0, Math.round(tPickup));
+    tDel = Math.max(0, Math.round(tDel));
+
+    const timeSaved = tPickup - tDel; // positive means delivery is faster
+
+    // Lazy tax
+    const pct = meal > 0 ? (fee / meal) * 100 : 0;
+
+    // Value of time (what you pay for each minute saved)
+    let perMin = null;
+    if (timeSaved > 0) perMin = fee / timeSaved;
+
+    // Rage model
+    let rage = 0;
+    rage += weatherRage[weather];
+    rage += (fatigue * 0.45);
+
+    // If you choose pickup mentally, rage rises when pickup is slower.
+    // If delivery is slower, rage also rises (hungry waiting).
+    const delayPenalty = Math.abs(timeSaved) * 1.2;
+    rage += delayPenalty;
+
+    // Transport base rage for pickup effort
+    rage += pickupRageBase * 0.7;
+
+    // Event rage
+    rage += (lastEvent.rage || 0);
+
+    // Fee pain: paying more increases rage unless timeSaved big
+    const feePain = clamp(fee / 10, 0, 15);
+    rage += feePain;
+    if (timeSaved > 10) rage -= 6;
+
+    rage = Math.round(clamp(rage, 0, 100));
+
+    // Render
+    $('taxPct').textContent = (meal > 0) ? `${round1(pct)}%` : '—';
+
+    let taxNote = '';
+    if (meal <= 0) taxNote = '先輸入餐價，不然我不知道你多盤。';
+    else if (pct < 15) taxNote = '這懶惰稅很佛，幾乎是「時間折扣」。';
+    else if (pct < 30) taxNote = '合理懶惰稅：你在買回家的尊嚴。';
+    else if (pct < 50) taxNote = '偏貴，但可能是你今天太累。';
+    else taxNote = '盤到發亮：你在買「不用出門」的快樂。';
+    $('taxNote').textContent = taxNote;
+
+    if (perMin !== null && isFinite(perMin)) {
+      $('timeValue').textContent = `NT$ ${round1(perMin)} / 分`;
+      $('timeNote').textContent = `你用 NT$ ${fee} 買回約 ${timeSaved} 分鐘。`;
+    } else {
+      if (timeSaved === 0) {
+        $('timeValue').textContent = '平手';
+        $('timeNote').textContent = '時間上沒差，完全是信仰問題。';
+      } else {
+        $('timeValue').textContent = '外送更慢';
+        $('timeNote').textContent = `你可能會多等 ${Math.abs(timeSaved)} 分鐘，但少走路。`;
+      }
+    }
+
+    $('rageNum').textContent = `${rage} / 100`;
+    $('rageBar').style.width = `${rage}%`;
+
+    let rageText = '';
+    if (rage < 25) rageText = '情緒穩定：你可以理性做選擇（罕見）。';
+    else if (rage < 50) rageText = '微焦躁：有人跟你說「你看起來很累」你會回瞪。';
+    else if (rage < 75) rageText = '高壓狀態：你已經在腦內重播喇叭聲。';
+    else rageText = '爆表：建議先喝水、深呼吸、不要跟店員吵架。';
+    $('rageText').textContent = rageText;
+
+    // Convert fee to snacks
+    const boba = fee / PRICES.boba;
+    const jipai = fee / PRICES.jipai;
+    const lurou = fee / PRICES.lurou;
+    $('boba').textContent = `${round1(boba)} 杯（以 NT$${PRICES.boba}/杯）`;
+    $('jipai').textContent = `${round1(jipai)} 片（以 NT$${PRICES.jipai}/片）`;
+    $('lurou').textContent = `${round1(lurou)} 碗（以 NT$${PRICES.lurou}/碗）`;
+
+    // Verdict logic
+    // Score: delivery good when fatigue high, weather bad, timeSaved positive and big, fee low.
+    let score = 0;
+    score += (fatigue / 10);
+    score += (weather === 'rain' ? 2.5 : 0);
+    score += (weather === 'hot' ? 1.5 : 0);
+    score += (weather === 'rush' ? 1.5 : 0);
+    score += (timeSaved > 0 ? Math.min(4, timeSaved / 6) : -Math.min(3, Math.abs(timeSaved) / 8));
+    score += (pct < 20 ? 2 : pct < 35 ? 0.5 : -1.5);
+    score += (rage > 70 ? 2 : 0);
+
+    let verdict = '';
+    let sub = '';
+
+    if (score >= 8) {
+      verdict = '叫外送。你今天的腿值得休假。';
+      sub = `理由：疲勞值 ${fatigue}、${weather === 'normal' ? '路況普普通通' : '天候不友善'}，而且你付的懶惰稅看起來還算能忍。`;
+    } else if (score >= 5) {
+      verdict = '可以叫外送，但請保持理智。';
+      sub = `理由：外送可能不是最便宜，但能降低你今天的怒氣值。事件：${lastEvent.mode === 'delivery' ? '外送線' : '自取線'}。`;
+    } else if (score >= 2) {
+      verdict = '出門自取吧，省錢也順便醒腦。';
+      sub = `理由：懶惰稅偏高或外送不一定快。當作散步（以及避免「盤到發亮」）。`;
+    } else {
+      verdict = '自取！把外送費省下來買雞排。';
+      sub = `理由：外送費在作怪，或外送更慢。你其實只是想要有人幫你背鍋。`;
+    }
+
+    $('verdict').textContent = verdict;
+    $('verdictSub').textContent = sub;
+  }
+
+  function resetAll(){
+    $('mealPrice').value = 150;
+    $('deliveryFee').value = 49;
+    $('pickupMinutes').value = 18;
+    $('deliveryMinutes').value = 35;
+    $('transport').value = 'scooter';
+    $('weather').value = 'normal';
+    $('fatigue').value = 62;
+    $('fatigueLabel').textContent = '62 / 100';
+    $('fatigueHint').textContent = fatigueCopy(62);
+
+    lastEvent = null;
+    $('eventText').textContent = '按「計算」抽一張。';
+
+    $('taxPct').textContent = '—';
+    $('taxNote').textContent = '—';
+    $('timeValue').textContent = '—';
+    $('timeNote').textContent = '—';
+    $('rageNum').textContent = '—';
+    $('rageBar').style.width = '0%';
+    $('rageText').textContent = '—';
+    $('verdict').textContent = '先算完再說。';
+    $('verdictSub').textContent = '—';
+    $('boba').textContent = '—';
+    $('jipai').textContent = '—';
+    $('lurou').textContent = '—';
+  }
+
+  function bind(){
+    const f = $('fatigue');
+    const updateFatigue = () => {
+      const v = Number(f.value || 0);
+      $('fatigueLabel').textContent = `${v} / 100`;
+      $('fatigueHint').textContent = fatigueCopy(v);
+    };
+    f.addEventListener('input', updateFatigue);
+    updateFatigue();
+
+    $('btn-calc').addEventListener('click', calc);
+    $('btn-reset').addEventListener('click', resetAll);
+
+    $('btn-reroll').addEventListener('click', () => { rerollEvent(); });
+    $('btn-reroll2').addEventListener('click', () => { rerollEvent(); });
+
+    // Auto reroll when context changes
+    ['weather','transport'].forEach(id => $(id).addEventListener('change', () => { lastEvent = null; $('eventText').textContent = '（環境變了）按「計算」或抽一次。'; }));
+  }
+
+  bind();
+</script>
+</body>
+</html>
