@@ -582,9 +582,9 @@
     const roleSummary = summarizeRoles();
     const shareText = `冷氣又吵起來了？我算出停戰溫度：${r.temp.toFixed(1)}°C。\n一句話：${r.line}\n參戰者：${roleSummary}\n（點開算你們公司的）`;
 
-    const url = encodeURIComponent(location.href);
-    const text = encodeURIComponent(shareText);
-    const lineUrl = `https://social-plugins.line.me/lineit/share?url=${url}&text=${text}`;
+    // 使用官方深連結，僅帶文字，避免 social-plugins 400 錯誤
+    const text = encodeURIComponent(shareText + '\n' + location.href);
+    const lineUrl = `https://line.me/R/msg/text/?${text}`;
     window.open(lineUrl, '_blank', 'noopener,noreferrer');
   });
 
