@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🇹🇼 Daily Taiwan Web Tools | SimonLiu OpenClaw Works</title>
+    <title>SimonLiu OpenClaw Works | SimonLiu OpenClaw Works</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
     <style>
@@ -19,91 +19,23 @@
         .btn-toggle:not(.active):hover { background-color: #e7e5e4; }
     </style>
     <script>
-        const PROJECT_DATA = [
-            {"title_zh": "⚖️ CP 值審判官", "title_en": "Taiwanese CP Value Judge", "desc_zh": "想買東西又怕被笑盤子？輸入價格與使用頻率，AI 審判官幫你算出真實 CP 值與換算成珍奶/雞腿便當。", "desc_en": "Input price and usage frequency to calculate the true Cost Per Use. Is it a steal or a rip-off?", "link": "tools/cp-value-judge/index.html", "type": "Tool", "icon": "⚖️"},
-            {"title_zh": "🥡 外送懶惰稅計算機", "title_en": "Delivery Laziness Tax Calculator", "desc_zh": "輸入餐價、外送費、時間與疲勞值，抽一張台味隨機事件，算出懶惰稅%、怒氣值與『叫外送／自取』判決。", "desc_en": "Estimate your delivery laziness tax with time saved, rage meter, and random Taiwan-flavored events.", "link": "tools/delivery-laziness-tax/index.html", "type": "Tool", "icon": "🥡"},
-            {"title_zh": "🍱 台式便當命運轉盤", "title_en": "Taiwanese Lunchbox Destiny", "desc_zh": "中午吃什麼？交給命運來決定！小心三色豆與螢光咖哩的地獄組合。", "desc_en": "Spin the wheel to decide your lunch! Beware of the dreaded three-color beans.", "link": "tools/lunchbox-destiny/index.html", "type": "Tool", "icon": "🍱"},
-            {"title_zh": "💼 職場老黃曆", "title_en": "Office Worker Almanac", "desc_zh": "社畜必備！每日更新的職場運勢指南，告訴你今天適合摸魚還是裝忙，避開老闆與雷包同事。", "desc_en": "Daily horoscope for office workers. Know when to slack off and when to avoid eye contact with your boss.", "link": "tools/office-almanac/index.html", "type": "Tool", "icon": "💼"},
-            {"title_zh": "🚰 台灣停水／降壓小幫手", "title_en": "Taiwan Water Outage Assistant", "desc_zh": "串接台水公開資料，查詢近 48 小時停水/降壓案件、影響範圍與恢復時間，並可用案件編號看詳情。", "desc_en": "Google ADK agent for Taiwan Water outage/low-pressure events (official open data).", "link": "https://github.com/simonliu-moltbot/adk-tw-wateroff", "type": "ADK", "icon": "🚰"},
-            {"title_zh": "💧 台灣水庫即時水情 AI", "title_en": "Taiwan Reservoir Agent", "desc_zh": "您的 AI 水情專家，查詢全台水庫即時蓄水量、有效容量與旱災警示。", "desc_en": "AI agent for real-time Taiwan reservoir levels and drought alerts.", "link": "https://github.com/simonliu-moltbot/adk-tw-reservoir", "type": "ADK", "icon": "💧"},
-            {"title_zh": "🌊 海岸守護者", "title_en": "Taiwan Coastal Guardian", "desc_zh": "全天候監控台灣潮汐、沿海天氣與海上警報，給你最安全的海岸行程判斷。", "desc_en": "Monitor tides, coastal forecasts, and maritime alerts for safe Taiwanese shore plans.", "link": "https://github.com/simonliu-moltbot/adk-tw-coastal-guardian", "type": "ADK", "icon": "🌊"},
-            {"title_zh": "🏢 台灣公司登記查詢 AI", "title_en": "Taiwan Company Lookup AI", "desc_zh": "基於經濟部商工行政資料，快速查詢公司統編、資本額與負責人資訊。", "desc_en": "AI agent for looking up Taiwan company registration details via MOEA.", "link": "https://github.com/simonliu-moltbot/adk-tw-company", "type": "ADK", "icon": "🏢"},
-            {"title_zh": "📅 台灣黃曆查詢 MCP", "title_en": "Taiwan Almanac MCP", "desc_zh": "查詢每日宜忌、節氣、沖煞與吉日搜尋，台灣在地化黃曆。", "desc_en": "Taiwanese Farmers' Almanac (Huangli) for daily auspicious activities and dates.", "link": "https://github.com/simonliu-moltbot/mcp-tw-almanac", "type": "MCP", "icon": "📅"},
-            {"title_zh": "♨️ 台灣溫泉小幫手", "title_en": "Taiwan Hot Spring Agent", "desc_zh": "您的 AI 溫泉嚮導，提供全台溫泉區介紹、泉質說明與泡湯建議。", "desc_en": "Your AI guide to Taiwan's hot springs. Find locations, types, and recommendations.", "link": "https://github.com/simonliu-moltbot/adk-tw-hotspring-2026", "type": "ADK", "icon": "♨️"},
-            {"title_zh": "🤫 乖乖保平安指南", "title_en": "Guai Guai Lucky Charm Guide", "desc_zh": "機房、股市、考試必備！AI 幫你選出正確顏色的乖乖，守護你的 Server 不當機、股票不跌停。", "desc_en": "The ultimate guide to Taiwan's 'Guai Guai' culture. Pick the right snack color to protect your servers, stocks, and life.", "link": "tools/guai-guai-guide/index.html", "type": "Tool", "icon": "🤫"},
-            {"title_zh": "🚬 菸酒生最討厭聽到的賓果", "title_en": "Grad Student Meltdown Bingo", "desc_zh": "論文寫完了嗎？50 句菸酒生最討厭聽到的話，隨機生成賓果盤，連成線就釋放你的崩潰！", "desc_en": "Thesis done yet? Bingo grid generated from 50 most annoying phrases for grad students. Mark them to release stress.", "link": "tools/grad-student-bingo/index.html", "type": "Tool", "icon": "🍷"},
-            {"title_zh": "🍱 台灣美食味蕾身分證", "title_en": "Taiwan Food Identity Test", "desc_zh": "你是南部粽還是北部粽派？吃番茄沾醬油嗎？6題測出你的台灣美食靈魂歸屬地。", "desc_en": "Are you a Northern or Southern Zongzi person? Do you dip tomatoes in soy sauce? Find out your Taiwan food soul city.", "link": "tools/taiwan-food-identity/index.html", "type": "Tool", "icon": "🍱"},
-            {"title_zh": "🔍 台灣事實查核中心 MCP", "title_en": "Taiwan FactCheck MCP", "desc_zh": "搜尋謠言、假訊息與最新查核報告，對抗不實資訊。", "desc_en": "MCP server to search for rumors and fact-check reports from Taiwan FactCheck Center.", "link": "https://github.com/simonliu-moltbot/mcp-tw-factcheck", "type": "MCP", "icon": "🔍"},
-            {"title_zh": "🧺 台灣洗衣小幫手", "title_en": "Taiwan Laundry Helper", "desc_zh": "根據即時天氣（濕度、降雨）判斷是否適合曬衣的 AI 助手。", "desc_en": "AI agent that checks weather to advise on laundry drying conditions.", "link": "https://github.com/simonliu-moltbot/adk-tw-laundry", "type": "ADK", "icon": "🧺"},
-            {"title_zh": "🎬 台灣電影時刻查詢", "title_en": "Taiwan Movie Times", "desc_zh": "查詢全台電影上映資訊與近期上映電影，不錯過任何強檔大片。", "desc_en": "Check Taiwan movie showtimes and coming soon lists.", "link": "https://github.com/simonliu-moltbot/mcp-tw-movie", "type": "MCP", "icon": "🎬"},
-            {"title_zh": "🏯 台灣廟宇靈籤 AI", "title_en": "Taiwan Temple Fortune AI", "desc_zh": "模擬台灣傳統廟宇求籤，AI 根據籤詩為您指點迷津與推薦靈驗廟宇。", "desc_en": "Simulate traditional Taiwan temple fortune telling with AI interpretation.", "link": "https://github.com/simonliu-moltbot/adk-tw-temple", "type": "ADK", "icon": "🏯"},
-            {"title_zh": "♻️ 台灣回收大考驗", "title_en": "Taiwan Recycling Master", "desc_zh": "挑戰你的垃圾分類知識！什麼是養豬廚餘？什麼是堆肥？答錯小心被倒垃圾阿姨瞪喔！", "desc_en": "Test your recycling skills in Taiwan. Sort trash correctly or face the wrath of the recycling auntie!", "link": "tools/taiwan-recycling-game/index.html", "type": "Tool", "icon": "♻️"},
-            {"title_zh": "🍗 薪水雞排指數計算機", "title_en": "Salary Jipai Index", "desc_zh": "你的時薪值幾片雞排？用最台的方式衡量你的購買力，看看你是「雞排自由」還是「雞排奴隸」。", "desc_en": "Calculate your hourly wage in terms of Chicken Cutlets. Are you free or a slave to the fried chicken?", "link": "tools/salary-jipai-index/index.html", "type": "Tool", "icon": "🍗"},
-            {"title_zh": "⚖️ 台灣法規助手", "title_en": "Taiwan Law Assistant", "desc_zh": "基於 Google ADK 的法律查詢與問答工具，支援憲法、民法、刑法等常見法規。", "desc_en": "AI-powered Taiwan law lookup and Q&A assistant using Google ADK.", "link": "https://github.com/simonliu-moltbot/adk-tw-law", "type": "ADK", "icon": "⚖️"},
-            {"title_zh": "🍲 台灣火鍋沾醬心理測驗", "title_en": "Hot Pot Sauce Personality Test", "desc_zh": "你的沾醬透露了你的靈魂！是沙茶狂魔、蔥花富翁還是生蛋勇者？", "desc_en": "What does your hot pot sauce say about you? Satay demon or cilantro cultist?", "link": "tools/hotpot-sauce-test/index.html", "type": "Tool", "icon": "🍲"},
-            {"title_zh": "🎱 1-49 賓果抽號機", "title_en": "1-49 Bingo Number Caller", "desc_zh": "隨機抽出 1-49 號碼不重複，支援歷史紀錄，過年聚會抽獎、玩賓果必備神器。", "desc_en": "Randomly draw numbers from 1-49 without repeats. Perfect for holiday parties.", "link": "tools/bingo-caller-49/index.html", "type": "Tool", "icon": "🎱"},
-            {"title_zh": "🎰 1-49 賓果卡產生器", "title_en": "1-49 Bingo Card Generator", "desc_zh": "隨機生成 1-49 的 5x5 賓果卡，手機即可標記號碼，環保省錢不用買紙卡。", "desc_en": "Generate 1-49 random bingo cards. Mark numbers on your phone, no paper needed.", "link": "tools/bingo-card-49/index.html", "type": "Tool", "icon": "🎰"},
-            {"title_zh": "🧧 過年長輩問候語 Bingo", "title_en": "CNY Relative Cliché Bingo", "desc_zh": "聚餐必備！聽到哪句點哪句，連成線就贏了！看看你今年深受長輩多少「關愛」。", "desc_en": "Survival Bingo for CNY family gatherings. Mark the clichés as you hear them!", "link": "tools/cny-bingo/index.html", "type": "Tool", "icon": "🧧"},
-            {"title_zh": "🚄 連假雙鐵搶票神指", "title_en": "Taiwan Ticket Snatch Trainer", "desc_zh": "模擬台鐵/高鐵連假搶票倒數，訓練你的手指反應速度！別讓除夕回不了家。", "desc_en": "Simulate the countdown for holiday train tickets and train your reaction speed.", "link": "tools/ticket-snatch-practice/index.html", "type": "Tool", "icon": "🚄"},
-            {"title_zh": "🚆 博愛座生存戰", "title_en": "Priority Seat Survival", "desc_zh": "挑戰你的道德底線！面對正義魔人與懷孕阿姨，你能守住座位撐到終點站嗎？", "desc_en": "Test your morality! Can you defend your priority seat against judgmental aunties and social justice warriors?", "link": "tools/priority-seat-survival/index.html", "type": "Tool", "icon": "🚆"},
-            {"title_zh": "🔥 台灣人上火指數計算機", "title_en": "Taiwanese Shang-Huo Index", "desc_zh": "最近火氣大嗎？選出你的作息與飲食習慣，AI 幫你診斷上火指數與降火良方。", "desc_en": "Calculate your 'internal heat' level based on recent diet and sleep habits.", "link": "tools/shang-huo-index/index.html", "type": "Tool", "icon": "🔥"},
-            {"title_zh": "🥬 菜市場殺價王", "title_en": "Market Bargain King", "desc_zh": "挑戰你的厚臉皮與口才！在阿姨失去耐心前，用最低價格買到心儀商品。", "desc_en": "Challenge a market auntie to get the best price before she kicks you out.", "link": "tools/market-bargain-trainer/index.html", "type": "Tool", "icon": "🥬"},
-            {"title_zh": "🥣 早餐店阿姨記憶力大考驗", "title_en": "Breakfast Auntie Memory Challenge", "desc_zh": "你能像早餐店阿姨一樣，記住每位「帥哥美女」的客製化點餐嗎？挑戰你的記憶極限！", "desc_en": "Can you memorize complex orders like a Taiwanese breakfast shop auntie? Test your memory skills!", "link": "tools/breakfast-auntie-challenge/index.html", "type": "Tool", "icon": "🥣"},
-            {"title_zh": "📕 台灣萌典 MCP", "title_en": "Taiwan Moedict MCP", "desc_zh": "整合教育部國語辭典，支援國語、閩南語、客語定義與翻譯查詢。", "desc_en": "MCP server for Moedict (Taiwan Ministry of Education Dictionary) with definitions and translations.", "link": "https://github.com/simonliu-moltbot/mcp-tw-moedict", "type": "MCP", "icon": "📕"},
-            {"title_zh": "🏠 台灣租屋生存指數", "title_en": "Rental Survival Index", "desc_zh": "輸入薪水與房租，看看你在這座城市還能活多久，並換算成滷肉飯價值。", "desc_en": "Check your survival status based on rent-to-income ratio in Taiwan.", "link": "tools/rental-survival-index/index.html", "type": "Tool", "icon": "🏠"},
-            {"title_zh": "🧱 經典俄羅斯方塊", "title_en": "Classic Tetris", "desc_zh": "經典俄羅斯方塊遊戲，支援手機觸控優化，馬年舒壓必備。", "desc_en": "Classic Tetris game with mobile touch support. Perfect for stress relief.", "link": "tetris.html", "type": "Tool", "icon": "🧱"},
-            {"title_zh": "🐎 2026 馬到成功 AI 賀詞產生器", "title_en": "2026 Horse Year AI Greeting", "desc_zh": "輸入名字即可生成馬年專屬 AI 春聯與賀詞，祝您龍馬精神。", "desc_en": "Generate exclusive AI Lunar New Year greetings for the Year of the Horse.", "link": "cny2026.html", "type": "Tool", "icon": "🐎"},
-            {"title_zh": "🕵️ 台灣慣老闆黑話解碼器", "title_en": "Corporate BS Decoder", "desc_zh": "輸入老闆或主管的金句，AI 幫你翻譯背後的真實含義與奴性指數。", "desc_en": "Decode the hidden meaning behind corporate speak and boss's empty promises.", "link": "tools/work-bs-translator/index.html", "type": "Tool", "icon": "🕵️"},
-            {"title_zh": "🕒 台灣加班費試算器", "title_en": "Overtime Calculator", "desc_zh": "符合勞基法標準，快速計算平日、休息日加班費與平均時薪。", "desc_en": "Standard labor law compliant calculator for Taiwan overtime pay.", "link": "tools/taiwan-overtime-calc/index.html", "type": "Tool", "icon": "🕒"},
-            {"title_zh": "🇯🇵 日本旅遊「盤子」偵測器", "title_en": "Japan Value Checker", "desc_zh": "日本購物必備！一秒換算台幣並對比台灣售價，偵測你是買到「真香」還是當了「盤子」。", "desc_en": "Japan travel currency converter with meme logic. Check if it's a steal or a rip-off.", "link": "tools/japan-travel-checker/index.html", "type": "Tool", "icon": "🇯🇵"},
-            {"title_zh": "🧾 發票稅額計算機", "title_en": "Invoice Tax Calculator", "desc_zh": "快速計算台灣 5% 營業稅，支援含稅/未稅反推，報帳開發票必備。", "desc_en": "Quickly calculate 5% sales tax in Taiwan. Supports inclusive/exclusive reversal.", "link": "tools/invoice-calculator/index.html", "type": "Tool", "icon": "🧾"},
-            {"title_zh": "🧧 刮刮樂發財號碼挑選器", "title_en": "Scratch Card Lucky Number", "desc_zh": "播放開運神曲並挑選刮刮樂中獎末碼，財神爺報號祝你中大獎。", "desc_en": "Pick lucky scratch card numbers with theme music to boost your luck.", "link": "tools/scratch-card-lucky-number/index.html", "type": "Tool", "icon": "🧧"},
-            {"title_zh": "🏮 尾牙加碼大轉盤", "title_en": "Year-End Party Game", "desc_zh": "尾牙炒熱氣氛神器！自訂加碼獎項，讓老闆與員工嗨翻全場。", "desc_en": "Year-end party lucky wheel. Perfect for bonus rounds and games.", "link": "tools/yearend-party-game/index.html", "type": "Tool", "icon": "🏮"},
-            {"title_zh": "💍 婚禮幸福大抽獎", "title_en": "Wedding Lucky Draw", "desc_zh": "婚禮現場抽獎必備！自訂名單與桌號，隨機選出幸運賓客。", "desc_en": "A random picker for wedding games. Customize names or tables.", "link": "tools/wedding-lucky-draw/index.html", "type": "Tool", "icon": "💍"},
-            {"title_zh": "🧋 台灣早餐店大冰奶腸胃預測器", "title_en": "Milk Tea Index", "desc_zh": "根據糖度、冰塊與氣溫，預測早餐店大冰奶對腸胃的衝擊力。", "desc_en": "Predict the digestive impact of breakfast shop milk tea based on sugar, ice, and temp.", "link": "tools/taiwan-milktea-index/index.html", "type": "Tool", "icon": "🧋"},
-            {"title_zh": "🌀 颱風假預測器", "title_en": "Typhoon Holiday Predictor", "desc_zh": "輸入風力、雨量與政治壓力，預測市長是否會宣布放假。", "desc_en": "Input wind, rain, and political pressure to predict if the mayor will declare a holiday.", "link": "tools/typhoon-holiday-predictor/index.html", "type": "Tool", "icon": "🌀"},
-            {"title_zh": "⚡️ 台灣電費試算器", "title_en": "Electricity Bill Calculator", "desc_zh": "快速試算台灣家用電費級距與電費估計。", "desc_en": "Quickly calculate Taiwan residential electricity tiers and costs.", "link": "tools/electricity-bill-calc/index.html", "type": "Tool", "icon": "⚡️"},
-            {"title_zh": "📢 里長廣播模擬器", "title_en": "Village Broadcast Simulator", "desc_zh": "模擬台灣巷弄間常見的里長廣播音效與廣播詞。", "desc_en": "Simulate local village chief announcements and sound effects.", "link": "tools/village-broadcast/index.html", "type": "Tool", "icon": "📢"},
-            {"title_zh": "💰 開會成本計算機", "title_en": "Meeting Cost Calculator", "desc_zh": "計算會議參與者的人力成本，讓會議更有生產力。", "desc_en": "Calculate the manpower cost of meetings to improve productivity.", "link": "tools/meeting-cost-calc/index.html", "type": "Tool", "icon": "💰"},
-            {"title_zh": "📅 台灣特休計算機", "title_en": "Taiwan Annual Leave Calculator", "desc_zh": "計算您的到職日、年資與應得的法定特休天數。", "desc_en": "Calculate your annual leave entitlement based on seniority.", "link": "tools/annual-leave-calc/index.html", "type": "Tool", "icon": "📅"},
-            {"title_zh": "🧋 今天喝什麼？ - 台灣手搖飲抽籤機", "title_en": "What to Drink? - Boba Tea Picker", "desc_zh": "為猶豫不決的人設計，隨機抽出台灣常見手搖飲。", "desc_en": "Randomly pick a boba tea for the indecisive.", "link": "tools/drink-picker/index.html", "type": "Tool", "icon": "🧋"},
-            {"title_zh": "🧧 台灣婚禮紅包行情計算機 🧧", "title_en": "Taiwan Wedding Red Envelope Guide", "desc_zh": "根據宴客地區、餐廳類型與交情建議紅包金額。", "desc_en": "Wedding gift money suggestions based on location and relationship.", "link": "tools/red-envelope-guide/index.html", "type": "Tool", "icon": "🧧"},
-            {"title_zh": "🍚 台股損益滷肉飯換算機 🍚", "title_en": "Stock Profit to Braised Pork Rice", "desc_zh": "將股票損益金額轉換為多少碗滷肉飯，更直觀感受盈虧。", "desc_en": "Convert stock gains/losses into bowls of braised pork rice.", "link": "tools/stock-to-rice/index.html", "type": "Tool", "icon": "🍚"},
-            {"title_zh": "🀄️ 麻將台數計算機", "title_en": "Mahjong Tai Calculator", "desc_zh": "精準計算台灣 16 張麻將台數，包含莊家連莊、圈門風與花牌判定。", "desc_en": "Accurately calculate Taiwan Mahjong Tai including dealer and winds.", "link": "tools/mahjong-tai-calc/index.html", "type": "Tool", "icon": "🀄️"},
-            {"title_zh": "🛵 機車族雨衣指數", "title_en": "Scooter Raincoat Index", "desc_zh": "根據即時降雨機率與風速，為台灣廣大的機車族提供雨衣穿著建議。", "desc_en": "Raincoat recommendations for Taiwan's scooter riders based on real-time weather.", "link": "tools/scooter-raincoat-index/index.html", "type": "Tool", "icon": "🛵"},
-            {"title_zh": "🛵 機車路考：直線七秒大魔王", "title_en": "Scooter Test: 7 Seconds King", "desc_zh": "線上練習台灣機車路考中最具挑戰性的直線七秒。", "desc_en": "Online practice for the infamous 7-second straight line scooter test.", "link": "tools/scooter-7-seconds/index.html", "type": "Tool", "icon": "🛵"},
-            {"title_zh": "🧾 統一發票對獎小幫手", "title_en": "Uniform Invoice Lottery Helper", "desc_zh": "快速對獎台灣統一發票，支援多期數查詢。", "desc_en": "Quickly check Taiwan uniform invoice winning numbers.", "link": "tools/invoice-lottery/index.html", "type": "Tool", "icon": "🧾"},
-            {"title_zh": "🙏 線上擲筊 - 有問必答 Bwa Bwei", "title_en": "Online Bwa Bwei", "desc_zh": "模擬宮廟擲筊體驗，尋求指點迷津。", "desc_en": "Simulate the traditional temple 'Bwa Bwei' experience.", "link": "tools/bwa-bwei/index.html", "type": "Tool", "icon": "🙏"},
-            {"title_zh": "👥 親戚稱謂計算機", "title_en": "Relatives Calculator", "desc_zh": "快速查詢台灣繁瑣的親戚稱謂。", "desc_en": "Quickly find the correct titles for complex family relationships.", "link": "tools/relative-calculator/index.html", "type": "Tool", "icon": "👥"},
-            {"title_zh": "📦 台北搬家運氣測驗", "title_en": "Taipei Moving Luck Test", "desc_zh": "挑戰在台北狹窄巷弄與房東監視下成功搬家，你能全身而退嗎？", "desc_en": "Challenge yourself to move out in Taipei's narrow alleys. Can you survive the stress?", "link": "tools/scooter-moving-checker/index.html", "type": "Tool", "icon": "📦"},
-            {"title_zh": "🅿️ 車位難求度指數", "title_en": "Parking Despair Index", "desc_zh": "根據地段、時間與天氣，精準計算你在台灣找車位的「絕望程度」。", "desc_en": "Calculate your 'parking despair' in Taiwan based on location, time, and weather.", "link": "tools/parking-despair-index/index.html", "type": "Tool", "icon": "🅿️"},
-            {"title_zh": "🔌 台灣電動車充電小幫手", "title_en": "Taiwan EV Charging Advisor", "desc_zh": "快速搜尋全台電動車充電站，支援依地區與接頭規格（J1772, CCS, Tesla）篩選。", "desc_en": "Find EV charging stations in Taiwan by location and connector type (J1772, CCS, Tesla).", "link": "https://github.com/simonliu-moltbot/adk-tw-ev-charging", "type": "ADK", "icon": "🔌"},
-            {"title_zh": "🛵 機車待轉區大挑戰", "title_en": "Scooter Box Challenge", "desc_zh": "挑戰在極小待轉區擠入最多機車！模擬台灣路口待轉區的生存遊戲。", "desc_en": "Survival game in Taiwan's scooter waiting boxes. How many scooters can you fit?", "link": "tools/scooter-box-challenge/index.html", "type": "Tool", "icon": "🛵"},
-            {"title_zh": "💸 台灣個人綜合所得稅小幫手", "title_en": "Taiwan Personal Tax Assistant", "desc_zh": "2025 年度所得稅試算 AI 代理，協助您估算稅額與扣除額。", "desc_en": "AI agent for estimating 2025 Taiwan personal income tax.", "link": "https://github.com/simonliu-moltbot/adk-tw-tax", "type": "ADK", "icon": "💸"},
-            {"title_zh": "🍢 台灣夜市嚮導", "title_en": "Taiwan Night Market Guide", "desc_zh": "查詢全台夜市營業時間與必吃美食，您的隨身夜市達人。", "desc_en": "Find the best Night Markets in Taiwan, check opening hours, and discover delicious food.", "link": "https://github.com/simonliu-moltbot/adk-tw-nightmarket", "type": "ADK", "icon": "🍢"},
-            {"title_zh": "🏪 地獄超商模擬器", "title_en": "Convenience Store Hell", "desc_zh": "體驗台灣超商店員的極限挑戰！結帳、泡咖啡、找包裹、微波...手忙腳亂的日常。", "desc_en": "Simulate the chaotic life of a Taiwanese convenience store clerk. Coffee, parcels, bills!", "link": "tools/convenience-store-clerk/index.html", "type": "Tool", "icon": "🏪"},
-            {"title_zh": "🎯 夜市彈珠檯", "title_en": "Night Market Pinball", "desc_zh": "重現台灣夜市經典！拉桿力道決定你的香腸數量。", "desc_en": "Relive the classic Taiwan Night Market game! Your plunger skill determines your prize.", "link": "tools/night-market-pinball/index.html", "type": "Tool", "icon": "🎯"},
-            {"title_zh": "👮‍♂️ 台灣反詐騙小幫手", "title_en": "Taiwan Anti-Fraud Assistant", "desc_zh": "您的 AI 反詐騙顧問，協助辨識可疑電話、LINE ID 與詐騙話術。", "desc_en": "Your AI consultant for identifying potential scams, suspicious numbers, and fraud tactics.", "link": "https://github.com/simonliu-moltbot/adk-tw-antifraud", "type": "ADK", "icon": "👮‍♂️"},
-            {"title_zh": "🇹🇼 台灣選舉旗幟產生器", "title_en": "Taiwan Election Flag Generator", "desc_zh": "輸入姓名、號次與口號，一鍵生成超台的選舉旗幟，支援藍綠白黃粉五色戰隊。", "desc_en": "Generate your own Taiwan-style election flag with custom name, number, slogan, and party colors.", "link": "tools/election-flag-gen/index.html", "type": "Tool", "icon": "🇹🇼"},
-            {"title_zh": "📹 臺北市CCTV點位小幫手", "title_en": "Taipei CCTV Facility Locator", "desc_zh": "串接臺北市資料大平臺開放資料，依關鍵字或座標查詢臺北市CCTV設備點位（僅點位/座標，不含即時影像）。", "desc_en": "Google ADK agent to search Taipei CCTV facility locations via Open Taipei open data (locations only, no live streams).", "link": "https://github.com/simonliu-moltbot/adk-tw-taipei-cctv", "type": "ADK", "icon": "📹"},
-            {"title_zh": "🗑️ 台北垃圾車時刻小幫手", "title_en": "Taipei Garbage Truck Schedule Helper", "desc_zh": "查詢臺北市垃圾車清運路線/點位與抵達、離開時間（非即時 GPS），支援行政區/里別/路線與關鍵字搜尋。", "desc_en": "Google ADK agent to look up Taipei garbage truck routes/stops and arrival/leave times (not live GPS).", "link": "https://github.com/simonliu-moltbot/adk-tw-garbage-truck", "type": "ADK", "icon": "🗑️"}
-        ];
-        const TRANSLATIONS = {"nav_home": {"en": "Home", "zh": "首頁"}, "nav_tools": {"en": "Web Tools", "zh": "工具集"}, "nav_gallery": {"en": "AI Gallery", "zh": "藝術畫廊"}, "nav_mcp": {"en": "MCP Services", "zh": "MCP 服務"}, "nav_adk": {"en": "ADK Agents", "zh": "ADK 代理"}, "footer_built": {"en": "Built with ❤️ by AI Agent", "zh": "由 AI Agent 打造"}, "footer_updated": {"en": "Last Updated", "zh": "最後更新"}, "search_placeholder": {"en": "Search tools...", "zh": "檢索工具..."}, "btn_view": {"en": "View", "zh": "進入"}};
+        const PROJECT_DATA = [{"title_en": "Web Tools", "title_zh": "網頁工具", "desc_en": "Daily tools.", "desc_zh": "日常工具。", "link": "web-tools/index.html", "icon": "🛠️", "type": "Section", "target": "_self"}, {"title_en": "AI Gallery", "title_zh": "AI 藝廊", "desc_en": "AI art.", "desc_zh": "AI 藝術。", "link": "gallery/index.html", "icon": "🎨", "type": "Section", "target": "_self"}, {"title_en": "MCP Services", "title_zh": "MCP 服務", "desc_en": "Backend.", "desc_zh": "後端服務。", "link": "mcp/index.html", "icon": "🔌", "type": "Section", "target": "_self"}, {"title_en": "ADK Agents", "title_zh": "ADK 代理人", "desc_en": "Agents.", "desc_zh": "代理人。", "link": "adk/index.html", "icon": "🤖", "type": "Section", "target": "_self"}];
+        const TRANSLATIONS = {"nav_home": {"en": "Home", "zh": "首頁"}, "nav_tools": {"en": "Web Tools", "zh": "工具集"}, "nav_gallery": {"en": "AI Gallery", "zh": "藝術畫廊"}, "nav_mcp": {"en": "MCP Services", "zh": "MCP 服務"}, "nav_adk": {"en": "ADK Agents", "zh": "ADK 代理"}, "footer_built": {"en": "Built with ❤️ by AI Agent", "zh": "由 AI Agent 打造"}, "footer_updated": {"en": "Last Updated", "zh": "最後更新"}, "search_placeholder": {"en": "Search projects...", "zh": "檢索項目..."}, "btn_view": {"en": "View", "zh": "進入"}};
     </script>
 </head>
 <body class="min-h-screen flex flex-col selection:bg-stone-200">
 
     <nav class="sticky top-0 z-50 glass-panel">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between h-16">
-            <a href="index.html" class="text-lg font-bold tracking-tight text-stone-900">
+            <a href="https://simonliu-moltbot.github.io/daily-web-tools/index.html" class="text-lg font-bold tracking-tight text-stone-900">
                 SimonLiu OpenClaw Works
             </a>
             <div class="hidden md:flex space-x-1">
-                <a href="index.html" class="px-3 py-2 rounded-md text-xs font-medium transition-colors text-stone-500 hover:text-stone-900" data-i18n-key="nav_home">Home</a>
-                <a href="index.html" class="px-3 py-2 rounded-md text-xs font-medium transition-colors text-stone-900 bg-stone-100 font-bold" data-i18n-key="nav_tools">Web Tools</a>
-                <a href="gallery/index.html" class="px-3 py-2 rounded-md text-xs font-medium transition-colors text-stone-500 hover:text-stone-900" data-i18n-key="nav_gallery">AI Gallery</a>
-                <a href="mcp/index.html" class="px-3 py-2 rounded-md text-xs font-medium transition-colors text-stone-500 hover:text-stone-900" data-i18n-key="nav_mcp">MCP Services</a>
-                <a href="adk/index.html" class="px-3 py-2 rounded-md text-xs font-medium transition-colors text-stone-500 hover:text-stone-900" data-i18n-key="nav_adk">ADK Agents</a>
+                <a href="https://simonliu-moltbot.github.io/" class="px-3 py-2 rounded-md text-xs font-medium transition-colors text-stone-900 bg-stone-100 font-bold" data-i18n-key="nav_home">Home</a>
+<a href="https://simonliu-moltbot.github.io/daily-web-tools/web-tools/index.html" class="px-3 py-2 rounded-md text-xs font-medium transition-colors text-stone-500 hover:text-stone-900" data-i18n-key="nav_tools">Web Tools</a>
+<a href="https://simonliu-moltbot.github.io/daily-web-tools/gallery/index.html" class="px-3 py-2 rounded-md text-xs font-medium transition-colors text-stone-500 hover:text-stone-900" data-i18n-key="nav_gallery">AI Gallery</a>
+<a href="https://simonliu-moltbot.github.io/daily-web-tools/mcp/index.html" class="px-3 py-2 rounded-md text-xs font-medium transition-colors text-stone-500 hover:text-stone-900" data-i18n-key="nav_mcp">MCP Services</a>
+<a href="https://simonliu-moltbot.github.io/daily-web-tools/adk/index.html" class="px-3 py-2 rounded-md text-xs font-medium transition-colors text-stone-500 hover:text-stone-900" data-i18n-key="nav_adk">ADK Agents</a>
             </div>
             <div class="flex items-center gap-3">
                 <button id="lang-toggle" class="text-[10px] font-bold bg-stone-100 px-2.5 py-1.5 rounded-full border border-stone-200 hover:bg-stone-200 transition-colors">
@@ -115,18 +47,18 @@
             </div>
         </div>
         <div id="mobile-menu" class="hidden md:hidden border-t border-stone-100 bg-white/95 backdrop-blur-sm px-2 py-3 space-y-1">
-            <a href="index.html" class="block px-3 py-2 rounded-md text-sm font-medium text-stone-500 hover:text-stone-900" data-i18n-key="nav_home">Home</a>
-            <a href="index.html" class="block px-3 py-2 rounded-md text-sm font-medium text-stone-900 bg-stone-100 font-bold" data-i18n-key="nav_tools">Web Tools</a>
-            <a href="gallery/index.html" class="block px-3 py-2 rounded-md text-sm font-medium text-stone-500 hover:text-stone-900" data-i18n-key="nav_gallery">AI Gallery</a>
-            <a href="mcp/index.html" class="block px-3 py-2 rounded-md text-sm font-medium text-stone-500 hover:text-stone-900" data-i18n-key="nav_mcp">MCP Services</a>
-            <a href="adk/index.html" class="block px-3 py-2 rounded-md text-sm font-medium text-stone-500 hover:text-stone-900" data-i18n-key="nav_adk">ADK Agents</a>
+            <a href="https://simonliu-moltbot.github.io/" class="block px-3 py-2 rounded-md text-sm font-medium text-stone-900 bg-stone-100 font-bold" data-i18n-key="nav_home">Home</a>
+<a href="https://simonliu-moltbot.github.io/daily-web-tools/web-tools/index.html" class="block px-3 py-2 rounded-md text-sm font-medium text-stone-500 hover:text-stone-900" data-i18n-key="nav_tools">Web Tools</a>
+<a href="https://simonliu-moltbot.github.io/daily-web-tools/gallery/index.html" class="block px-3 py-2 rounded-md text-sm font-medium text-stone-500 hover:text-stone-900" data-i18n-key="nav_gallery">AI Gallery</a>
+<a href="https://simonliu-moltbot.github.io/daily-web-tools/mcp/index.html" class="block px-3 py-2 rounded-md text-sm font-medium text-stone-500 hover:text-stone-900" data-i18n-key="nav_mcp">MCP Services</a>
+<a href="https://simonliu-moltbot.github.io/daily-web-tools/adk/index.html" class="block px-3 py-2 rounded-md text-sm font-medium text-stone-500 hover:text-stone-900" data-i18n-key="nav_adk">ADK Agents</a>
         </div>
     </nav>
 
     <header class="bg-white border-b border-stone-100 pt-16 pb-12 px-4 text-center">
-        <h1 class="text-4xl font-light text-stone-900 mb-4 tracking-tight" data-i18n-zh="🇹🇼 台灣日常工具集" data-i18n-en="🇹🇼 Daily Taiwan Web Tools">🇹🇼 Daily Taiwan Web Tools</h1>
-        <p class="max-w-2xl mx-auto text-lg text-stone-500 font-light leading-relaxed" data-i18n-zh="解決台灣生活痛點的實用小工具。" data-i18n-en="Useful tools for daily life in Taiwan.">Useful tools for daily life in Taiwan.</p>
-        <div class="mt-10 max-w-xl mx-auto flex flex-col sm:flex-row gap-4 items-center justify-center ">
+        <h1 class="text-4xl font-light text-stone-900 mb-4 tracking-tight" data-i18n-zh="SimonLiu OpenClaw Works" data-i18n-en="SimonLiu OpenClaw Works">SimonLiu OpenClaw Works</h1>
+        <p class="max-w-2xl mx-auto text-lg text-stone-500 font-light leading-relaxed" data-i18n-zh="AI 中心樞紐。" data-i18n-en="AI Central Hub.">AI Central Hub.</p>
+        <div class="mt-10 max-w-xl mx-auto flex flex-col sm:flex-row gap-4 items-center justify-center hidden">
             <div class="relative w-full">
                 <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                     <svg class="h-5 w-5 text-stone-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0" stroke-width="2"/></svg>
@@ -140,11 +72,11 @@
         </div>
     </header>
 
-    <main class="flex-1 w-full max-w-7xl mx-auto px-4 py-12"><div id="projects-container"></div><div id="empty-state" class="hidden text-center py-20 text-stone-400 text-lg">No tools found.</div></main>
+    <main class="flex-1 w-full max-w-7xl mx-auto px-4 py-12"><div id="projects-container"></div><div id="empty-state" class="hidden text-center py-20 text-stone-400 text-lg">No projects found.</div></main>
 
     <footer class="bg-white border-t border-stone-200 py-12 text-center text-sm text-stone-400">
         <p data-i18n-key="footer_built">Built with ❤️ by AI Agent</p>
-        <p class="mt-2"><span data-i18n-key="footer_updated">Last Updated</span>: 2026-02-10</p>
+        <p class="mt-2"><span data-i18n-key="footer_updated">Last Updated</span>: 2026-03-28</p>
     </footer>
 
     <script>
